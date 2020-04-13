@@ -21,31 +21,27 @@ import           GHC.TypeLits
 import qualified Data.List as L
 
 
-instance Encode (Enc xs T.Text) (Enc ("UPPER" ': xs) T.Text) where
-    encode = unPriv . pure . T.toUpper . getPayload
-instance Encode (Enc xs TL.Text) (Enc ("UPPER" ': xs) TL.Text) where
-    encode = unPriv . pure . TL.toUpper . getPayload
+instance Encode (Enc xs c T.Text) (Enc ("UPPER" ': xs) c T.Text) where
+    encode = implTran T.toUpper
+instance Encode (Enc xs c TL.Text) (Enc ("UPPER" ': xs) c TL.Text) where
+    encode = implTran TL.toUpper 
 
-instance Encode (Enc xs T.Text) (Enc ("lower" ': xs) T.Text) where
-    encode = unPriv . pure . T.toLower . getPayload    
-instance Encode (Enc xs TL.Text) (Enc ("lower" ': xs) TL.Text) where
-    encode = unPriv . pure . TL.toLower . getPayload    
+instance Encode (Enc xs c T.Text) (Enc ("lower" ': xs) c T.Text) where
+    encode = implTran T.toLower    
+instance Encode (Enc xs c TL.Text) (Enc ("lower" ': xs) c TL.Text) where
+    encode = implTran TL.toLower 
 
-instance Encode (Enc xs T.Text) (Enc ("Title" ': xs) T.Text) where
-    encode = unPriv . pure . T.toTitle . getPayload      
-instance Encode (Enc xs TL.Text) (Enc ("Title" ': xs) TL.Text) where
-    encode = unPriv . pure . TL.toTitle . getPayload      
+instance Encode (Enc xs c T.Text) (Enc ("Title" ': xs) c T.Text) where
+    encode = implTran T.toTitle   
+instance Encode (Enc xs c TL.Text) (Enc ("Title" ': xs) c TL.Text) where
+    encode = implTran TL.toTitle   
 
-instance Encode (Enc xs T.Text) (Enc ("reverse" ': xs) T.Text) where
-    encode = unPriv . pure . T.reverse . getPayload
-instance Encode (Enc xs TL.Text) (Enc ("reverse" ': xs) TL.Text) where
-    encode = unPriv . pure . TL.reverse . getPayload    
+instance Encode (Enc xs c T.Text) (Enc ("reverse" ': xs) c T.Text) where
+    encode = implTran T.reverse 
+instance Encode (Enc xs c TL.Text) (Enc ("reverse" ': xs) c TL.Text) where
+    encode = implTran TL.reverse    
 
--- instance (KnownSymbol s, KnownSymbol t, t ~ AppendSymbol "limit " s) => Encode (Enc xs T.Text) (Enc (t ': xs) T.Text) where    
---     encode txt = 
---         let p = Proxy :: Proxy t
---             str = symbolVal p
---             nums = L.drop (L.length "limit ") str
---             num :: Int = read nums
---         in     
---             unPriv . pure . T.take num . getPayload $ txt
+newtype SizeLimit = SizeLimit {unSizeLimit :: Int} deriving (Eq, Show)
+instance HasA c SizeLimit => Encode (Enc xs c T.Text) (Enc ("size-limit" ': xs) c T.Text) where
+    encode =  implTran' (T.take . unSizeLimit . has (Proxy :: Proxy SizeLimit)) 
+

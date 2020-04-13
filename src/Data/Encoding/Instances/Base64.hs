@@ -24,43 +24,43 @@ import qualified Data.ByteString.Base64.Lazy as BL64
 import qualified Data.ByteString.Base64.URL as B64URL
 import qualified Data.ByteString.Base64.URL.Lazy as BL64URL
 
-toTxt :: Enc ("B64" ': xs) B.ByteString -> Enc ("B64" ': xs) T.Text
+toTxt :: Enc ("B64" ': xs) c B.ByteString -> Enc ("B64" ': xs) c T.Text
 toTxt = fmap TE.decodeUtf8
 
-toBts :: Enc ("B64" ': xs) T.Text ->  Enc ("B64" ': xs) B.ByteString
+toBts :: Enc ("B64" ': xs) c T.Text ->  Enc ("B64" ': xs) c B.ByteString
 toBts = fmap TE.encodeUtf8
 
-toTxtL :: Enc ("B64" ': xs) BL.ByteString -> Enc ("B64" ': xs) TL.Text
+toTxtL :: Enc ("B64" ': xs) c BL.ByteString -> Enc ("B64" ': xs) c TL.Text
 toTxtL = fmap TEL.decodeUtf8
 
-toBtsL :: Enc ("B64" ': xs) TL.Text ->  Enc ("B64" ': xs) BL.ByteString
+toBtsL :: Enc ("B64" ': xs) c TL.Text ->  Enc ("B64" ': xs) c BL.ByteString
 toBtsL = fmap TEL.encodeUtf8
 
-instance Encode (Enc xs B.ByteString) (Enc ("B64" ': xs) B.ByteString) where
-    encode = unPriv . pure . B64.encode . getPayload
-instance Decode  (Enc ("B64" ': xs) B.ByteString) (Enc xs B.ByteString) where
-    decode = fmap (unPriv . pure) . B64.decode . getPayload
-instance DecodeLenient (Enc ("B64" ': xs) B.ByteString) (Enc xs B.ByteString) where
-    decodeLenient = unPriv . pure . B64.decodeLenient . getPayload
+instance Encode (Enc xs c B.ByteString) (Enc ("B64" ': xs) c B.ByteString) where
+    encode = implTran B64.encode 
+instance Decode  (Enc ("B64" ': xs) c B.ByteString) (Enc xs c B.ByteString) where
+    decode = implTranErr B64.decode 
+instance DecodeLenient (Enc ("B64" ': xs) c B.ByteString) (Enc xs c B.ByteString) where
+    decodeLenient = implTran B64.decodeLenient 
 
-instance Encode (Enc xs BL.ByteString) (Enc ("B64" ': xs) BL.ByteString) where
-    encode = unPriv . pure . BL64.encode . getPayload
-instance Decode  (Enc ("B64" ': xs) BL.ByteString) (Enc xs BL.ByteString) where
-    decode = fmap (unPriv . pure) . BL64.decode . getPayload
-instance DecodeLenient (Enc ("B64" ': xs) BL.ByteString) (Enc xs BL.ByteString) where
-    decodeLenient = unPriv . pure . BL64.decodeLenient . getPayload
+instance Encode (Enc xs c BL.ByteString) (Enc ("B64" ': xs) c BL.ByteString) where
+    encode = implTran BL64.encode 
+instance Decode  (Enc ("B64" ': xs) c BL.ByteString) (Enc xs c BL.ByteString) where
+    decode = implTranErr BL64.decode 
+instance DecodeLenient (Enc ("B64" ': xs) c BL.ByteString) (Enc xs c BL.ByteString) where
+    decodeLenient = implTran BL64.decodeLenient 
 
-instance Encode (Enc xs B.ByteString) (Enc ("B64URL" ': xs) B.ByteString) where
-    encode = unPriv . pure . B64URL.encode . getPayload
-instance Decode  (Enc ("B64URL" ': xs) B.ByteString) (Enc xs B.ByteString) where
-    decode = fmap (unPriv . pure) . B64URL.decode . getPayload
-instance DecodeLenient (Enc ("B64URL" ': xs) B.ByteString) (Enc xs B.ByteString) where
-    decodeLenient = unPriv . pure . B64URL.decodeLenient . getPayload
+instance Encode (Enc xs c B.ByteString) (Enc ("B64URL" ': xs) c B.ByteString) where
+    encode = implTran B64URL.encode 
+instance Decode  (Enc ("B64URL" ': xs) c B.ByteString) (Enc xs c B.ByteString) where
+    decode = implTranErr B64URL.decode 
+instance DecodeLenient (Enc ("B64URL" ': xs) c B.ByteString) (Enc xs c B.ByteString) where
+    decodeLenient = implTran B64URL.decodeLenient 
 
-instance Encode (Enc xs BL.ByteString) (Enc ("B64URL" ': xs) BL.ByteString) where
-    encode = unPriv . pure . BL64URL.encode . getPayload
-instance Decode  (Enc ("B64URL" ': xs) BL.ByteString) (Enc xs BL.ByteString) where
-    decode = fmap (unPriv . pure) . BL64URL.decode . getPayload
-instance DecodeLenient (Enc ("B64URL" ': xs) BL.ByteString) (Enc xs BL.ByteString) where
-    decodeLenient = unPriv . pure . BL64URL.decodeLenient . getPayload
+instance Encode (Enc xs c BL.ByteString) (Enc ("B64URL" ': xs) c BL.ByteString) where
+    encode = implTran BL64URL.encode 
+instance Decode  (Enc ("B64URL" ': xs) c BL.ByteString) (Enc xs c BL.ByteString) where
+    decode = implTranErr BL64URL.decode 
+instance DecodeLenient (Enc ("B64URL" ': xs) c BL.ByteString) (Enc xs c BL.ByteString) where
+    decodeLenient = implTran BL64URL.decodeLenient 
          

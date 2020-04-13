@@ -24,35 +24,35 @@ import qualified Data.ByteString.Lazy as BL
 import qualified Data.Text as T
 
 
-example1 :: Enc '["B64"] B.ByteString
-example1 = encodeAll . toEncoding $ "Hello World"
+example1 :: Enc '["B64"] () B.ByteString
+example1 = encodeAll . toEncoding () $ "Hello World"
 
 example1_ :: B.ByteString
 example1_ = fromEncoding . decodeAllLenient $ example1
 
-example11 :: Enc '["B64","B64"] B.ByteString
-example11 = encodeAll . toEncoding $ "Hello World"
+example11 :: Enc '["B64","B64"] () B.ByteString
+example11 = encodeAll . toEncoding () $ "Hello World"
 
 example11_ :: B.ByteString
 example11_ = fromEncoding . decodeAllLenient $ example11
 
--- example1 :: Enc "B64URL" B.ByteString
--- example1 = encode "Hello John"
 
--- example2 :: Enc "B64" B.ByteString
--- example2 = encode "Hello John"
+exupper :: Enc '["UPPER"] () T.Text
+exupper = encodeAll . toEncoding () $ "Hello World"
 
--- example2L :: Enc "B64" BL.ByteString
--- example2L = encode "Hello John"
+extitlerev :: Enc '["reverse", "Title"] () T.Text
+extitlerev = encodeAll . toEncoding () $ "HeLlo world"
 
-exupper :: Enc '["UPPER"] T.Text
-exupper = encodeAll . toEncoding $ "Hello World"
+extitlerev' :: Enc '["reverse", "Title"] Config T.Text
+extitlerev' = encodeAll . toEncoding exampleConf $ "HeLlo world"
 
-extitle :: Enc '["Title"] T.Text
-extitle = encodeAll . toEncoding $ "HeLlo world"
+data Config = Config {
+    sizeLimit :: SizeLimit
+  } deriving (Show)
+exampleConf = Config (SizeLimit 8) 
 
-extitlerev :: Enc '["reverse", "Title"] T.Text
-extitlerev = encodeAll . toEncoding $ "HeLlo world"
+instance HasA Config SizeLimit where
+   has _ = sizeLimit  
 
--- exlimit :: Enc '["limit 3", "reverse", "Title"] T.Text
--- exlimit = encodeAll . toEncoding $ "HeLlo world"
+exlimit :: Enc '["size-limit", "reverse", "Title"] Config T.Text
+exlimit = encodeAll . toEncoding exampleConf $ "HeLlo world"
