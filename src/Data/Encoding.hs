@@ -6,23 +6,53 @@ module Data.Encoding (
     module Data.Encoding
     , module Data.Encoding.Internal.Class
     , module Data.Encoding.Instances.Base64
+    , module Data.Encoding.Instances.Encode.Simple
     , Enc
     , unsafeGetPayload 
+    , fromEncoding
+    , toEncoding
  ) where
 
-import           Data.Encoding.Internal.Types (Enc, unsafeGetPayload)
+import           Data.Encoding.Internal.Types (Enc, unsafeGetPayload, toEncoding, fromEncoding)
 import           Data.Encoding.Internal.Class
 import           Data.Encoding.Instances.Base64
+import           Data.Encoding.Instances.Encode.Simple
 
 import           GHC.TypeLits
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Lazy as BL
+import qualified Data.Text as T
 
-example1 :: Enc "B64URL" B.ByteString
-example1 = encode "Hello John"
 
-example2 :: Enc "B64" B.ByteString
-example2 = encode "Hello John"
+example1 :: Enc '["B64"] B.ByteString
+example1 = encodeAll . toEncoding $ "Hello World"
 
-example2L :: Enc "B64" BL.ByteString
-example2L = encode "Hello John"
+example1_ :: B.ByteString
+example1_ = fromEncoding . decodeAllLenient $ example1
+
+example11 :: Enc '["B64","B64"] B.ByteString
+example11 = encodeAll . toEncoding $ "Hello World"
+
+example11_ :: B.ByteString
+example11_ = fromEncoding . decodeAllLenient $ example11
+
+-- example1 :: Enc "B64URL" B.ByteString
+-- example1 = encode "Hello John"
+
+-- example2 :: Enc "B64" B.ByteString
+-- example2 = encode "Hello John"
+
+-- example2L :: Enc "B64" BL.ByteString
+-- example2L = encode "Hello John"
+
+exupper :: Enc '["UPPER"] T.Text
+exupper = encodeAll . toEncoding $ "Hello World"
+
+extitle :: Enc '["Title"] T.Text
+extitle = encodeAll . toEncoding $ "HeLlo world"
+
+extitlerev :: Enc '["reverse", "Title"] T.Text
+extitlerev = encodeAll . toEncoding $ "HeLlo world"
+
+-- exlimit :: Enc '["limit 3", "reverse", "Title"] T.Text
+-- exlimit = encodeAll . toEncoding $ "HeLlo world"

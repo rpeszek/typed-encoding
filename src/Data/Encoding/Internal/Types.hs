@@ -1,6 +1,8 @@
 {-# LANGUAGE GADTs #-}
 {-# LANGUAGE PolyKinds #-}
 {-# LANGUAGE DeriveFunctor #-}
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE TypeOperators #-}
 
 module Data.Encoding.Internal.Types where
 
@@ -12,10 +14,16 @@ data Enc enc str where
     MkEnc :: Proxy enc -> str -> Enc enc str
     deriving (Functor, Show) 
 
+toEncoding :: str -> Enc '[] str
+toEncoding str = MkEnc Proxy str
+
+fromEncoding :: Enc '[] str -> str
+fromEncoding = getPayload
+
 unsafeGetPayload :: Enc enc str -> str  
 unsafeGetPayload = getPayload
 
--- private
+-- private, to be used by Encode/decode instances only
 getPayload :: Enc enc str -> str 
 getPayload (MkEnc _ str) = str
 
