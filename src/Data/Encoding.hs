@@ -11,9 +11,10 @@ module Data.Encoding (
     , unsafeGetPayload 
     , fromEncoding
     , toEncoding
+    , proxyNull
  ) where
 
-import           Data.Encoding.Internal.Types (Enc, unsafeGetPayload, toEncoding, fromEncoding)
+import           Data.Encoding.Internal.Types (Enc, proxyNull, unsafeGetPayload, toEncoding, fromEncoding)
 import           Data.Encoding.Internal.Class
 import           Data.Encoding.Instances.Base64
 import           Data.Encoding.Instances.Encode.Sample

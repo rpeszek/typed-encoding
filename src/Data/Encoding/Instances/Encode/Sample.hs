@@ -12,7 +12,8 @@ module Data.Encoding.Instances.Encode.Sample where
 
 import qualified Data.Text as T
 import qualified Data.Text.Lazy as TL
-
+import qualified Data.ByteString as B
+-- import qualified Data.ByteString.Lazy as BL
 
 import           Data.Encoding.Internal.Types
 import           Data.Encoding.Internal.Class
@@ -44,4 +45,6 @@ instance Applicative f => EncodeF f (Enc xs c TL.Text) (Enc ("reverse" ': xs) c 
 newtype SizeLimit = SizeLimit {unSizeLimit :: Int} deriving (Eq, Show)
 instance (HasA c SizeLimit, Applicative f) => EncodeF f (Enc xs c T.Text) (Enc ("size-limit" ': xs) c T.Text) where
     encodeF =  implTranP' (T.take . unSizeLimit . has (Proxy :: Proxy SizeLimit)) 
+instance (HasA c SizeLimit, Applicative f) => EncodeF f (Enc xs c B.ByteString) (Enc ("size-limit" ': xs) c B.ByteString) where
+    encodeF =  implTranP' (B.take . unSizeLimit . has (Proxy :: Proxy SizeLimit)) 
 

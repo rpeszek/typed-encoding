@@ -17,6 +17,8 @@ data Enc enc conf str where
     MkEnc :: Proxy enc -> conf -> str -> Enc enc conf str
     deriving (Show) 
 
+proxyNull = Proxy :: Proxy '[]
+ 
 toEncoding :: conf -> str -> Enc '[] conf str
 toEncoding conf str = MkEnc Proxy conf str
 
@@ -61,11 +63,3 @@ instance Functor (Impl enc conf) where
 --TODO JSON instances    
 
 
--- class HasA c a | c -> a where
---     has :: c -> a
-
--- data Named (nm :: k) a where
---     MkNamed :: Proxy nm -> a -> Named nm a
-
--- tst :: Enc (Named "Test" Int) String
--- tst = MkEnc (Proxy :: Proxy (Named "Test" Int)) ""
