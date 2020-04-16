@@ -8,13 +8,14 @@
 module Data.Encoding.Internal.Types where
 
 import           Data.Proxy
+import           Data.Functor.Identity
 
 -- Not a Functor on purpose
 data Enc enc conf str where
-    -- | constructor is to be treated as private to Encode and Decode instance implementations
+    -- | constructor is to be treated as Impl to Encode and Decode instance implementations
     -- particular encoding instances may expose smart constructors for limited data types
     MkEnc :: Proxy enc -> conf -> str -> Enc enc conf str
-    deriving (Functor, Show) -- TODO remove Functor from here
+    deriving (Show) 
 
 toEncoding :: conf -> str -> Enc '[] conf str
 toEncoding conf str = MkEnc Proxy conf str
@@ -25,28 +26,36 @@ fromEncoding = unsafeGetPayload
 unsafeGetPayload :: Enc enc conf str -> str  
 unsafeGetPayload (MkEnc _ _ str) = str
 
+implTranF :: Functor f => (str -> f str) -> Enc enc1 conf str -> f (Enc enc2 conf str)
+implTranF f  = implTranF' (\c -> f)
+
+implTranF' :: Functor f =>  (conf -> str -> f str) -> Enc enc1 conf str -> f (Enc enc2 conf str)
+implTranF' f (MkEnc _ conf str) = (MkEnc Proxy conf) <$> f conf str
 
 
-implTran :: (str -> str) -> Enc enc1 conf str -> Enc enc2 conf str
-implTran f (MkEnc _ conf str) = MkEnc Proxy conf (f str)
+implTranP :: Applicative f => (str -> str) -> Enc enc1 conf str -> f (Enc enc2 conf str)
+implTranP f  = implTranF' (\c -> pure . f)
 
-implTranErr :: (str -> Either a str) -> Enc enc1 conf str -> Either a (Enc enc2 conf str)
-implTranErr f (MkEnc _ conf str) = (MkEnc Proxy conf) <$> f str
+implTranP' :: Applicative f => (conf -> str -> str) -> Enc enc1 conf str -> f (Enc enc2 conf str)
+implTranP' f  = implTranF' (\c -> pure . f c)
+ 
 
-implTran' :: (conf -> str -> str) -> Enc enc1 conf str -> Enc enc2 conf str
-implTran' f (MkEnc _ conf str) = MkEnc Proxy conf (f conf str)
+-- | Functor instance are to be used by Encode and Decode instance implemenations only
+newtype Impl enc conf str = Impl {unImpl :: Enc enc conf str} deriving (Show)
 
-implTranErr' :: (conf -> str -> Either a str) -> Enc enc1 conf str -> Either a (Enc enc2 conf str)
-implTranErr' f (MkEnc _ conf str) = (MkEnc Proxy conf) <$> f conf str
+withImpl :: (Impl e c s1 -> Impl e c s2) -> Enc e c s1 -> Enc e c s2
+withImpl f enc = unImpl . f $ Impl enc
 
--- | Applicative and Monad instance are to be used by Encode and Decode instance implemenations only
-newtype Private enc conf str = Priv {unPriv :: Enc enc conf str} deriving (Functor, Show)
+instance Functor (Impl enc conf) where
+    fmap f (Impl (MkEnc p c x)) = Impl (MkEnc p c (f x))
 
--- instance Default conf => Applicative (Private enc conf) where
+-- we could add these if needed
+--    
+-- instance Default conf => Applicative (Impl enc conf) where
 --     pure = Priv . MkEnc Proxy def  
 --     Priv (MkEnc p c1 f) <*> Priv (MkEnc _ c2 x) = Priv (MkEnc p (mappend c1 c2) (f x))  
 
--- instance Default conf => Monad (Private enc conf) where 
+-- instance Default conf => Monad (Impl enc conf) where 
 --     Priv (MkEnc _ _ x) >>= f = f x     
 
 --TODO JSON instances    

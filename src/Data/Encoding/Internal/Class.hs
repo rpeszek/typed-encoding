@@ -13,51 +13,56 @@ module Data.Encoding.Internal.Class where
 
 import          Data.Encoding.Internal.Types (Enc(..), toEncoding)
 import          Data.Proxy
+import          Data.Functor.Identity
 
-class Encode instr outstr where 
-    encode :: instr -> outstr
 
-class EncodeAll (xs :: [k]) c str where
-    encodeAll :: (Enc '[] c str) -> (Enc xs c str)
+class EncodeF f instr outstr where    
+    encodeF :: instr -> f outstr
 
-instance EncodeAll '[] c str where
-    encodeAll (MkEnc _ c str) = toEncoding c str 
+class EncodeFAll f (xs :: [k]) c str where
+    encodeFAll :: (Enc '[] c str) -> f (Enc xs c str)
 
-instance (EncodeAll xs c str, Encode (Enc xs c str) (Enc (x ': xs) c str)) => EncodeAll (x ': xs) c str where
-    encodeAll str = 
-        let r :: Enc xs c str = encodeAll str
-        in encode r
+instance Applicative f => EncodeFAll f '[] c str where
+    encodeFAll (MkEnc _ c str) = pure $ toEncoding c str 
 
-class Decode instr outstr where    
-    decode :: instr -> Either String outstr
+instance (Monad f, EncodeFAll f xs c str, EncodeF f (Enc xs c str) (Enc (x ': xs) c str)) => EncodeFAll f (x ': xs) c str where
+    encodeFAll str = 
+        let re :: f (Enc xs c str) = encodeFAll str
+        in re >>= encodeF
 
-class DecodeAll (xs :: [k]) c str where
-    decodeAll :: (Enc xs c str) ->  Either String (Enc '[] c str)
 
-instance DecodeAll '[] c str where
-    decodeAll (MkEnc _ c str) = Right $ toEncoding c str 
+encodeAll :: EncodeFAll Identity (xs :: [k]) c str => 
+              (Enc '[] c str) 
+              -> (Enc xs c str)
+encodeAll = runIdentity . encodeFAll             
 
-instance (DecodeAll xs c str, Decode (Enc (x ': xs) c str) (Enc (xs) c str)) => DecodeAll (x ': xs) c str where
-    decodeAll str = 
-        let re :: Either String (Enc xs c str) = decode str
-        in case re of 
-            Left err -> Left err
-            Right r -> decodeAll r
+class DecodeF f instr outstr where    
+    decodeF :: instr -> f outstr
 
-class DecodeLenient instr outstr where    
-    decodeLenient :: instr -> outstr
+class DecodeFAll f (xs :: [k]) c str where
+    decodeFAll :: (Enc xs c str) ->  f (Enc '[] c str)
 
-class DecodeAllLenient (xs :: [k]) c str where
-    decodeAllLenient :: (Enc xs c str) -> (Enc '[] c str)
+instance Applicative f => DecodeFAll f '[] c str where
+    decodeFAll (MkEnc _ c str) = pure $ toEncoding c str 
 
-instance DecodeAllLenient '[] c str where
-    decodeAllLenient (MkEnc _ c str) = toEncoding c str
+instance (Monad f, DecodeFAll f xs c str, DecodeF f (Enc (x ': xs) c str) (Enc (xs) c str)) => DecodeFAll f (x ': xs) c str where
+    decodeFAll str = 
+        let re :: f (Enc xs c str) = decodeF str
+        in re >>= decodeFAll
 
-instance (DecodeAllLenient xs c str, DecodeLenient (Enc (x ': xs) c str) (Enc (xs) c str)) => DecodeAllLenient (x ': xs) c str where
-    decodeAllLenient str = 
-        let r :: Enc xs c str = decodeLenient str
-        in decodeAllLenient r
+decodeAll :: DecodeFAll Identity (xs :: [k]) c str => 
+              (Enc xs c str)
+              -> (Enc '[] c str) 
+decodeAll = runIdentity . decodeFAll 
 
+
+-- Other classes --
+
+-- | Converts keeping encoding annotations
+class Convert (xs :: [k]) str1 str2 where
+    convert :: Enc (xs :: [k]) c str1 ->  Enc xs c str2
+
+-- | Polymorphic data payloads used to encode/decode
 class HasA c a where
     has :: Proxy a -> c -> a
 
