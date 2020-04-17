@@ -2,7 +2,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE DataKinds #-}
 
-{-# LANGUAGE TypeFamilies #-}
 
 module Examples where
 

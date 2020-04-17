@@ -38,5 +38,5 @@ Here are some [examples](src/Examples.hs).
 Currently it uses
    - `base64-bytestring` because it was my driving example
    - `aeson` because it makes sense to define consistent JSON instances for `Enc`
-   - I will try to separate bigger deps like servant into separate libs if there is interest
+   - I will try to separate other deps like `servant` into separate libs if there is interest
 
