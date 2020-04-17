@@ -8,6 +8,7 @@
 {-# LANGUAGE UndecidableInstances #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE FunctionalDependencies #-}
+{-# LANGUAGE TypeFamilies #-}
 
 module Data.Encoding.Internal.Class where
 
@@ -36,6 +37,8 @@ encodeAll :: EncodeFAll Identity (xs :: [k]) c str =>
               -> (Enc xs c str)
 encodeAll = runIdentity . encodeFAll             
 
+
+
 class DecodeF f instr outstr where    
     decodeF :: instr -> f outstr
 
@@ -55,6 +58,57 @@ decodeAll :: DecodeFAll Identity (xs :: [k]) c str =>
               -> (Enc '[] c str) 
 decodeAll = runIdentity . decodeFAll 
 
+-- | This appears to need INCOHERENT instances 
+-- and is kept separate from DecodeFAll
+class DecodeFPart f (xsf :: [k]) (xst :: [k]) c str where
+    decodeFPart :: Proxy xst -> (Enc xsf c str) ->  f (Enc xst c str)
+
+-- | for reason I do not understand this does not work:
+--
+-- instance {-# INCOHERENT #-} (Applicative f, xs1 ~ xs2) => DecodeFPart f xs1 xs2 c str where
+--     decodeFPart p (MkEnc _ c str) = pure $ (MkEnc p c str)
+--
+-- but this does
+instance {-# INCOHERENT #-} (Applicative f) => DecodeFPart f xs1 xs1 c str where
+    decodeFPart p (MkEnc _ c str) = pure $ (MkEnc p c str)
+
+instance {-# INCOHERENT #-} (Monad f, DecodeFPart f xs xs0 c str, DecodeF f (Enc (x ': xs) c str) (Enc (xs) c str)) => DecodeFPart f (x ': xs) xs0 c str where
+    decodeFPart p str = 
+        let re :: f (Enc xs c str) = decodeF str
+        in re >>= decodeFPart p
+
+decodePart :: DecodeFPart Identity (xsf :: [k]) (xst :: [k]) c str => 
+              Proxy xst
+              -> (Enc xsf c str)
+              -> (Enc xst c str) 
+decodePart p = runIdentity . decodeFPart p 
+
+-- | This appears to need INCOHERENT instances 
+-- and is kept separate from EncodeFAll
+class EncodeFPart f (xsf :: [k]) (xst :: [k]) c str where
+    encodeFPart :: Proxy xsf -> (Enc xsf c str) ->  f (Enc xst c str)
+
+-- | for reason I do not understand this does not work:
+--
+-- instance {-# INCOHERENT #-} (Applicative f, xs1 ~ xs2) => EncodeFPart f xs1 xs2 c str where
+--     encodeFPart p (MkEnc _ c str) = pure $ (MkEnc p c str)
+--
+-- but this does
+instance {-# INCOHERENT #-} (Applicative f) => EncodeFPart f xs1 xs1 c str where
+    encodeFPart p (MkEnc _ c str) = pure $ (MkEnc p c str)
+
+instance {-# INCOHERENT #-} (Monad f, EncodeFPart f xs0 xs c str, EncodeF f (Enc (xs) c str) (Enc (x ': xs) c str)) => EncodeFPart f xs0 (x ': xs) c str where
+    encodeFPart p str = 
+        let re :: f (Enc xs c str) = encodeFPart p str
+        in re >>= encodeF
+
+encodePart :: EncodeFPart Identity (xsf :: [k]) (xst :: [k]) c str => 
+              Proxy xsf
+              -> (Enc xsf c str)
+              -> (Enc xst c str) 
+encodePart p = runIdentity . encodeFPart p 
+
+-- 
 
 -- Other classes --
 
