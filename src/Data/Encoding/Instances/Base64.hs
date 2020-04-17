@@ -4,6 +4,7 @@
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE FlexibleContexts #-}
 
+
 module Data.Encoding.Instances.Base64 where
 
 import           Data.Encoding.Internal.Types

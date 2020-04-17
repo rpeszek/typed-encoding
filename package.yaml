@@ -24,8 +24,7 @@ dependencies:
 - bytestring
 - text
 - base64-bytestring
-- aeson
-
+# - aeson
 # - uri-encode
 
 library:

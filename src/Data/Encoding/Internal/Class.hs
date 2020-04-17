@@ -7,14 +7,14 @@
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE UndecidableInstances #-}
 {-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE FunctionalDependencies #-}
 {-# LANGUAGE TypeFamilies #-}
 
 module Data.Encoding.Internal.Class where
 
-import          Data.Encoding.Internal.Types (Enc(..), toEncoding)
+import          Data.Encoding.Internal.Types (Enc(..), toEncoding, unsafeGetPayload)
 import          Data.Proxy
 import          Data.Functor.Identity
+import          GHC.TypeLits
 
 
 class EncodeF f instr outstr where    
@@ -58,57 +58,35 @@ decodeAll :: DecodeFAll Identity (xs :: [k]) c str =>
               -> (Enc '[] c str) 
 decodeAll = runIdentity . decodeFAll 
 
--- | This appears to need INCOHERENT instances 
--- and is kept separate from DecodeFAll
-class DecodeFPart f (xsf :: [k]) (xst :: [k]) c str where
-    decodeFPart :: Proxy xst -> (Enc xsf c str) ->  f (Enc xst c str)
 
--- | for reason I do not understand this does not work:
---
--- instance {-# INCOHERENT #-} (Applicative f, xs1 ~ xs2) => DecodeFPart f xs1 xs2 c str where
---     decodeFPart p (MkEnc _ c str) = pure $ (MkEnc p c str)
---
--- but this does
-instance {-# INCOHERENT #-} (Applicative f) => DecodeFPart f xs1 xs1 c str where
-    decodeFPart p (MkEnc _ c str) = pure $ (MkEnc p c str)
+-- | TODO use singletons def instead?
+type family Append (xs :: [k]) (ys :: [k]) :: [k] where
+    Append '[] xs = xs
+    Append (y ': ys) xs = y ': (Append ys xs)
 
-instance {-# INCOHERENT #-} (Monad f, DecodeFPart f xs xs0 c str, DecodeF f (Enc (x ': xs) c str) (Enc (xs) c str)) => DecodeFPart f (x ': xs) xs0 c str where
-    decodeFPart p str = 
-        let re :: f (Enc xs c str) = decodeF str
-        in re >>= decodeFPart p
+-- | Unsafe implemenation guarted by safe type definition
+encodeFPart :: forall f xs xsf c str . (Functor f, EncodeFAll f xs c str) => Proxy xs -> (Enc xsf c str) -> f (Enc (Append xs xsf) c str)
+encodeFPart p (MkEnc _ conf str) = 
+    let re :: f (Enc xs c str) = encodeFAll $ MkEnc Proxy conf str
+    in  (MkEnc Proxy conf . unsafeGetPayload) <$> re 
 
-decodePart :: DecodeFPart Identity (xsf :: [k]) (xst :: [k]) c str => 
-              Proxy xst
+encodePart :: EncodeFAll Identity (xs :: [k]) c str => 
+              Proxy xs 
               -> (Enc xsf c str)
-              -> (Enc xst c str) 
-decodePart p = runIdentity . decodeFPart p 
+              -> (Enc (Append xs xsf) c str) 
+encodePart p = runIdentity . encodeFPart p
 
--- | This appears to need INCOHERENT instances 
--- and is kept separate from EncodeFAll
-class EncodeFPart f (xsf :: [k]) (xst :: [k]) c str where
-    encodeFPart :: Proxy xsf -> (Enc xsf c str) ->  f (Enc xst c str)
-
--- | for reason I do not understand this does not work:
---
--- instance {-# INCOHERENT #-} (Applicative f, xs1 ~ xs2) => EncodeFPart f xs1 xs2 c str where
---     encodeFPart p (MkEnc _ c str) = pure $ (MkEnc p c str)
---
--- but this does
-instance {-# INCOHERENT #-} (Applicative f) => EncodeFPart f xs1 xs1 c str where
-    encodeFPart p (MkEnc _ c str) = pure $ (MkEnc p c str)
-
-instance {-# INCOHERENT #-} (Monad f, EncodeFPart f xs0 xs c str, EncodeF f (Enc (xs) c str) (Enc (x ': xs) c str)) => EncodeFPart f xs0 (x ': xs) c str where
-    encodeFPart p str = 
-        let re :: f (Enc xs c str) = encodeFPart p str
-        in re >>= encodeF
-
-encodePart :: EncodeFPart Identity (xsf :: [k]) (xst :: [k]) c str => 
-              Proxy xsf
-              -> (Enc xsf c str)
-              -> (Enc xst c str) 
-encodePart p = runIdentity . encodeFPart p 
-
--- 
+-- | Unsafe implemenation guarted by safe type definition
+decodeFPart :: forall f xs xsf c str . (Functor f, DecodeFAll f xs c str) => Proxy xs -> (Enc (Append xs xsf) c str) -> f (Enc xsf c str)
+decodeFPart p (MkEnc _ conf str) = 
+    let re :: f (Enc '[] c str) = decodeFAll $ MkEnc (Proxy :: Proxy xs) conf str
+    in  (MkEnc Proxy conf . unsafeGetPayload) <$> re 
+ 
+decodePart :: DecodeFAll Identity (xs :: [k]) c str => 
+              Proxy xs 
+              -> (Enc (Append xs xsf) c str) 
+              -> (Enc xsf c str) 
+decodePart p = runIdentity . decodeFPart p
 
 -- Other classes --
 

@@ -2,6 +2,8 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE DataKinds #-}
 
+{-# LANGUAGE TypeFamilies #-}
+
 module Examples where
 
 import           Data.Encoding
@@ -26,11 +28,10 @@ b64TwiceDecoded' :: B.ByteString
 b64TwiceDecoded' = fromEncoding . decodeAll $ b64Twice
 
 b64TwiceDecoded :: B.ByteString
-b64TwiceDecoded = fromEncoding . decodePart proxyNull $ b64Twice
+b64TwiceDecoded = fromEncoding . decodePart (Proxy :: Proxy '["B64","B64"]) $ b64Twice
 
--- b64PartiallyDecoded :: Enc '["B64"] () B.ByteString
--- b64PartiallyDecoded = decodePart (Proxy :: Proxy '["B64"]) $ b64Twice
-
+b64PartiallyDecoded :: Enc '["B64"] () B.ByteString
+b64PartiallyDecoded = decodePart (Proxy :: Proxy '["B64"]) $ b64Twice
 
 exupper :: Enc '["UPPER"] () T.Text
 exupper = encodeAll . toEncoding () $ "Hello World"
@@ -56,8 +57,8 @@ exlimit = encodeAll . toEncoding exampleConf $ "HeLlo world"
 extitle :: Enc '["Title"] Config T.Text
 extitle = encodeAll . toEncoding exampleConf $ "hello wOrld"
 
--- expartial :: Enc '["size-limit", "reverse", "Title"] Config T.Text
--- expartial = encodePart (Proxy :: Proxy '["Title"])  extitle
+expartial :: Enc '["size-limit", "reverse", "Title"] Config T.Text
+expartial = encodePart (Proxy :: Proxy '["size-limit", "reverse"]) extitle
 
 -- | this will not work because "B64" instances are for ByteString not Text
 -- exlimitB64 :: Enc '["B64", "size-limit", "reverse", "Title"] Config T.Text
@@ -65,5 +66,5 @@ extitle = encodeAll . toEncoding exampleConf $ "hello wOrld"
 exlimitB64 :: Enc '["B64", "size-limit"] Config B.ByteString
 exlimitB64 = encodeAll . toEncoding exampleConf $ "HeLlo world"
 
--- exlimitParDec :: Enc '["size-limit"] Config B.ByteString
--- exlimitParDec =  decodePart (Proxy :: Proxy '["size-limit"]) $ exlimitB64
+exlimitParDec :: Enc '["size-limit"] Config B.ByteString
+exlimitParDec =  decodePart (Proxy :: Proxy '["B64"]) $ exlimitB64
