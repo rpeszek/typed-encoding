@@ -16,8 +16,6 @@ data Enc enc conf str where
     -- particular encoding instances may expose smart constructors for limited data types
     MkEnc :: Proxy enc -> conf -> str -> Enc enc conf str
     deriving (Show) 
-
-proxyNull = Proxy :: Proxy '[]
  
 toEncoding :: conf -> str -> Enc '[] conf str
 toEncoding conf str = MkEnc Proxy conf str

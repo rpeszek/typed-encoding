@@ -7,6 +7,10 @@
 module Examples where
 
 import           Data.Encoding
+import           Data.Encoding.Instances.Base64
+import           Data.Encoding.Instances.Encode.Sample
+ 
+
 
 import           GHC.TypeLits
 import qualified Data.ByteString as B
