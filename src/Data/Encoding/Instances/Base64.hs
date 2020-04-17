@@ -68,4 +68,8 @@ instance DecodeF (Either String) (Enc ("B64URL" ': xs) c BL.ByteString) (Enc xs 
     decodeF = implTranF BL64URL.decode 
 instance DecodeF Identity (Enc ("B64URL" ': xs) c BL.ByteString) (Enc xs c BL.ByteString) where
     decodeF = implTranP BL64URL.decodeLenient 
-         
+
+-- instance Applicative f => EncodeF f (Enc xs c T.Text) (Enc ("B64" ': xs) c T.Text) where
+--     encodeF = implTranP (TE.decodeUtf8 . B64.encode . TE.encodeUtf8)   
+-- instance Applicative f => EncodeF f (Enc xs c TL.Text) (Enc ("B64" ': xs) c TL.Text) where
+--     encodeF = implTranP (TEL.decodeUtf8 . BL64.encode . TEL.encodeUtf8)   
