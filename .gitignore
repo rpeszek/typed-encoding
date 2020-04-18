@@ -2,3 +2,5 @@
 *~
 .history/
 *.cabal
+
+Temp*

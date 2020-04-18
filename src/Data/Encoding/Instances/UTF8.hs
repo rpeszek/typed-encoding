@@ -65,6 +65,13 @@ byteString2TextL = withUnsafeCoerce TEL.decodeUtf8
 -----------------
 
 -- TODO these are quick and dirty
+
+-- | UTF8 encodings are defined for ByteStream only as that would not make much sense for Text
+--
+-- >>> encodeFAll . toEncoding () $ "\xc3\xb1" :: Either UnicodeException (Enc '["r-UTF8"] () B.ByteString)
+-- Right (MkEnc Proxy () "\195\177")
+-- >>> encodeFAll . toEncoding () $ "\xc3\x28" :: Either UnicodeException (Enc '["r-UTF8"] () B.ByteString)
+-- Left Cannot decode byte '\xc3': Data.Text.Internal.Encoding.decodeUtf8: Invalid UTF-8 stream
 instance EncodeF (Either UnicodeException) (Enc xs c B.ByteString) (Enc ("r-UTF8" ': xs) c B.ByteString) where
     encodeF = implTranF (fmap TE.encodeUtf8 . TE.decodeUtf8')
 instance Applicative f => DecodeF f (Enc ("r-UTF8" ': xs) c B.ByteString) (Enc xs c B.ByteString) where
