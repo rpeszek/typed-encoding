@@ -93,8 +93,8 @@ decodePart p = runIdentity . decodeFPart p
 -- subsets are usefull for restriction encodings
 -- like r-UFT8 but not for other encodings.
 class Subset (x :: k) (y :: k) where
-    inject :: Enc (x ': xs) c str ->  Enc (y ': xs) c str
-    inject = withUnsafeCoerce id
+    inject :: Proxy y -> Enc (x ': xs) c str ->  Enc (y ': xs) c str
+    inject _ = withUnsafeCoerce id
 
 class FlattenAs (x :: k) (y :: k) where
     flattenAs :: Proxy y -> Enc (x ': xs) c str ->  Enc '[y] c str

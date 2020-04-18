@@ -71,9 +71,6 @@ instance FlattenAs "enc-B64-nontext" "r-ASCII" where
 instance FlattenAs "enc-B64" "r-ASCII" where
 
 
--- tstB64 = encodeAll . toEncoding () $ "Hello World" :: Enc '["enc-B64"] () B.ByteString
--- tstAscii = inject tstB64 :: Enc '["r-ASCII"] () B.ByteString
-
 -----------------
 -- Encondings  --
 -----------------
