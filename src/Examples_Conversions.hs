@@ -5,8 +5,8 @@
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE OverloadedStrings #-}
 
--- | 
-module DiyExample_Sign where
+-- | TODO
+module Examples_Conversions where
 
 import           Data.Encoding.Internal.Types
 import           Data.Encoding.Internal.Class

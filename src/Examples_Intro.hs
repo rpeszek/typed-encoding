@@ -3,7 +3,7 @@
 {-# LANGUAGE DataKinds #-}
 
 -- | Overview examples showing how this library can be used 
-module UsageExamples where
+module Examples_Intro where
 
 import           Data.Encoding
 import           Data.Encoding.Instances.Base64

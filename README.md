@@ -34,7 +34,10 @@ Transformations can be
 The approach seems like a different take on programming. 
 A form of type directed program synthesis - programs are a boilerplate and the game is played at the type level. 
 
-Here are some [examples](src/UsageExamples.hs).
+Here are some examples:
+   - [Overview Code Examples](src/Examples_Intro.hs)
+   - TODO [Conversions between encodings](src/Examples_Conversions.hs)
+   - TODO [adding new conversion example](src/Examples_Conversions.hs)
 
 ## Dependencies
 
