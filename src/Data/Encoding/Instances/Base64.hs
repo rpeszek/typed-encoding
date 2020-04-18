@@ -60,6 +60,20 @@ text2ByteStringS' = withUnsafeCoerce (TE.encodeUtf8)
 text2ByteStringL'  :: Enc ("enc-B64-nontext" ': ys) c TL.Text -> Enc ("enc-B64" ': ys) c BL.ByteString 
 text2ByteStringL'  = withUnsafeCoerce (TEL.encodeUtf8)
 
+-- | allow to treat B64 encodings as ASCII forgetting about B64 encoding
+-- 
+-- TODO use showEnc
+--
+-- >>> let tstB64 = encodeAll . toEncoding () $ "Hello World" :: Enc '["enc-B64"] () B.ByteString
+-- >>> inject tstB64 :: Enc '["r-ASCII"] () B.ByteString
+-- MkEnc Proxy () "SGVsbG8gV29ybGQ="
+instance Subset "enc-B64-nontext" "r-ASCII" where
+instance Subset "enc-B64" "r-ASCII" where
+
+
+-- tstB64 = encodeAll . toEncoding () $ "Hello World" :: Enc '["enc-B64"] () B.ByteString
+-- tstAscii = inject tstB64 :: Enc '["r-ASCII"] () B.ByteString
+
 -----------------
 -- Encondings  --
 -----------------

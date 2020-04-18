@@ -56,6 +56,10 @@ text2ByteStringS = withUnsafe (fmap TE.encodeUtf8)
 text2ByteStringL  :: Enc ("r-ASCII" ': ys) c TL.Text -> Enc ("r-ASCII" ': ys) c BL.ByteString 
 text2ByteStringL  = withUnsafe (fmap TEL.encodeUtf8)
 
+
+-- | allow to treat ASCII encodings as UTF8 forgetting about B64 encoding
+instance Subset "r-ASCII" "r-UTF8" where
+
 -----------------
 -- Encondings  --
 -----------------

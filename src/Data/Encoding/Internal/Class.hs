@@ -11,7 +11,7 @@
 
 module Data.Encoding.Internal.Class where
 
-import          Data.Encoding.Internal.Types (Enc(..), toEncoding, unsafeGetPayload)
+import          Data.Encoding.Internal.Types (Enc(..), toEncoding, unsafeGetPayload, withUnsafeCoerce)
 import          Data.Proxy
 import          Data.Functor.Identity
 import          GHC.TypeLits
@@ -89,6 +89,10 @@ decodePart :: DecodeFAll Identity (xs :: [k]) c str =>
 decodePart p = runIdentity . decodeFPart p
 
 -- Other classes --
+class Subset (x :: k) (y :: k) where
+    inject :: Enc (x ': xs) c str ->  Enc (y ': xs) c str
+    inject = withUnsafeCoerce id
+
 
 -- | Polymorphic data payloads used to encode/decode
 class HasA c a where
