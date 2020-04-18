@@ -4,6 +4,7 @@
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE OverloadedStrings #-}
+-- {-# LANGUAGE KindSignatures #-}
 
 -- | 
 module Data.Encoding.Instances.UTF8 where
@@ -24,14 +25,44 @@ import qualified Data.Text.Lazy.Encoding as TEL
 import qualified Data.ByteString.Char8 as B8
 import qualified Data.ByteString.Lazy.Char8 as BL8
 
+import           GHC.TypeLits
 import           Data.Char
 import           Data.Encoding.Internal.Utils (explainBool)
 import           Data.Encoding.Internal.Unsafe (withUnsafe)
 import           Control.Arrow
 import           Data.Text.Encoding.Error (UnicodeException)
 
-Right tst = encodeFAll . toEncoding () $ "Hello World" :: Either UnicodeException (Enc '["r-UTF8"] () B.ByteString)
+-----------------
+-- Conversions --
+-----------------
 
+-- Right tst = encodeFAll . toEncoding () $ "Hello World" :: Either UnicodeException (Enc '["r-UTF8"] () B.ByteString)
+-- tstTxt = byteString2TextS tst
+
+-- | Type-safer version of @Data.Text.Encoding.encodeUtf8@
+--
+-- >>> text2ByteStringS $ toEncoding () ("text" :: T.Text)
+-- MkEnc Proxy () "text"
+text2ByteStringS :: Enc ys c T.Text -> Enc ("r-UTF8" ': ys) c B.ByteString
+text2ByteStringS = withUnsafeCoerce TE.encodeUtf8
+
+-- | Type-safer version of Data.Text.Encoding.decodeUtf8
+--
+-- >>> let Right tst = encodeFAll . toEncoding () $ "Hello World" :: Either UnicodeException (Enc '["r-UTF8"] () B.ByteString)
+-- >>> byteString2TextS tst
+-- MkEnc Proxy () "Hello World"
+byteString2TextS :: Enc ("r-UTF8" ': ys) c B.ByteString -> Enc ys c T.Text 
+byteString2TextS = withUnsafeCoerce TE.decodeUtf8
+
+text2ByteStringL :: Enc ys c TL.Text -> Enc ("r-UTF8" ': ys) c BL.ByteString
+text2ByteStringL = withUnsafeCoerce TEL.encodeUtf8
+
+byteString2TextL :: Enc ("r-UTF8" ': ys) c BL.ByteString -> Enc ys c TL.Text 
+byteString2TextL = withUnsafeCoerce TEL.decodeUtf8
+
+-----------------
+-- Encondings  --
+-----------------
 
 -- TODO these are quick and dirty
 instance EncodeF (Either UnicodeException) (Enc xs c B.ByteString) (Enc ("r-UTF8" ': xs) c B.ByteString) where

@@ -27,24 +27,26 @@ import qualified Data.ByteString.Base64.URL as B64URL
 import qualified Data.ByteString.Base64.URL.Lazy as BL64URL
 import           Data.Encoding.Internal.Unsafe (withUnsafe)
 
--- these are risky, need to rethink conversions
--- "enc-B64" Text <-> ["enc-B64", "utf8"] Text
 
--- instance Convert ("enc-B64" ': xs) B.ByteString T.Text where
---     convert = withUnsafe (fmap TE.decodeUtf8)
+-----------------
+-- Conversions --
+-----------------
 
--- instance Convert ("enc-B64" ': xs) BL.ByteString TL.Text where
---     convert = withUnsafe (fmap TEL.decodeUtf8)
+byteString2TextS :: Enc ("enc-B64" ': "r-UTF8" ': ys) c B.ByteString -> Enc ("enc-B64" ': ys) c T.Text 
+byteString2TextS = withUnsafeCoerce (TE.decodeUtf8)
 
-instance Convert ("enc-B64" ': xs) T.Text B.ByteString where
-    convert = withUnsafe (fmap TE.encodeUtf8)
+byteString2TextL :: Enc ("enc-B64" ': "r-UTF8" ': ys) c BL.ByteString -> Enc ("enc-B64" ': ys) c TL.Text 
+byteString2TextL = withUnsafeCoerce (TEL.decodeUtf8)
 
-instance Convert ("enc-B64" ': xs) TL.Text BL.ByteString where
-    convert = withUnsafe (fmap TEL.encodeUtf8)
+text2ByteStringS :: Enc ("enc-B64" ': ys) c T.Text -> Enc ("enc-B64" ': "r-UTF8" ': ys) c B.ByteString 
+text2ByteStringS = withUnsafeCoerce (TE.encodeUtf8)
 
--- tst :: Enc '["enc-B64"] c B.ByteString -> Enc '["enc-B64"] c T.Text 
--- tst = convert
+text2ByteStringL  :: Enc ("enc-B64" ': ys) c TL.Text -> Enc ("enc-B64" ': "r-UTF8" ': ys) c BL.ByteString 
+text2ByteStringL  = withUnsafeCoerce (TEL.encodeUtf8)
 
+-----------------
+-- Encondings  --
+-----------------
 
 instance Applicative f => EncodeF f (Enc xs c B.ByteString) (Enc ("enc-B64" ': xs) c B.ByteString) where
     encodeF = implTranP B64.encode     

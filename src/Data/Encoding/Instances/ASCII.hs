@@ -40,18 +40,25 @@ import           Control.Arrow
 -- tst2 = encodeFAll . toEncoding () $ "\194\160" :: Either NonAsciiChar (Enc '["r-ASCII"] () T.Text)
 -- tst3 = encodeFAll . toEncoding () $ "\194\160" :: Either NonAsciiChar (Enc '["r-ASCII"] () B.ByteString)
 
--- instance Convert ("r-ASCII" ': xs) B.ByteString T.Text where
---     convert = withUnsafe (fmap TE.decodeUtf8)
+-----------------
+-- Conversions --
+-----------------
 
--- instance Convert ("r-ASCII" ': xs) BL.ByteString TL.Text where
---     convert = withUnsafe (fmap TEL.decodeUtf8)
+byteString2TextS :: Enc ("r-ASCII" ': ys) c B.ByteString -> Enc ("r-ASCII" ': ys) c T.Text 
+byteString2TextS = withUnsafe (fmap TE.decodeUtf8)
 
--- instance Convert ("r-ASCII" ': xs) T.Text B.ByteString where
---     convert = withUnsafe (fmap TE.encodeUtf8)
+byteString2TextL :: Enc ("r-ASCII" ': ys) c BL.ByteString -> Enc ("r-ASCII" ': ys) c TL.Text 
+byteString2TextL = withUnsafe (fmap TEL.decodeUtf8)
 
--- instance Convert ("r-ASCII" ': xs) TL.Text BL.ByteString where
---     convert = withUnsafe (fmap TEL.encodeUtf8)
+text2ByteStringS :: Enc ("r-ASCII" ': ys) c T.Text -> Enc ("r-ASCII" ': ys) c B.ByteString 
+text2ByteStringS = withUnsafe (fmap TE.encodeUtf8)
 
+text2ByteStringL  :: Enc ("r-ASCII" ': ys) c TL.Text -> Enc ("r-ASCII" ': ys) c BL.ByteString 
+text2ByteStringL  = withUnsafe (fmap TEL.encodeUtf8)
+
+-----------------
+-- Encondings  --
+-----------------
 
 data NonAsciiChar = NonAsciiChar Char deriving (Eq, Show)
 

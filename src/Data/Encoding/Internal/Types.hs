@@ -39,6 +39,6 @@ implTranP' f  = implTranF' (\c -> pure . f c)
 unsafeGetPayload :: Enc enc conf str -> str  
 unsafeGetPayload (MkEnc _ _ str) = str
 
-withUnsafeCoerce :: (s1 -> s2) -> Enc e1 c s1 -> Enc e2 c s2
+withUnsafeCoerce ::  (s1 -> s2) -> Enc e1 c s1 -> Enc e2 c s2
 withUnsafeCoerce f (MkEnc _ conf str)  = (MkEnc Proxy conf (f str)) 
 
