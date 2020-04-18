@@ -91,6 +91,12 @@ decodePart p = runIdentity . decodeFPart p
 -- Other classes --
 
 -- | Converts keeping encoding annotations
+-- This can be problematic and one needs to careful
+-- enabling these.  
+-- For example converting Enc '["enc-B64"] ByteStream to
+-- Enc '["enc-B64"] Text would allow decoding in Text of binary
+-- streams, that would fail. 
+-- 
 class Convert (xs :: [k]) str1 str2 where
     convert :: Enc (xs :: [k]) c str1 ->  Enc xs c str2
 

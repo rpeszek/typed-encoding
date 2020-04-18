@@ -41,3 +41,5 @@ tests:
     - -with-rtsopts=-N
     dependencies:
     - typed-encoding
+    - doctest
+    - doctest-discover

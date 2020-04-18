@@ -9,7 +9,7 @@ Issues like these do not manifest themselves with run-time errors.  The issues 
 What if the encodings were visible at the type level...
 
 ```Haskell
-myData :: Enc '["B64"] ByteString
+myData :: Enc '["enc-B64"] ByteString
 ```
 
 ## About this library
@@ -17,7 +17,7 @@ myData :: Enc '["B64"] ByteString
 
 ```Haskell
 -- upper cased text encoded as base64
-example :: Enc '["B64", "UPPER"] () T.Text
+example :: Enc '["enc-B64", "do-UPPER"] () T.Text
 example = encodeAll . toEncoding () $ "some text goes here"
 ```
 It becomes a declarative style of applying string transformations.
@@ -26,8 +26,11 @@ Transformations can be
    - used with parameters.
    - applied partially
    - undone or undone partially (id encoding is reversible)
-   - can be effectful
-
+   - effectful
+   - used to not only encode / decode but to
+       * restrict type to smaller set of values
+       * apply some preset tranformation
+        
 The approach seems like a different take on programming. 
 A form of type directed program synthesis - programs are a boilerplate and the game is played at the type level. 
 
