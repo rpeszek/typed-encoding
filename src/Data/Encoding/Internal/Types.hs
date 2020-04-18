@@ -4,11 +4,13 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE ScopedTypeVariables #-}
 
 module Data.Encoding.Internal.Types where
 
 import           Data.Proxy
 import           Data.Functor.Identity
+import           GHC.TypeLits
 
 -- Not a Functor on purpose
 data Enc enc conf str where
@@ -35,6 +37,9 @@ implTranP f  = implTranF' (\c -> pure . f)
 
 implTranP' :: Applicative f => (conf -> str -> str) -> Enc enc1 conf str -> f (Enc enc2 conf str)
 implTranP' f  = implTranF' (\c -> pure . f c)
+
+showEnc :: forall s c str xs. (KnownSymbol s, Show c, Show str) => Enc (s ': xs) c str -> String
+showEnc (MkEnc _ c s) = "MkEnc [" ++ symbolVal (Proxy :: Proxy s) ++ " ...] " ++ show c ++ " " ++ show s
 
 unsafeGetPayload :: Enc enc conf str -> str  
 unsafeGetPayload (MkEnc _ _ str) = str

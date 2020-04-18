@@ -7,20 +7,16 @@ module Data.Encoding (
     , module Data.Encoding.Internal.Class
     , Enc
     , unsafeGetPayload 
-    -- , unsafeMap
-    -- , unsafeApp
-    -- , unsafeBind
     , fromEncoding
     , toEncoding
+    , showEnc
  ) where
 
 import           Data.Encoding.Internal.Types (Enc
                                               , unsafeGetPayload
                                               , toEncoding
                                               , fromEncoding
-                                            --   , unsafeMap
-                                            --   , unsafeApp
-                                            --   , unsafeBind
+                                              , showEnc
                                               )
 import           Data.Encoding.Internal.Class
 import           Data.Encoding.Instances.Base64

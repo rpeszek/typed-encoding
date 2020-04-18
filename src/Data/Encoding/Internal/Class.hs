@@ -89,10 +89,16 @@ decodePart :: DecodeFAll Identity (xs :: [k]) c str =>
 decodePart p = runIdentity . decodeFPart p
 
 -- Other classes --
+
+-- subsets are usefull for restriction encodings
+-- like r-UFT8 but not for other encodings.
 class Subset (x :: k) (y :: k) where
     inject :: Enc (x ': xs) c str ->  Enc (y ': xs) c str
     inject = withUnsafeCoerce id
 
+class FlattenAs (x :: k) (y :: k) where
+    flattenAs :: Proxy y -> Enc (x ': xs) c str ->  Enc '[y] c str
+    flattenAs _ = withUnsafeCoerce id
 
 -- | Polymorphic data payloads used to encode/decode
 class HasA c a where

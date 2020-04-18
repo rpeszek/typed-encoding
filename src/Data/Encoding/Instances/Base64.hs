@@ -65,10 +65,10 @@ text2ByteStringL'  = withUnsafeCoerce (TEL.encodeUtf8)
 -- TODO use showEnc
 --
 -- >>> let tstB64 = encodeAll . toEncoding () $ "Hello World" :: Enc '["enc-B64"] () B.ByteString
--- >>> inject tstB64 :: Enc '["r-ASCII"] () B.ByteString
--- MkEnc Proxy () "SGVsbG8gV29ybGQ="
-instance Subset "enc-B64-nontext" "r-ASCII" where
-instance Subset "enc-B64" "r-ASCII" where
+-- >>> showEnc (flattenAs (Proxy :: Proxy "r-ASCII") tstB64 :: Enc '["r-ASCII"] () B.ByteString)
+-- "MkEnc [r-ASCII ...] () \"SGVsbG8gV29ybGQ=\""
+instance FlattenAs "enc-B64-nontext" "r-ASCII" where
+instance FlattenAs "enc-B64" "r-ASCII" where
 
 
 -- tstB64 = encodeAll . toEncoding () $ "Hello World" :: Enc '["enc-B64"] () B.ByteString
