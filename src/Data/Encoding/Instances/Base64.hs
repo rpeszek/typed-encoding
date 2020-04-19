@@ -7,8 +7,8 @@
 
 module Data.Encoding.Instances.Base64 where
 
-import           Data.Encoding.Internal.Types
-import           Data.Encoding.Internal.Class
+import           Data.Encoding.Instances.Support
+
 import           Data.Proxy
 import           Data.Functor.Identity
 import           GHC.TypeLits
@@ -79,7 +79,13 @@ instance FlattenAs "enc-B64" "r-ASCII" where
 -----------------
 
 instance Applicative f => EncodeF f (Enc xs c B.ByteString) (Enc ("enc-B64" ': xs) c B.ByteString) where
-    encodeF = implTranP B64.encode     
+    encodeF = implTranP B64.encode 
+        
+-- | Effectful instance for corruption detection.
+-- This protocol is used, for example, in emails. 
+-- It is a well known encoding and hackers will have no problem 
+-- making undetectable changes, but error handling at this stage
+-- could verify that email was corrupted.
 instance DecodeF (Either String) (Enc ("enc-B64" ': xs) c B.ByteString) (Enc xs c B.ByteString) where
     decodeF = implTranF B64.decode 
 instance DecodeF Identity (Enc ("enc-B64" ': xs) c B.ByteString) (Enc xs c B.ByteString) where

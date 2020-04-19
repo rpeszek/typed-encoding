@@ -22,7 +22,7 @@ import           Data.Char
 
 import           Data.Encoding
 import qualified Data.Encoding.Instances.ASCII as EnASCII
-import qualified Data.Encoding.Internal.Unsafe as Unsafe
+import qualified Data.Encoding.Unsafe as Unsafe
 import           Data.Semigroup ((<>))
 
 

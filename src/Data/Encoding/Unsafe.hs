@@ -5,7 +5,7 @@
 {-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE FlexibleInstances #-}
 
-module Data.Encoding.Internal.Unsafe where
+module Data.Encoding.Unsafe where
 
 import           Data.Proxy
 import           Data.Functor.Identity

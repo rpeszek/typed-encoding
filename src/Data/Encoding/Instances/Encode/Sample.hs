@@ -15,8 +15,8 @@ import qualified Data.Text.Lazy as TL
 import qualified Data.ByteString as B
 -- import qualified Data.ByteString.Lazy as BL
 
-import           Data.Encoding.Internal.Types
-import           Data.Encoding.Internal.Class
+import           Data.Encoding.Instances.Support
+
 import           Data.Proxy
 import           GHC.TypeLits
 import qualified Data.List as L

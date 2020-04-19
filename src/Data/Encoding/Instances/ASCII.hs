@@ -15,8 +15,8 @@
 -- Left (NonAsciiChar '\194')
 module Data.Encoding.Instances.ASCII where
 
-import           Data.Encoding.Internal.Types
-import           Data.Encoding.Internal.Class
+import           Data.Encoding.Instances.Support
+
 import           Data.Proxy
 import           Data.Functor.Identity
 import           GHC.TypeLits
@@ -33,7 +33,7 @@ import qualified Data.ByteString.Lazy.Char8 as BL8
 
 import           Data.Char
 import           Data.Encoding.Internal.Utils (explainBool)
-import           Data.Encoding.Internal.Unsafe (withUnsafe)
+import           Data.Encoding.Unsafe (withUnsafe)
 import           Control.Arrow
 
 -- tst = encodeFAll . toEncoding () $ "Hello World" :: Either NonAsciiChar (Enc '["r-ASCII"] () T.Text)

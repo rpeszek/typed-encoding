@@ -8,6 +8,7 @@
 {-# LANGUAGE UndecidableInstances #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE PartialTypeSignatures #-}
 
 module Data.Encoding.Internal.Class where
 
@@ -15,6 +16,7 @@ import          Data.Encoding.Internal.Types (Enc(..), toEncoding, unsafeGetPayl
 import          Data.Proxy
 import          Data.Functor.Identity
 import          GHC.TypeLits
+import          Data.Semigroup ((<>))
 
 
 class EncodeF f instr outstr where    
@@ -58,6 +60,13 @@ decodeAll :: DecodeFAll Identity (xs :: [k]) c str =>
               -> (Enc '[] c str) 
 decodeAll = runIdentity . decodeFAll 
 
+-- | We know that data in @Enc xs c str@ was not compromized.
+-- This trusts the encoding type safety to force-ingore either in the decode
+trustDecodeAll :: forall err xs c str . (Show err, DecodeFAll (Either err) (xs :: [k]) c str) => 
+              Proxy err 
+              -> (Enc xs c str)
+              -> (Enc '[] c str) 
+trustDecodeAll _ inp = errorOnLeft $ (decodeFAll inp :: Either err (Enc '[] c str)) 
 
 -- | TODO use singletons def instead?
 type family Append (xs :: [k]) (ys :: [k]) :: [k] where
@@ -88,6 +97,16 @@ decodePart :: DecodeFAll Identity (xs :: [k]) c str =>
               -> (Enc xsf c str) 
 decodePart p = runIdentity . decodeFPart p
 
+-- | Similar to 'trustDecodeAll'
+trustDecodePart :: forall err xs xsf c str . 
+              (Show err, DecodeFAll (Either err) (xs :: [k]) c str) => 
+              Proxy err
+              -> Proxy xs 
+              -> (Enc (Append xs xsf) c str) 
+              -> (Enc xsf c str) 
+trustDecodePart _ p x = errorOnLeft $ (decodeFPart p x :: Either err (Enc xsf c str))
+
+
 -- Other classes --
 
 -- subsets are usefull for restriction encodings
@@ -106,3 +125,10 @@ class HasA c a where
 
 instance HasA a () where
     has _ = const ()
+
+
+-- Utils --
+
+errorOnLeft :: Show err => Either err a -> a
+errorOnLeft (Left e) = error $ "You trusted encodings too much " <> show e
+errorOnLeft (Right r) =  r

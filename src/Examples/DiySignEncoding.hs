@@ -11,8 +11,8 @@
 module Examples.DiySignEncoding where
 
 import           Data.Encoding
-import qualified Data.Encoding.Internal.Types as EnT
-import           Data.Encoding.Internal.Class
+import qualified Data.Encoding.Instances.Support as EnT
+
 import           Data.Proxy
 import           Data.Functor.Identity
 import           GHC.TypeLits

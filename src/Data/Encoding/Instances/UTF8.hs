@@ -9,8 +9,8 @@
 -- | 
 module Data.Encoding.Instances.UTF8 where
 
-import           Data.Encoding.Internal.Types
-import           Data.Encoding.Internal.Class
+import           Data.Encoding.Instances.Support
+
 import           Data.Proxy
 import           Data.Functor.Identity
 import           GHC.TypeLits
@@ -28,7 +28,7 @@ import qualified Data.ByteString.Lazy.Char8 as BL8
 import           GHC.TypeLits
 import           Data.Char
 import           Data.Encoding.Internal.Utils (explainBool)
-import           Data.Encoding.Internal.Unsafe (withUnsafe)
+import           Data.Encoding.Unsafe (withUnsafe)
 import           Control.Arrow
 import           Data.Text.Encoding.Error (UnicodeException)
 
