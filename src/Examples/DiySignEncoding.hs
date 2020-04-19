@@ -5,7 +5,7 @@
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE PartialTypeSignatures #-}
+-- {-# LANGUAGE PartialTypeSignatures #-}
 
 -- | Simple DIY encoding example that 'signs' Text with its length
 module Examples.DiySignEncoding where
@@ -23,6 +23,9 @@ import           Data.Semigroup ((<>))
 import           Control.Arrow
 import           Text.Read (readMaybe)
 
+-- $setup
+-- >>> :set -XOverloadedStrings -XMultiParamTypeClasses -XDataKinds
+
 -- | Not exposed method that 'encodes' 
 encodeSign :: T.Text -> T.Text
 encodeSign t = (T.pack . show . T.length $ t) <> ":" <> t
@@ -33,7 +36,6 @@ encodeSign t = (T.pack . show . T.length $ t) <> ":" <> t
 -- Unless a hacker somehow figures out our very secret hash, we will know our data is corrupted! 
 -- (See also 'Examples.ErrorHandling' discussion) 
 --
--- >>> :set -XOverloadedStrings -XMultiParamTypeClasses -XDataKinds
 -- >>> decodeSign "3:abc"
 -- Right "abc"
 -- >>> decodeSign "4:abc"

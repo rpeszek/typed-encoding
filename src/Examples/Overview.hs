@@ -22,9 +22,12 @@ import qualified Data.Text as T
 import           Data.Proxy
 import           Data.Functor.Identity
 
+
+-- $setup
+-- >>> :set -XOverloadedStrings -XMultiParamTypeClasses -XDataKinds
+
 -- | "Hello World" encoded as Base64
 --
--- >>> :set -XOverloadedStrings -XMultiParamTypeClasses -XDataKinds
 -- >>> b64Once 
 -- MkEnc Proxy () "SGVsbG8gV29ybGQ="
 --
@@ -115,7 +118,7 @@ extitlerev' = encodeAll . toEncoding exampleConf $ "HeLLo world"
 exlimit :: Enc '["do-size-limit", "do-reverse", "do-Title"] Config T.Text
 exlimit = encodeAll . toEncoding exampleConf $ "HeLlo world"
 
--- | Needed in following examples, simply applies toTitle to "Hello wOrld"
+-- | `extitle' is needed in following examples, simply applies toTitle to "Hello wOrld"
 extitle :: Enc '["do-Title"] Config T.Text
 extitle = encodeAll . toEncoding exampleConf $ "hello wOrld"
 

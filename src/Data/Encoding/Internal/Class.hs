@@ -8,7 +8,7 @@
 {-# LANGUAGE UndecidableInstances #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeFamilies #-}
-{-# LANGUAGE PartialTypeSignatures #-}
+-- {-# LANGUAGE PartialTypeSignatures #-}
 
 module Data.Encoding.Internal.Class where
 

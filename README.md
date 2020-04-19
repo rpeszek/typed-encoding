@@ -13,7 +13,7 @@ myData :: Enc '["enc-B64"] ByteString
 ```
 that would be really nice! But what would be even nicer if we could do something like
 ```Haskell
-myData :: Enc '["enc-B64", "r-ASCII"] ByteString
+myData :: Enc '["enc-B64", "r-UTF8"] ByteString
 ```
 So, after decoding Base64 I would know that what is left is not some jpeg image...
 
@@ -43,7 +43,7 @@ Here are some code examples:
    - [Overview](src/Examples/Overview.hs)
    - [Conversions between encodings](src/Examples/Conversions.hs)
    - [Adding a new encoding](src/Examples/DiySignEncoding.hs)
-   - TODO [Error handling](src/Examples/ErrorHandling.hs)
+   - TODO [(Opinionated) Error handling](src/Examples/ErrorHandling.hs)
    - [Unsafe - working inside encodings](src/Examples/Unsafe.hs)
 
 ## Dependencies

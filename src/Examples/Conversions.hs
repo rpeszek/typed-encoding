@@ -19,10 +19,12 @@ import qualified Data.Text as T
 import qualified Data.ByteString as B
 import           Data.Text.Encoding.Error (UnicodeException)
 
+-- $setup
+-- >>> :set -XOverloadedStrings -XMultiParamTypeClasses -XDataKinds
+
 
 -- | A simple ASCII example
 --
--- >>> :set -XOverloadedStrings -XMultiParamTypeClasses -XDataKinds
 -- >>>  encodeFAll . toEncoding () $ "HeLlo world" :: Either EnASCII.NonAsciiChar (Enc '["r-ASCII"] () B.ByteString) 
 -- Right (MkEnc Proxy () "HeLlo world")
 exAsciiE :: Either EnASCII.NonAsciiChar (Enc '["r-ASCII"] () B.ByteString)
@@ -65,7 +67,7 @@ exUtf8B64 = encodePart (Proxy :: Proxy '["enc-B64"]) exUtf8
 -- 
 -- >>> :t EnB64.text2ByteStringS exUtf8B64T
 -- EnB64.text2ByteStringS exUtf8B64T
---   :: Enc '["enc-B64", "r-UTF8"] () B.ByteString
+-- ... :: Enc '["enc-B64", "r-UTF8"] () B.ByteString
 exUtf8B64T :: Enc '["enc-B64"] () T.Text
 exUtf8B64T = EnB64.byteString2TextS exUtf8B64  
 
@@ -75,6 +77,6 @@ exUtf8B64T = EnB64.byteString2TextS exUtf8B64
 --
 -- >>> :t flattenAs (Proxy :: Proxy "r-ASCII") exUtf8B64
 -- flattenAs (Proxy :: Proxy "r-ASCII") exUtf8B64
---   :: Enc '["r-ASCII"] () B.ByteString
+-- ... :: Enc '["r-ASCII"] () B.ByteString
 b64IsAscii :: Enc '["r-ASCII"] () B.ByteString
 b64IsAscii = flattenAs Proxy exUtf8B64

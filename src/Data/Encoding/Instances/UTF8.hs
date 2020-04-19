@@ -1,15 +1,19 @@
 {-# LANGUAGE DataKinds #-}
+{-# LANGUAGE KindSignatures #-}
+{-# LANGUAGE PolyKinds #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE OverloadedStrings #-}
--- {-# LANGUAGE KindSignatures #-}
-
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE PartialTypeSignatures #-}
 -- | 
 module Data.Encoding.Instances.UTF8 where
 
 import           Data.Encoding.Instances.Support
+import           Data.Encoding.Internal.Utils (explainBool)
+import           Data.Encoding.Unsafe (withUnsafe)
 
 import           Data.Proxy
 import           Data.Functor.Identity
@@ -27,10 +31,15 @@ import qualified Data.ByteString.Lazy.Char8 as BL8
 
 import           GHC.TypeLits
 import           Data.Char
-import           Data.Encoding.Internal.Utils (explainBool)
-import           Data.Encoding.Unsafe (withUnsafe)
 import           Control.Arrow
 import           Data.Text.Encoding.Error (UnicodeException)
+
+import           Data.Either
+
+-- $setup
+-- >>> :set -XScopedTypeVariables -XKindSignatures -XMultiParamTypeClasses -XDataKinds -XPolyKinds -XPartialTypeSignatures
+-- >>> import Test.QuickCheck.Instances.Text()
+-- >>> import Test.QuickCheck.Instances.ByteString()
 
 -----------------
 -- Conversions --
@@ -54,6 +63,16 @@ text2ByteStringS = withUnsafeCoerce TE.encodeUtf8
 byteString2TextS :: Enc ("r-UTF8" ': ys) c B.ByteString -> Enc ys c T.Text 
 byteString2TextS = withUnsafeCoerce TE.decodeUtf8
 
+-- | Indentity property "byteString2TextS . text2ByteStringS == id"
+-- prop> \(t :: T.Text) -> t == (fromEncoding . txtBsSIdProp (Proxy :: Proxy '[]) . toEncoding () $ t)
+txtBsSIdProp :: Proxy (ys :: [Symbol]) -> Enc ys c T.Text -> Enc ys c T.Text
+txtBsSIdProp _ = byteString2TextS . text2ByteStringS 
+
+-- | Indentity property "text2ByteStringS . byteString2TextS == id".
+bsTxtIdProp :: Proxy (ys :: [Symbol]) -> Enc ("r-UTF8" ': ys) c B.ByteString -> Enc ("r-UTF8" ': ys) c B.ByteString
+bsTxtIdProp _ = text2ByteStringS . byteString2TextS
+
+
 text2ByteStringL :: Enc ys c TL.Text -> Enc ("r-UTF8" ': ys) c BL.ByteString
 text2ByteStringL = withUnsafeCoerce TEL.encodeUtf8
 
@@ -72,6 +91,10 @@ byteString2TextL = withUnsafeCoerce TEL.decodeUtf8
 -- Right (MkEnc Proxy () "\195\177")
 -- >>> encodeFAll . toEncoding () $ "\xc3\x28" :: Either UnicodeException (Enc '["r-UTF8"] () B.ByteString)
 -- Left Cannot decode byte '\xc3': Data.Text.Internal.Encoding.decodeUtf8: Invalid UTF-8 stream
+--
+-- Following test uses 'verEncoding' helper that checks that bytes are encoded as Right iff they are valid UTF8 bytes
+--
+-- prop> \(b :: B.ByteString) -> verEncoding b (fmap (fromEncoding . decodeAll . bsTxtIdProp (Proxy :: Proxy '[])) . (encodeFAll :: _ -> Either UnicodeException _). toEncoding () $ b)
 instance EncodeF (Either UnicodeException) (Enc xs c B.ByteString) (Enc ("r-UTF8" ': xs) c B.ByteString) where
     encodeF = implTranF (fmap TE.encodeUtf8 . TE.decodeUtf8')
 instance Applicative f => DecodeF f (Enc ("r-UTF8" ': xs) c B.ByteString) (Enc xs c B.ByteString) where
@@ -82,3 +105,11 @@ instance EncodeF (Either UnicodeException) (Enc xs c BL.ByteString) (Enc ("r-UTF
 instance Applicative f => DecodeF f (Enc ("r-UTF8" ': xs) c BL.ByteString) (Enc xs c BL.ByteString) where
     decodeF = implTranP id 
 
+--- Utilities ---
+
+-- | helper function checks that given ByteString, 
+-- if is encoded as Left is must be not Utf8 decodable
+-- is is encoded as Right is must be Utf8 encodable 
+verEncoding :: B.ByteString -> Either err B.ByteString -> Bool
+verEncoding bs (Left _) = isLeft . TE.decodeUtf8' $ bs
+verEncoding bs (Right _) = isRight . TE.decodeUtf8' $ bs
