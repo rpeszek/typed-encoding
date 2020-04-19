@@ -33,16 +33,18 @@ Transformations can be
    - effectful
 
 And these annotations are not only for transformations.  Annotations can be used
-to restrict type to smaller set of values (`r-ASCII`, `r-UTF8`), they 
-can be converted to other annotations (eg. `r-ASCII` is subset of `r-UTF8`) ...
+to restrict type to smaller set of values (character sets like `r-ASCII`, `r-UTF8`), 
+they can be converted to other annotations (eg. `r-ASCII` is subset of `r-UTF8`) ...
 
 The approach seems like a different take on programming: 
 a form of type directed program synthesis - programs become a boilerplate and the game is played at the type level. 
 
-Here are some examples:
-   - [Overview Code Examples](src/Examples_Intro.hs)
-   - TODO [Conversions between encodings](src/Examples_Conversions.hs)
-   - TODO [adding new conversion example](src/Examples_Conversions.hs)
+Here are some code examples:
+   - [Overview](src/Examples/Overview.hs)
+   - [Conversions between encodings](src/Examples/Conversions.hs)
+   - [Adding a new encoding](src/Examples/DiySignEncoding.hs)
+   - TODO [Error handling](src/Examples/ErrorHandling.hs)
+   - [Unsafe - working inside encodings](src/Examples/Unsafe.hs)
 
 ## Dependencies
 

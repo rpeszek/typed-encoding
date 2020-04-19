@@ -6,7 +6,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 -- | TODO
-module Examples_Conversions where
+module Examples.ErrorHandling where
 
 import           Data.Encoding.Internal.Types
 import           Data.Encoding.Internal.Class

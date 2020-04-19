@@ -39,6 +39,9 @@ byteString2TextS = withUnsafeCoerce (TE.decodeUtf8)
 byteString2TextL :: Enc ("enc-B64" ': "r-UTF8" ': ys) c BL.ByteString -> Enc ("enc-B64" ': ys) c TL.Text 
 byteString2TextL = withUnsafeCoerce (TEL.decodeUtf8)
 
+-- | Converts encoded text to ByteString adding "r-UTF8" annotation.
+-- The question is why "r-UTF8", not for example, "r-UTF16"?
+-- No reason, there maybe a diffrent combinator for that in the future or one that accepts a proxy.
 text2ByteStringS :: Enc ("enc-B64" ': ys) c T.Text -> Enc ("enc-B64" ': "r-UTF8" ': ys) c B.ByteString 
 text2ByteStringS = withUnsafeCoerce (TE.encodeUtf8)
 

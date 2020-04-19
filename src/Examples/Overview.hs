@@ -3,10 +3,16 @@
 {-# LANGUAGE DataKinds #-}
 
 -- | Overview examples showing how this library can be used 
-module Examples_Intro where
+-- These example use encoding and decoding instances found in 
+--
+-- 'Data.Encoding.Instances.Base64'
+-- 'Data.Encoding.Instances.ASCII'
+-- 'Data.Encoding.Instances.Encode.Sample'
+module Examples.Overview where
 
 import           Data.Encoding
 import           Data.Encoding.Instances.Base64
+import           Data.Encoding.Instances.ASCII
 import           Data.Encoding.Instances.Encode.Sample
  
 import           GHC.TypeLits
@@ -43,7 +49,7 @@ b64Twice :: Enc '["enc-B64","enc-B64"] () B.ByteString
 b64Twice = encodeAll . toEncoding () $ "Hello World"
 
 -- | Previous text decoded from double Base64 encoding.
--- Notice same code that does it as single decoding.
+-- Notice, a similar polymorphism in decoding.
 --
 -- >>> fromEncoding . decodeAll $ b64Twice :: B.ByteString 
 -- "Hello World"
@@ -102,7 +108,7 @@ instance HasA Config SizeLimit where
 extitlerev' :: Enc '["do-reverse", "do-Title"] Config T.Text
 extitlerev' = encodeAll . toEncoding exampleConf $ "HeLLo world"
 
--- | Configuration can now be used
+-- | Configuration can now be used to impact the encoding process
 --
 -- >>> encodeAll . toEncoding exampleConf $ "HeLlo world" :: Enc '["do-size-limit", "do-reverse", "do-Title"] Config T.Text
 -- MkEnc Proxy (Config {sizeLimit = SizeLimit {unSizeLimit = 8}}) "dlroW ol"
@@ -136,8 +142,32 @@ exlimitB64 = encodeAll . toEncoding exampleConf $ "HeLlo world"
 exlimitParDec :: Enc '["do-size-limit"] Config B.ByteString
 exlimitParDec =  decodePart (Proxy :: Proxy '["enc-B64"]) $ exlimitB64
 
--- Decoding errors, why?
 
--- Moving between types
+-- | ASCII char set
+-- ByteStrings are sequences of Bytes ('Data.Word.Word8'). The type
+-- is very permissive, it may contain binary data such as jpeg picture.
+--
+-- "r-ASCII" encoding acts as partial identity function
+-- it does not change any bytes in bytestream but it fails if a byte
+-- is outside of ASCII range.
+--
+-- Note naming thing: "r-" is paritial identity ("r-" is from restriction).
+--
+-- >>>  encodeFAll . toEncoding () $ "HeLlo world" :: Either NonAsciiChar (Enc '["r-ASCII"] () B.ByteString) 
+-- Right (MkEnc Proxy () "HeLlo world")
+exAscii :: Either NonAsciiChar (Enc '["r-ASCII"] () B.ByteString)
+exAscii = encodeFAll . toEncoding () $ "HeLlo world" 
 
--- Restriction types
+-- | Arguably the type we used for b64Once was too permissive.
+-- a better version is here:
+--
+-- >>> encodeFAll . toEncoding () $ "Hello World" :: Either NonAsciiChar (Enc '["enc-B64", "r-ASCII"] () B.ByteString)
+-- Right (MkEnc Proxy () "SGVsbG8gV29ybGQ=") 
+b64Once' :: Either NonAsciiChar (Enc '["enc-B64", "r-ASCII"] () B.ByteString)
+b64Once' = encodeFAll . toEncoding () $ "Hello World"
+
+-- |
+-- >>> decodePart (Proxy :: Proxy '["enc-B64"]) <$> b64Once'
+-- Right (MkEnc Proxy () "Hello World")
+b64OnceDecoded' :: Either NonAsciiChar (Enc '["r-ASCII"] () B.ByteString)
+b64OnceDecoded' = decodePart (Proxy :: Proxy '["enc-B64"]) <$> b64Once' 
