@@ -8,13 +8,19 @@
 {-# LANGUAGE UndecidableInstances #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeFamilies #-}
+-- {-# LANGUAGE PartialTypeSignatures #-}
 
 module Data.Encoding.Internal.Class where
 
-import          Data.Encoding.Internal.Types (Enc(..), toEncoding, unsafeGetPayload)
+import          Data.Encoding.Internal.Types (Enc(..) 
+                                              , toEncoding
+                                              , unsafeGetPayload
+                                              , withUnsafeCoerce
+                                              , unsafeChangePayload)
 import          Data.Proxy
 import          Data.Functor.Identity
 import          GHC.TypeLits
+import          Data.Semigroup ((<>))
 
 
 class EncodeF f instr outstr where    
@@ -58,6 +64,33 @@ decodeAll :: DecodeFAll Identity (xs :: [k]) c str =>
               -> (Enc '[] c str) 
 decodeAll = runIdentity . decodeFAll 
 
+-- | Used to safely recover encoded data validating all encodingss
+class RecreateF f instr outstr where    
+    checkPrevF :: outstr -> f instr
+
+class (Functor f) => RecreateFAll f (xs :: [k]) c str where
+    checkFAll :: (Enc xs c str) -> f (Enc '[] c str)
+    recreateFAll :: (Enc '[] c str) -> f (Enc xs c str)
+    recreateFAll str@(MkEnc _ _ pay) = 
+        let str0 :: Enc xs c str = withUnsafeCoerce id str
+        in fmap (withUnsafeCoerce (const pay)) $ checkFAll str0    
+
+instance Applicative f => RecreateFAll f '[] c str where
+    checkFAll (MkEnc _ c str) = pure $ toEncoding c str 
+
+
+instance (f ~ Either err, RecreateFAll f xs c str, RecreateF f (Enc xs c str) (Enc (x ': xs) c str)) => RecreateFAll f (x ': xs) c str where
+    checkFAll str = 
+        let re :: f (Enc xs c str) = checkPrevF str
+        in re >>= checkFAll
+         
+
+-- recFromDecodeFn :: (a -> Either err a) -> a -> Either err a
+-- recFromDecodeFn fn a = 
+--     case fn a of
+--         Left err -> Left err
+--         Right _ -> Right a
+                    
 
 -- | TODO use singletons def instead?
 type family Append (xs :: [k]) (ys :: [k]) :: [k] where
@@ -90,9 +123,15 @@ decodePart p = runIdentity . decodeFPart p
 
 -- Other classes --
 
--- | Converts keeping encoding annotations
-class Convert (xs :: [k]) str1 str2 where
-    convert :: Enc (xs :: [k]) c str1 ->  Enc xs c str2
+-- subsets are usefull for restriction encodings
+-- like r-UFT8 but not for other encodings.
+class Subset (x :: k) (y :: k) where
+    inject :: Proxy y -> Enc (x ': xs) c str ->  Enc (y ': xs) c str
+    inject _ = withUnsafeCoerce id
+
+class FlattenAs (x :: k) (y :: k) where
+    flattenAs :: Proxy y -> Enc (x ': xs) c str ->  Enc '[y] c str
+    flattenAs _ = withUnsafeCoerce id
 
 -- | Polymorphic data payloads used to encode/decode
 class HasA c a where
@@ -100,3 +139,26 @@ class HasA c a where
 
 instance HasA a () where
     has _ = const ()
+
+-- | With type safety in pace decoding errors should be unexpected
+-- this class can be used to provide extra info if decoding could fail
+class UnexpectedDecodeErr f where 
+    unexpectedDecodeErr :: String -> f a
+
+instance UnexpectedDecodeErr Identity where
+    unexpectedDecodeErr msg = fail msg
+
+newtype UnexpectedDecodeEx = UnexpectedDecodeEx String deriving (Show, Eq)
+
+instance UnexpectedDecodeErr (Either UnexpectedDecodeEx) where
+    unexpectedDecodeErr = Left . UnexpectedDecodeEx
+
+asUnexpected :: (UnexpectedDecodeErr f, Applicative f, Show err) => Either err a -> f a
+asUnexpected (Left err) = unexpectedDecodeErr $ show err
+asUnexpected (Right r) = pure r
+
+-- Utils --
+
+errorOnLeft :: Show err => Either err a -> a
+errorOnLeft (Left e) = error $ "You trusted encodings too much " <> show e
+errorOnLeft (Right r) =  r
