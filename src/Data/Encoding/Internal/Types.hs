@@ -31,7 +31,6 @@ implTranF f  = implTranF' (\c -> f)
 implTranF' :: Functor f =>  (conf -> str -> f str) -> Enc enc1 conf str -> f (Enc enc2 conf str)
 implTranF' f (MkEnc _ conf str) = (MkEnc Proxy conf) <$> f conf str
 
-
 implTranP :: Applicative f => (str -> str) -> Enc enc1 conf str -> f (Enc enc2 conf str)
 implTranP f  = implTranF' (\c -> pure . f)
 
@@ -46,4 +45,7 @@ unsafeGetPayload (MkEnc _ _ str) = str
 
 withUnsafeCoerce ::  (s1 -> s2) -> Enc e1 c s1 -> Enc e2 c s2
 withUnsafeCoerce f (MkEnc _ conf str)  = (MkEnc Proxy conf (f str)) 
+
+unsafeChangePayload ::  (s1 -> s2) -> Enc e c s1 -> Enc e c s2
+unsafeChangePayload f (MkEnc p conf str)  = (MkEnc p conf (f str)) 
 

@@ -77,21 +77,29 @@ instance Applicative f => DecodeF f (Enc ("r-ASCII" ': xs) c Char) (Enc xs c Cha
 
 instance EncodeF (Either NonAsciiChar) (Enc xs c T.Text) (Enc ("r-ASCII" ': xs) c T.Text) where
     encodeF = implTranF (encodeImpl T.partition T.head T.null)
+instance (UnexpectedDecodeErr f, Applicative f) => RecreateF f (Enc xs c T.Text) (Enc ("r-ASCII" ': xs) c T.Text) where
+    checkPrevF = implTranF (asUnexpected . encodeImpl T.partition T.head T.null)
 instance Applicative f => DecodeF f (Enc ("r-ASCII" ': xs) c T.Text) (Enc xs c T.Text) where
     decodeF = implTranP id 
 
 instance EncodeF (Either NonAsciiChar) (Enc xs c TL.Text) (Enc ("r-ASCII" ': xs) c TL.Text) where
     encodeF = implTranF (encodeImpl TL.partition TL.head TL.null)
+instance (UnexpectedDecodeErr f, Applicative f) => RecreateF f (Enc xs c TL.Text) (Enc ("r-ASCII" ': xs) c TL.Text) where 
+    checkPrevF = implTranF (asUnexpected . encodeImpl TL.partition TL.head TL.null)
 instance Applicative f => DecodeF f (Enc ("r-ASCII" ': xs) c TL.Text) (Enc xs c TL.Text) where
     decodeF = implTranP id 
 
 instance EncodeF (Either NonAsciiChar) (Enc xs c B.ByteString) (Enc ("r-ASCII" ': xs) c B.ByteString) where
     encodeF = implTranF (encodeImpl (\p -> B8.filter p &&& B8.filter (not . p)) B8.head B8.null)
+instance (UnexpectedDecodeErr f, Applicative f) => RecreateF f (Enc xs c B.ByteString) (Enc ("r-ASCII" ': xs) c B.ByteString) where
+    checkPrevF = implTranF (asUnexpected . encodeImpl (\p -> B8.filter p &&& B8.filter (not . p)) B8.head B8.null)
 instance Applicative f => DecodeF f (Enc ("r-ASCII" ': xs) c B.ByteString) (Enc xs c B.ByteString) where
     decodeF = implTranP id 
 
 instance EncodeF (Either NonAsciiChar) (Enc xs c BL.ByteString) (Enc ("r-ASCII" ': xs) c BL.ByteString) where
     encodeF = implTranF (encodeImpl (\p -> BL8.filter p &&& BL8.filter (not . p)) BL8.head BL8.null)
+instance (UnexpectedDecodeErr f, Applicative f) => RecreateF f (Enc xs c BL.ByteString) (Enc ("r-ASCII" ': xs) c BL.ByteString) where
+    checkPrevF = implTranF (asUnexpected . encodeImpl (\p -> BL8.filter p &&& BL8.filter (not . p)) BL8.head BL8.null)
 instance Applicative f => DecodeF f (Enc ("r-ASCII" ': xs) c BL.ByteString) (Enc xs c BL.ByteString) where
     decodeF = implTranP id 
 

@@ -42,14 +42,14 @@ a form of type directed program synthesis - programs become a boilerplate and th
 Here are some code examples:
    - [Overview](src/Examples/Overview.hs)
    - [Conversions between encodings](src/Examples/Conversions.hs)
-   - [Adding a new encoding](src/Examples/DiySignEncoding.hs)
-   - TODO [(Opinionated) Error handling](src/Examples/ErrorHandling.hs)
+   - [Adding a new encoding, error handling](src/Examples/DiySignEncoding.hs)
    - [Unsafe - working inside encodings](src/Examples/Unsafe.hs)
 
 ## Dependencies
 
 Currently it uses
    - `base64-bytestring` because it was my driving example
-   - `aeson` because it makes sense to define consistent JSON instances for `Enc`
+   - TODO `aeson` because it makes sense to define consistent JSON instances for `Enc`
    - I will try to separate other deps like `servant` into separate libs if there is interest
+
 

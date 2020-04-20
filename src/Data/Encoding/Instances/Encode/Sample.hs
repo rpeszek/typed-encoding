@@ -19,11 +19,18 @@ import           Data.Encoding.Instances.Support
 
 import           Data.Proxy
 import           GHC.TypeLits
-import qualified Data.List as L
+import           Data.Char
 
 
 instance Applicative f => EncodeF f (Enc xs c T.Text) (Enc ("do-UPPER" ': xs) c T.Text) where
     encodeF = implTranP T.toUpper
+instance (UnexpectedDecodeErr f, Applicative f) => RecreateF f (Enc xs c T.Text) (Enc ("do-UPPER" ': xs) c T.Text) where
+    checkPrevF = implTranF (asUnexpected . (\t -> 
+                                 let (g,b) = T.partition isUpper t
+                                 in if T.null b
+                                    then Right t
+                                    else Left $ "Found not upper case chars " ++ T.unpack b)
+                           )
 instance Applicative f => EncodeF f (Enc xs c TL.Text) (Enc ("do-UPPER" ': xs) c TL.Text) where
     encodeF = implTranP TL.toUpper 
 

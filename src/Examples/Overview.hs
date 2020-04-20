@@ -8,6 +8,11 @@
 -- 'Data.Encoding.Instances.Base64'
 -- 'Data.Encoding.Instances.ASCII'
 -- 'Data.Encoding.Instances.Encode.Sample'
+--
+-- This library is concerned with 3 main operations done on strings:
+-- encoding, decoding, and recovery.  Examples in this module cover all
+-- of these base cases.
+
 module Examples.Overview where
 
 import           Data.Encoding
@@ -43,6 +48,16 @@ b64Once = encodeAll . toEncoding () $ "Hello World"
 b64OnceDecoded :: B.ByteString
 b64OnceDecoded = fromEncoding . decodeAll $ b64Once
 
+-- | 'recreateFAll' allows for recovering data at boundaries, such as JSON input.
+-- 
+-- >>> recreateFAll . toEncoding () $ "SGVsbG8gV29ybGQ=" :: Either UnexpectedDecodeEx (Enc '["enc-B64"] () B.ByteString)
+-- Right (MkEnc Proxy () "SGVsbG8gV29ybGQ=")
+--
+-- recreateFAll . toEncoding () $ "SGVsbG8gV29ybGQ" :: Either UnexpectedDecodeEx (Enc '["enc-B64"] () B.ByteString)
+-- Left (UnexpectedDecodeEx "\"invalid padding\"")
+b64OnceRecovered :: Either UnexpectedDecodeEx (Enc '["enc-B64"] () B.ByteString)
+b64OnceRecovered = recreateFAll . toEncoding () $ "SGVsbG8gV29ybGQ="
+
 -- | "Hello World" double Base64 encoded.
 -- Notice the same code used as in single encoding, the game is played at type level.
 --
@@ -76,6 +91,13 @@ b64PartiallyDecoded = decodePart (Proxy :: Proxy '["enc-B64"]) $ b64Twice
 b64TwiceDecoded :: B.ByteString
 b64TwiceDecoded = fromEncoding . decodePart (Proxy :: Proxy '["enc-B64","enc-B64"]) $ b64Twice
 
+-- | what happens when we try to recover encoded once text to encoded twice 
+-- Notice the same expression is used as in previous recovery
+--
+-- >>> recreateFAll . toEncoding () $ "SGVsbG8gV29ybGQ=" :: Either UnexpectedDecodeEx (Enc '["enc-B64", "enc-B64"] () B.ByteString)
+-- Left (UnexpectedDecodeEx "\"invalid padding\"")
+b64TwiceRecoveredErr :: Either UnexpectedDecodeEx (Enc '["enc-B64", "enc-B64"] () B.ByteString)
+b64TwiceRecoveredErr = recreateFAll . toEncoding () $ "SGVsbG8gV29ybGQ="
 
 -- | Sample "do-UPPER" encoding applied to "Hello World"
 -- Notice a namespace thing going on, "enc-" is encoding, "do-" is some tranformation.  

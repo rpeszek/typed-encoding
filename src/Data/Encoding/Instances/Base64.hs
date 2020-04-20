@@ -7,6 +7,7 @@
 
 module Data.Encoding.Instances.Base64 where
 
+import           Data.Encoding
 import           Data.Encoding.Instances.Support
 
 import           Data.Proxy
@@ -26,6 +27,10 @@ import qualified Data.ByteString.Base64.Lazy as BL64
 import qualified Data.ByteString.Base64.URL as B64URL
 import qualified Data.ByteString.Base64.URL.Lazy as BL64URL
 
+-- $setup
+-- >>> :set -XScopedTypeVariables -XKindSignatures -XMultiParamTypeClasses -XDataKinds -XPolyKinds -XPartialTypeSignatures
+-- >>> import Test.QuickCheck.Instances.Text()
+-- >>> import Test.QuickCheck.Instances.ByteString()
 
 -----------------
 -- Conversions --
@@ -63,6 +68,9 @@ text2ByteStringS' = withUnsafeCoerce (TE.encodeUtf8)
 text2ByteStringL'  :: Enc ("enc-B64-nontext" ': ys) c TL.Text -> Enc ("enc-B64" ': ys) c BL.ByteString 
 text2ByteStringL'  = withUnsafeCoerce (TEL.encodeUtf8)
 
+acceptLenient :: Enc ("enc-B64-len" ': ys) c a -> Enc ("enc-B64" ': ys) c a  
+acceptLenient = withUnsafeCoerce (id)
+
 -- | allow to treat B64 encodings as ASCII forgetting about B64 encoding
 -- 
 -- TODO use showEnc
@@ -86,17 +94,26 @@ instance Applicative f => EncodeF f (Enc xs c B.ByteString) (Enc ("enc-B64" ': x
 -- It is a well known encoding and hackers will have no problem 
 -- making undetectable changes, but error handling at this stage
 -- could verify that email was corrupted.
-instance DecodeF (Either String) (Enc ("enc-B64" ': xs) c B.ByteString) (Enc xs c B.ByteString) where
-    decodeF = implTranF B64.decode 
-instance DecodeF Identity (Enc ("enc-B64" ': xs) c B.ByteString) (Enc xs c B.ByteString) where
-    decodeF = implTranP B64.decodeLenient 
+instance (UnexpectedDecodeErr f, Applicative f) => DecodeF f (Enc ("enc-B64" ': xs) c B.ByteString) (Enc xs c B.ByteString) where
+    decodeF = implTranF (asUnexpected . B64.decode) 
+
+instance (UnexpectedDecodeErr f, Applicative f) => RecreateF f (Enc xs c B.ByteString) (Enc ("enc-B64" ': xs) c B.ByteString) where
+    checkPrevF = implTranF (asUnexpected .  B64.decode) 
+
+instance Applicative f => RecreateF f (Enc xs c B.ByteString) (Enc ("enc-B64-len" ': xs) c B.ByteString) where
+    checkPrevF = implTranP (B64.encode . B64.decodeLenient) 
 
 instance Applicative f => EncodeF f  (Enc xs c BL.ByteString) (Enc ("enc-B64" ': xs) c BL.ByteString) where
     encodeF = implTranP BL64.encode 
-instance DecodeF (Either String) (Enc ("enc-B64" ': xs) c BL.ByteString) (Enc xs c BL.ByteString) where
-    decodeF = implTranF BL64.decode 
-instance DecodeF Identity (Enc ("enc-B64" ': xs) c BL.ByteString) (Enc xs c BL.ByteString) where
-    decodeF = implTranP BL64.decodeLenient 
+
+instance (UnexpectedDecodeErr f, Applicative f) => DecodeF f  (Enc ("enc-B64" ': xs) c BL.ByteString) (Enc xs c BL.ByteString) where
+    decodeF = implTranF (asUnexpected . BL64.decode)
+
+instance (UnexpectedDecodeErr f, Applicative f) => RecreateF f (Enc xs c BL.ByteString) (Enc ("enc-B64" ': xs) c BL.ByteString) where
+    checkPrevF = implTranF (asUnexpected .  BL64.decode) 
+
+instance Applicative f => RecreateF f (Enc xs c BL.ByteString) (Enc ("enc-B64-len" ': xs) c BL.ByteString) where
+    checkPrevF = implTranP (BL64.encode . BL64.decodeLenient) 
 
 -- B64URL currently not supported
 -- instance Applicative f => EncodeF f (Enc xs c B.ByteString) (Enc ("enc-B64URL" ': xs) c B.ByteString) where
@@ -116,7 +133,20 @@ instance DecodeF Identity (Enc ("enc-B64" ': xs) c BL.ByteString) (Enc xs c BL.B
 instance Applicative f => EncodeF f (Enc xs c T.Text) (Enc ("enc-B64" ': xs) c T.Text) where
     encodeF = implTranP (TE.decodeUtf8 . B64.encode . TE.encodeUtf8)   
 
+instance (UnexpectedDecodeErr f, Applicative f) => DecodeF f (Enc ("enc-B64" ': xs) c T.Text) (Enc xs c T.Text) where
+    decodeF = implTranF (asUnexpected . fmap TE.decodeUtf8 . B64.decode . TE.encodeUtf8) 
+
+instance (UnexpectedDecodeErr f, Applicative f) => RecreateF f (Enc xs c T.Text) (Enc ("enc-B64" ': xs) c T.Text) where
+    checkPrevF = implTranF (asUnexpected . fmap TE.decodeUtf8 .  B64.decode . TE.encodeUtf8) 
+
 instance Applicative f => EncodeF f (Enc xs c TL.Text) (Enc ("enc-B64" ': xs) c TL.Text) where
     encodeF = implTranP (TEL.decodeUtf8 . BL64.encode . TEL.encodeUtf8)   
+
+instance (UnexpectedDecodeErr f, Applicative f) => DecodeF f (Enc ("enc-B64" ': xs) c TL.Text) (Enc xs c TL.Text) where
+    decodeF = implTranF (asUnexpected . fmap TEL.decodeUtf8 . BL64.decode . TEL.encodeUtf8) 
+
+instance (UnexpectedDecodeErr f, Applicative f) => RecreateF f (Enc xs c TL.Text) (Enc ("enc-B64" ': xs) c TL.Text) where
+    checkPrevF = implTranF (asUnexpected . fmap TEL.decodeUtf8 .  BL64.decode . TEL.encodeUtf8) 
+
 
 

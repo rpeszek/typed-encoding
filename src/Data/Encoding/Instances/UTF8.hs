@@ -12,7 +12,7 @@
 module Data.Encoding.Instances.UTF8 where
 
 import           Data.Encoding.Instances.Support
-import           Data.Encoding.Internal.Utils (explainBool)
+-- import           Data.Encoding.Internal.Utils (proxiedId)
 import           Data.Encoding.Unsafe (withUnsafe)
 
 import           Data.Proxy
@@ -40,6 +40,7 @@ import           Data.Either
 -- >>> :set -XScopedTypeVariables -XKindSignatures -XMultiParamTypeClasses -XDataKinds -XPolyKinds -XPartialTypeSignatures
 -- >>> import Test.QuickCheck.Instances.Text()
 -- >>> import Test.QuickCheck.Instances.ByteString()
+-- >>> import Data.Encoding.Internal.Utils (proxiedId)
 
 -----------------
 -- Conversions --
@@ -69,9 +70,11 @@ txtBsSIdProp :: Proxy (ys :: [Symbol]) -> Enc ys c T.Text -> Enc ys c T.Text
 txtBsSIdProp _ = byteString2TextS . text2ByteStringS 
 
 -- | Indentity property "text2ByteStringS . byteString2TextS == id".
+--
+-- TODO need simpler prop test
+-- \(b :: B.ByteString) -> verEncoding b (fmap (fromEncoding . decodeAll . bsTxtIdProp (Proxy :: Proxy '[])) . (encodeFAll :: _ -> Either UnicodeException _). toEncoding () $ b)
 bsTxtIdProp :: Proxy (ys :: [Symbol]) -> Enc ("r-UTF8" ': ys) c B.ByteString -> Enc ("r-UTF8" ': ys) c B.ByteString
 bsTxtIdProp _ = text2ByteStringS . byteString2TextS
-
 
 text2ByteStringL :: Enc ys c TL.Text -> Enc ("r-UTF8" ': ys) c BL.ByteString
 text2ByteStringL = withUnsafeCoerce TEL.encodeUtf8
@@ -94,14 +97,19 @@ byteString2TextL = withUnsafeCoerce TEL.decodeUtf8
 --
 -- Following test uses 'verEncoding' helper that checks that bytes are encoded as Right iff they are valid UTF8 bytes
 --
--- prop> \(b :: B.ByteString) -> verEncoding b (fmap (fromEncoding . decodeAll . bsTxtIdProp (Proxy :: Proxy '[])) . (encodeFAll :: _ -> Either UnicodeException _). toEncoding () $ b)
+-- prop> \(b :: B.ByteString) -> verEncoding b (fmap (fromEncoding . decodeAll . proxiedId (Proxy :: Proxy (Enc '["r-UTF8"] _ _))) . (encodeFAll :: _ -> Either UnicodeException _). toEncoding () $ b)
+
 instance EncodeF (Either UnicodeException) (Enc xs c B.ByteString) (Enc ("r-UTF8" ': xs) c B.ByteString) where
     encodeF = implTranF (fmap TE.encodeUtf8 . TE.decodeUtf8')
+instance (UnexpectedDecodeErr f, Applicative f) => RecreateF f (Enc xs c B.ByteString) (Enc ("r-UTF8" ': xs) c B.ByteString) where
+    checkPrevF = implTranF (asUnexpected . fmap TE.encodeUtf8 . TE.decodeUtf8')
 instance Applicative f => DecodeF f (Enc ("r-UTF8" ': xs) c B.ByteString) (Enc xs c B.ByteString) where
     decodeF = implTranP id 
 
 instance EncodeF (Either UnicodeException) (Enc xs c BL.ByteString) (Enc ("r-UTF8" ': xs) c BL.ByteString) where
     encodeF = implTranF (fmap TEL.encodeUtf8 . TEL.decodeUtf8')
+instance (UnexpectedDecodeErr f, Applicative f) => RecreateF f (Enc xs c BL.ByteString) (Enc ("r-UTF8" ': xs) c BL.ByteString) where
+    checkPrevF = implTranF (asUnexpected . fmap TEL.encodeUtf8 . TEL.decodeUtf8')
 instance Applicative f => DecodeF f (Enc ("r-UTF8" ': xs) c BL.ByteString) (Enc xs c BL.ByteString) where
     decodeF = implTranP id 
 
