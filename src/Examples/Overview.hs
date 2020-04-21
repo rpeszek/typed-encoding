@@ -62,12 +62,12 @@ helloB64Decoded = fromEncoding . decodeAll $ helloB64
 -- | 'recreateFAll' allows for recovering data at program boundaries (for example, when parsing JSON input).
 -- It makes sure that the content satisfies specified encodings.
 -- 
--- >>> recreateFAll . toEncoding () $ "SGVsbG8gV29ybGQ=" :: Either UnexpectedDecodeEx (Enc '["enc-B64"] () B.ByteString)
+-- >>> recreateFAll . toEncoding () $ "SGVsbG8gV29ybGQ=" :: Either RecreateEx (Enc '["enc-B64"] () B.ByteString)
 -- Right (MkEnc Proxy () "SGVsbG8gV29ybGQ=")
 --
--- >>> recreateFAll . toEncoding () $ "SGVsbG8gV29ybGQ" :: Either UnexpectedDecodeEx (Enc '["enc-B64"] () B.ByteString)
--- Left (UnexpectedDecodeEx "\"invalid padding\"")
-helloB64Recovered :: Either UnexpectedDecodeEx (Enc '["enc-B64"] () B.ByteString)
+-- >>> recreateFAll . toEncoding () $ "SGVsbG8gV29ybGQ" :: Either RecreateEx (Enc '["enc-B64"] () B.ByteString)
+-- Left (RecreateEx "\"invalid padding\"")
+helloB64Recovered :: Either RecreateEx (Enc '["enc-B64"] () B.ByteString)
 helloB64Recovered = recreateFAll . toEncoding () $ "SGVsbG8gV29ybGQ="
 
 -- | "Hello World" double-Base64 encoded.
@@ -103,14 +103,14 @@ helloB64B64Decoded :: B.ByteString
 helloB64B64Decoded = fromEncoding . decodeAll $ helloB64B64
 
 
-helloB64B64RecoveredErr :: Either UnexpectedDecodeEx (Enc '["enc-B64", "enc-B64"] () B.ByteString)
+helloB64B64RecoveredErr :: Either RecreateEx (Enc '["enc-B64", "enc-B64"] () B.ByteString)
 helloB64B64RecoveredErr = recreateFAll . toEncoding () $ "SGVsbG8gV29ybGQ="
 -- ^ what happens when we try to recover encoded once text to @Enc '["enc-B64", "enc-B64"]@. 
 --
 -- Again, notice the same expression is used as in previous recovery.
 --
--- >>> recreateFAll . toEncoding () $ "SGVsbG8gV29ybGQ=" :: Either UnexpectedDecodeEx (Enc '["enc-B64", "enc-B64"] () B.ByteString)
--- Left (UnexpectedDecodeEx "\"invalid padding\"")
+-- >>> recreateFAll . toEncoding () $ "SGVsbG8gV29ybGQ=" :: Either RecreateEx (Enc '["enc-B64", "enc-B64"] () B.ByteString)
+-- Left (RecreateEx "\"invalid padding\"")
 --
 -- = "do-" Encodings section
 

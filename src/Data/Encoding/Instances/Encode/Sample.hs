@@ -24,8 +24,8 @@ import           Data.Char
 
 instance Applicative f => EncodeF f (Enc xs c T.Text) (Enc ("do-UPPER" ': xs) c T.Text) where
     encodeF = implTranP T.toUpper
-instance (UnexpectedDecodeErr f, Applicative f) => RecreateF f (Enc xs c T.Text) (Enc ("do-UPPER" ': xs) c T.Text) where
-    checkPrevF = implTranF (asUnexpected . (\t -> 
+instance (RecreateErr f, Applicative f) => RecreateF f (Enc xs c T.Text) (Enc ("do-UPPER" ': xs) c T.Text) where
+    checkPrevF = implTranF (asRecreateErr . (\t -> 
                                  let (g,b) = T.partition isUpper t
                                  in if T.null b
                                     then Right t

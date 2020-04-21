@@ -48,20 +48,20 @@ encodeSign t = (T.pack . show . T.length $ t) <> ":" <> t
 -- With type safety in pace, encoding/decoding errors should be only unexpected situations like
 -- a hacker somehow figuring out our very secret hash.
 --
--- >>> runIdentity $ decodeSign "3:abc" 
--- "abc"
+-- >>> decodeSign "3:abc" 
+-- Right "abc"
 --
--- >>> decodeSign "4:abc" :: Either UnexpectedDecodeEx T.Text
--- Left (UnexpectedDecodeEx "Corrupted Signature")
-decodeSign :: (UnexpectedDecodeErr f, Applicative f) => T.Text -> f T.Text
+-- >>> decodeSign "4:abc" 
+-- Left "Corrupted Signature"
+decodeSign :: T.Text -> Either String T.Text
 decodeSign t = 
     let (sdit, rest) = T.span isDigit $ t
         actsize = T.length rest - 1
         msize = readMaybe . T.unpack $ sdit
         checkDelimit = T.isInfixOf ":" rest
     in if msize == Just actsize && checkDelimit
-       then pure $ T.drop 1 rest
-       else unexpectedDecodeErr $ "Corrupted Signature"       
+       then Right $ T.drop 1 rest
+       else Left $ "Corrupted Signature"       
 
 
 -- | Because encoding function is pure we can create instance of EncodeF 
@@ -72,10 +72,15 @@ instance Applicative f => EncodeF f (Enc xs c T.Text) (Enc ("my-sign" ': xs) c T
 -- | Decoding is effectful to check for tampering with data.
 -- Implemenation simply uses 'EnT.implTranF' combinator on the decoding function.
 instance (UnexpectedDecodeErr f, Applicative f) => DecodeF f (Enc ("my-sign" ': xs) c T.Text) (Enc xs c T.Text) where
-    decodeF = EnT.implTranF decodeSign 
+    decodeF = EnT.implTranF (asUnexpected . decodeSign) 
 
-instance (UnexpectedDecodeErr f, Applicative f) => RecreateF f (Enc xs c T.Text) (Enc ("my-sign" ': xs) c T.Text) where   
-    checkPrevF = EnT.implTranF decodeSign 
+-- should this be different err? RecoveryErr? 
+-- the issue here is that Indentity has UnexpectedDecodeErr instance
+-- it should not for recovery .. only full Applicative instances would
+-- then allow for non-effectful recovery ....
+-- This would emphasize that other is unexpected ..
+instance (RecreateErr f, Applicative f) => RecreateF f (Enc xs c T.Text) (Enc ("my-sign" ': xs) c T.Text) where   
+    checkPrevF = EnT.implTranF (asRecreateErr . decodeSign) 
 
 -- | 
 -- >>> exEncoded
@@ -98,14 +103,14 @@ propEncDec t =
 -- The data was trasmitted over a network and got corrupted.
 --
 -- >>> hacker
--- Left (UnexpectedDecodeEx "Corrupted Signature")
-hacker :: Either UnexpectedDecodeEx (Enc '["my-sign"] () T.Text)
+-- Left (RecreateEx "\"Corrupted Signature\"")
+hacker :: Either RecreateEx (Enc '["my-sign"] () T.Text)
 hacker = 
     let payload = unsafeGetPayload $ exEncoded :: T.Text
         -- | payload is sent over network and get corrupted
         newpay = payload <> " corruption" 
         -- | boundary check recovers the data
-        newdata = recreateFAll . toEncoding () $ newpay :: Either UnexpectedDecodeEx (Enc '["my-sign"] () T.Text)
+        newdata = recreateFAll . toEncoding () $ newpay :: Either RecreateEx (Enc '["my-sign"] () T.Text)
     in newdata    
 
 

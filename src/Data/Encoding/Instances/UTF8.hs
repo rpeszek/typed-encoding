@@ -112,15 +112,15 @@ byteString2TextL = withUnsafeCoerce TEL.decodeUtf8
 
 instance EncodeF (Either UnicodeException) (Enc xs c B.ByteString) (Enc ("r-UTF8" ': xs) c B.ByteString) where
     encodeF = implTranF (fmap TE.encodeUtf8 . TE.decodeUtf8')
-instance (UnexpectedDecodeErr f, Applicative f) => RecreateF f (Enc xs c B.ByteString) (Enc ("r-UTF8" ': xs) c B.ByteString) where
-    checkPrevF = implTranF (asUnexpected . fmap TE.encodeUtf8 . TE.decodeUtf8')
+instance (RecreateErr f, Applicative f) => RecreateF f (Enc xs c B.ByteString) (Enc ("r-UTF8" ': xs) c B.ByteString) where
+    checkPrevF = implTranF (asRecreateErr . fmap TE.encodeUtf8 . TE.decodeUtf8')
 instance Applicative f => DecodeF f (Enc ("r-UTF8" ': xs) c B.ByteString) (Enc xs c B.ByteString) where
     decodeF = implTranP id 
 
 instance EncodeF (Either UnicodeException) (Enc xs c BL.ByteString) (Enc ("r-UTF8" ': xs) c BL.ByteString) where
     encodeF = implTranF (fmap TEL.encodeUtf8 . TEL.decodeUtf8')
-instance (UnexpectedDecodeErr f, Applicative f) => RecreateF f (Enc xs c BL.ByteString) (Enc ("r-UTF8" ': xs) c BL.ByteString) where
-    checkPrevF = implTranF (asUnexpected . fmap TEL.encodeUtf8 . TEL.decodeUtf8')
+instance (RecreateErr f, Applicative f) => RecreateF f (Enc xs c BL.ByteString) (Enc ("r-UTF8" ': xs) c BL.ByteString) where
+    checkPrevF = implTranF (asRecreateErr . fmap TEL.encodeUtf8 . TEL.decodeUtf8')
 instance Applicative f => DecodeF f (Enc ("r-UTF8" ': xs) c BL.ByteString) (Enc xs c BL.ByteString) where
     decodeF = implTranP id 
 

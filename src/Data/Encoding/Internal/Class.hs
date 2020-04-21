@@ -157,6 +157,22 @@ asUnexpected :: (UnexpectedDecodeErr f, Applicative f, Show err) => Either err a
 asUnexpected (Left err) = unexpectedDecodeErr $ show err
 asUnexpected (Right r) = pure r
 
+-- 
+
+-- | Recovery errors are expected unless Recovery allows Identity instance
+class RecreateErr f where 
+    recoveryErr :: String -> f a
+
+newtype RecreateEx = RecreateEx String deriving (Show, Eq)
+
+instance RecreateErr (Either RecreateEx) where
+    recoveryErr = Left . RecreateEx
+
+asRecreateErr :: (RecreateErr f, Applicative f, Show err) => Either err a -> f a
+asRecreateErr (Left err) = recoveryErr $ show err
+asRecreateErr (Right r) = pure r
+
+
 -- Utils --
 
 errorOnLeft :: Show err => Either err a -> a
