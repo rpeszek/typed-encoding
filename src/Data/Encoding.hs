@@ -7,6 +7,7 @@ module Data.Encoding (
     , module Data.Encoding.Internal.Class
     , Enc
     , unsafeGetPayload 
+    , unsafeSetPayload
     , fromEncoding
     , toEncoding
     , showEnc
@@ -14,6 +15,7 @@ module Data.Encoding (
 
 import           Data.Encoding.Internal.Types (Enc
                                               , unsafeGetPayload
+                                              , unsafeSetPayload
                                               , toEncoding
                                               , fromEncoding
                                               , showEnc

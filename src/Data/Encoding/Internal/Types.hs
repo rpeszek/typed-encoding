@@ -43,6 +43,9 @@ showEnc (MkEnc _ c s) = "MkEnc [" ++ symbolVal (Proxy :: Proxy s) ++ " ...] " ++
 unsafeGetPayload :: Enc enc conf str -> str  
 unsafeGetPayload (MkEnc _ _ str) = str
 
+unsafeSetPayload :: conf -> str -> Enc enc conf str 
+unsafeSetPayload c str = MkEnc Proxy c str
+
 withUnsafeCoerce ::  (s1 -> s2) -> Enc e1 c s1 -> Enc e2 c s2
 withUnsafeCoerce f (MkEnc _ conf str)  = (MkEnc Proxy conf (f str)) 
 

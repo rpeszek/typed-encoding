@@ -37,10 +37,22 @@ import           Data.Text.Encoding.Error (UnicodeException)
 import           Data.Either
 
 -- $setup
--- >>> :set -XScopedTypeVariables -XKindSignatures -XMultiParamTypeClasses -XDataKinds -XPolyKinds -XPartialTypeSignatures
+-- >>> :set -XScopedTypeVariables -XKindSignatures -XMultiParamTypeClasses -XDataKinds -XPolyKinds -XPartialTypeSignatures -XFlexibleInstances
+-- >>> import Test.QuickCheck
 -- >>> import Test.QuickCheck.Instances.Text()
 -- >>> import Test.QuickCheck.Instances.ByteString()
 -- >>> import Data.Encoding.Internal.Utils (proxiedId)
+-- >>> let prxyArb = Proxy :: Proxy (Either UnicodeException (Enc '["r-UTF8"] () B.ByteString))
+-- >>> :{
+-- >>> instance Arbitrary (Enc '["r-UTF8"] () B.ByteString) where 
+--      arbitrary =  fmap (fromRight (emptyUTF8B ())) 
+--                   . flip suchThat isRight 
+--                   . fmap (proxiedId prxyArb . encodeFAll . toEncoding ()) $ arbitrary 
+-- :}
+
+-- | empty string is valid utf8
+emptyUTF8B :: c -> Enc '["r-UTF8"] c B.ByteString
+emptyUTF8B c = unsafeSetPayload c ""   
 
 -----------------
 -- Conversions --
@@ -65,14 +77,13 @@ byteString2TextS :: Enc ("r-UTF8" ': ys) c B.ByteString -> Enc ys c T.Text
 byteString2TextS = withUnsafeCoerce TE.decodeUtf8
 
 -- | Indentity property "byteString2TextS . text2ByteStringS == id"
--- prop> \(t :: T.Text) -> t == (fromEncoding . txtBsSIdProp (Proxy :: Proxy '[]) . toEncoding () $ t)
+-- prop> \t -> t == (fromEncoding . txtBsSIdProp (Proxy :: Proxy '[]) . toEncoding () $ t)
 txtBsSIdProp :: Proxy (ys :: [Symbol]) -> Enc ys c T.Text -> Enc ys c T.Text
 txtBsSIdProp _ = byteString2TextS . text2ByteStringS 
 
 -- | Indentity property "text2ByteStringS . byteString2TextS == id".
 --
--- TODO need simpler prop test
--- \(b :: B.ByteString) -> verEncoding b (fmap (fromEncoding . decodeAll . bsTxtIdProp (Proxy :: Proxy '[])) . (encodeFAll :: _ -> Either UnicodeException _). toEncoding () $ b)
+-- prop> \(t :: Enc '["r-UTF8"] () B.ByteString) -> t == (bsTxtIdProp (Proxy :: Proxy '[]) $ t)
 bsTxtIdProp :: Proxy (ys :: [Symbol]) -> Enc ("r-UTF8" ': ys) c B.ByteString -> Enc ("r-UTF8" ': ys) c B.ByteString
 bsTxtIdProp _ = text2ByteStringS . byteString2TextS
 
