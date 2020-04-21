@@ -70,8 +70,11 @@ text2ByteStringS' = withUnsafeCoerce (TE.encodeUtf8)
 text2ByteStringL'  :: Enc ("enc-B64-nontext" ': ys) c TL.Text -> Enc ("enc-B64" ': ys) c BL.ByteString 
 text2ByteStringL'  = withUnsafeCoerce (TEL.encodeUtf8)
 
-acceptLenient :: Enc ("enc-B64-len" ': ys) c a -> Enc ("enc-B64" ': ys) c a  
-acceptLenient = withUnsafeCoerce (id)
+acceptLenientS :: Enc ("enc-B64-len" ': ys) c B.ByteString -> Enc ("enc-B64" ': ys) c B.ByteString 
+acceptLenientS = withUnsafeCoerce (B64.encode . B64.decodeLenient)
+
+acceptLenientL :: Enc ("enc-B64-len" ': ys) c BL.ByteString -> Enc ("enc-B64" ': ys) c BL.ByteString 
+acceptLenientL = withUnsafeCoerce (BL64.encode . BL64.decodeLenient)
 
 -- | allow to treat B64 encodings as ASCII forgetting about B64 encoding
 -- 
@@ -103,7 +106,7 @@ instance (UnexpectedDecodeErr f, Applicative f) => RecreateF f (Enc xs c B.ByteS
     checkPrevF = implTranF (asUnexpected .  B64.decode) 
 
 instance Applicative f => RecreateF f (Enc xs c B.ByteString) (Enc ("enc-B64-len" ': xs) c B.ByteString) where
-    checkPrevF = implTranP (B64.encode . B64.decodeLenient) 
+    checkPrevF = implTranP (id) 
 
 instance Applicative f => EncodeF f  (Enc xs c BL.ByteString) (Enc ("enc-B64" ': xs) c BL.ByteString) where
     encodeF = implTranP BL64.encode 
@@ -115,7 +118,7 @@ instance (UnexpectedDecodeErr f, Applicative f) => RecreateF f (Enc xs c BL.Byte
     checkPrevF = implTranF (asUnexpected .  BL64.decode) 
 
 instance Applicative f => RecreateF f (Enc xs c BL.ByteString) (Enc ("enc-B64-len" ': xs) c BL.ByteString) where
-    checkPrevF = implTranP (BL64.encode . BL64.decodeLenient) 
+    checkPrevF = implTranP (id) 
 
 -- B64URL currently not supported
 -- instance Applicative f => EncodeF f (Enc xs c B.ByteString) (Enc ("enc-B64URL" ': xs) c B.ByteString) where

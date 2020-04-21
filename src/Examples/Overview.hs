@@ -35,7 +35,7 @@ import           Data.Functor.Identity
 -- $setup
 -- >>> :set -XOverloadedStrings -XMultiParamTypeClasses -XDataKinds
 --
--- This module contains a bumch of ghci friently values to play with.
+-- This module contains some ghci friently values to play with.
 --
 -- Each value is documented in a doctest style by including an equivalent ghci ready expression.
 -- These documents generate a test suite for this libarary as well.

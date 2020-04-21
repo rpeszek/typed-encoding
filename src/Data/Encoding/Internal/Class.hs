@@ -79,17 +79,17 @@ instance Applicative f => RecreateFAll f '[] c str where
     checkFAll (MkEnc _ c str) = pure $ toEncoding c str 
 
 
-instance (f ~ Either err, RecreateFAll f xs c str, RecreateF f (Enc xs c str) (Enc (x ': xs) c str)) => RecreateFAll f (x ': xs) c str where
+instance (Monad f, RecreateFAll f xs c str, RecreateF f (Enc xs c str) (Enc (x ': xs) c str)) => RecreateFAll f (x ': xs) c str where
     checkFAll str = 
         let re :: f (Enc xs c str) = checkPrevF str
         in re >>= checkFAll
-         
 
--- recFromDecodeFn :: (a -> Either err a) -> a -> Either err a
--- recFromDecodeFn fn a = 
---     case fn a of
---         Left err -> Left err
---         Right _ -> Right a
+
+recreateAll :: RecreateFAll Identity (xs :: [k]) c str => 
+              (Enc '[] c str) 
+              -> (Enc xs c str)
+recreateAll = runIdentity . recreateFAll             
+
                     
 
 -- | TODO use singletons def instead?
