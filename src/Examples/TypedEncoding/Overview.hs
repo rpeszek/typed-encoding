@@ -33,10 +33,10 @@ import           Data.Functor.Identity
 -- $setup
 -- >>> :set -XOverloadedStrings -XMultiParamTypeClasses -XDataKinds
 --
--- This module contains some ghci friently values to play with.
+-- This module contains some ghci friendly values to play with.
 --
 -- Each value is documented in a doctest style by including an equivalent ghci ready expression.
--- These documents generate a test suite for this libarary as well.
+-- These documents generate a test suite for this library as well.
 
 -- * Basics
 
@@ -116,8 +116,8 @@ helloB64B64RecoveredErr = recreateFAll . toEncoding () $ "SGVsbG8gV29ybGQ="
 -- |
 -- "do-UPPER" (from 'Data.TypedEncoding.Instances.Encode.Sample' module) encoding applied to "Hello World"
 --
--- Notice a namespace thing going on, "enc-" is encoding, "do-" is some tranformation. 
--- These are typically not reversable, some could be recoverable.
+-- Notice a namespace thing going on, "enc-" is encoding, "do-" is some transformation. 
+-- These are typically not reversible, some could be recoverable.
 --  
 -- The same code is used as in "enc-" examples to encode (now transform).
 --
@@ -126,7 +126,7 @@ helloB64B64RecoveredErr = recreateFAll . toEncoding () $ "SGVsbG8gV29ybGQ="
 helloUPP :: Enc '["do-UPPER"] () T.Text
 helloUPP = encodeAll . toEncoding () $ "Hello World"
 
--- | Sample compound tranformation 
+-- | Sample compound transformation 
 -- 
 -- >>> encodeAll . toEncoding () $ "HeLLo world" :: Enc '["do-reverse", "do-Title"] () T.Text
 -- MkEnc Proxy () "dlroW olleH" 
@@ -192,10 +192,10 @@ helloRevLimitParDec =  decodePart (Proxy :: Proxy '["enc-B64"]) $ helloLimitB64
 -- is very permissive, it may contain binary data such as jpeg picture.
 --
 -- "r-ASCII" encoding acts as partial identity function
--- it does not change any bytes in bytestream but it fails if a byte
+-- it does not change any bytes in bytestring but it fails if a byte
 -- is outside of ASCII range (in @Either@ monad).
 --
--- Note naming thing: "r-" is paritial identity ("r-" is from restriction).
+-- Note naming thing: "r-" is partial identity ("r-" is from restriction).
 --
 -- >>>  encodeFAll . toEncoding () $ "HeLlo world" :: Either NonAsciiChar (Enc '["r-ASCII"] () B.ByteString) 
 -- Right (MkEnc Proxy () "HeLlo world")
