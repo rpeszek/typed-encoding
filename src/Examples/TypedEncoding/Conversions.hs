@@ -28,10 +28,10 @@ import           Data.Text.Encoding.Error (UnicodeException)
 -- $setup
 -- >>> :set -XOverloadedStrings -XMultiParamTypeClasses -XDataKinds
 --
--- This module contains some ghci friently values to play with.
+-- This module contains some ghci friendly values to play with.
 --
 -- Each value is documented in a doctest style by including an equivalent ghci ready expression.
--- These documents generate a test suite for this libarary as well.
+-- These documents generate a test suite for this library as well.
 
 
 -- * Moving between Text and ByteString
@@ -83,7 +83,7 @@ helloUtf8B = inject Proxy helloAsciiB
 
 helloUtf8B64B :: Enc '["enc-B64", "r-UTF8"] () B.ByteString
 helloUtf8B64B = encodePart (Proxy :: Proxy '["enc-B64"]) helloUtf8B 
--- ^ We put Base64 on the UFT8 ByteStream
+-- ^ We put Base64 on the UFT8 ByteString
 --
 -- >>> encodePart (Proxy :: Proxy '["enc-B64"]) helloUtf8B
 -- MkEnc Proxy () "SGVMbG8gd29ybGQ="
@@ -96,7 +96,7 @@ helloUtf8B64T = EnB64.byteString2TextS helloUtf8B64B
 -- >>> :t EnB64.byteString2TextS helloUtf8B64B
 -- EnB64.byteString2TextS helloUtf8B64B :: Enc '["enc-B64"] () T.Text
 --
--- Conversly moving back to ByteString recovers the annotation.
+-- Conversely moving back to ByteString recovers the annotation.
 -- (there could be a choice of a UTF annotation to recover in the future)
 -- 
 -- >>> :t EnB64.text2ByteStringS helloUtf8B64T
@@ -117,7 +117,7 @@ notTextB = encodeAll . toEncoding () $ "\195\177"
 -- ... :: Enc '["enc-B64-nontext"] () T.Text
 --
 -- The result is annotated as "enc-B64-nontext" which prevents decoding it within 'T.Text' type.
--- We can only move it back to ByteStream as "enc-B64".
+-- We can only move it back to ByteString as "enc-B64".
 
 
 

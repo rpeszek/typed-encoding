@@ -3,7 +3,7 @@
 {-# LANGUAGE DataKinds #-}
 
 -- |
--- Main Module in typed-econdings. 
+-- Main Module in typed-encoding. 
 --
 -- This library allows to specify and work with types like
 --
@@ -27,14 +27,14 @@
 --
 -- To use this library import this module and one or more "instance" modules.
 --
--- Here is list of instance modules available in typed-econdings library itself
+-- Here is list of instance modules available in typed-encoding library itself
 --
 -- * "Data.TypedEncoding.Instances.Base64"
 -- * "Data.TypedEncoding.Instances.ASCII" 
 -- * "Data.TypedEncoding.Instances.UTF8" 
 -- * "Data.TypedEncoding.Instances.Encode.Sample" 
 -- 
--- This list is not intended to be exaustive, rather separate libraries
+-- This list is not intended to be exhaustive, rather separate libraries
 -- can provide instances for other encodings and transformations.
 --
 -- To implement a new encoding import this module and
@@ -70,5 +70,3 @@ import           Data.TypedEncoding.Internal.Types (Enc
                                               , showEnc
                                               )
 import           Data.TypedEncoding.Internal.Class
-
-

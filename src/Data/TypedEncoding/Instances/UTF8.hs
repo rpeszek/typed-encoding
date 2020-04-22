@@ -76,12 +76,12 @@ text2ByteStringS = withUnsafeCoerce TE.encodeUtf8
 byteString2TextS :: Enc ("r-UTF8" ': ys) c B.ByteString -> Enc ys c T.Text 
 byteString2TextS = withUnsafeCoerce TE.decodeUtf8
 
--- | Indentity property "byteString2TextS . text2ByteStringS == id"
+-- | Identity property "byteString2TextS . text2ByteStringS == id"
 -- prop> \t -> t == (fromEncoding . txtBsSIdProp (Proxy :: Proxy '[]) . toEncoding () $ t)
 txtBsSIdProp :: Proxy (ys :: [Symbol]) -> Enc ys c T.Text -> Enc ys c T.Text
 txtBsSIdProp _ = byteString2TextS . text2ByteStringS 
 
--- | Indentity property "text2ByteStringS . byteString2TextS == id".
+-- | Identity property "text2ByteStringS . byteString2TextS == id".
 --
 -- prop> \(t :: Enc '["r-UTF8"] () B.ByteString) -> t == (bsTxtIdProp (Proxy :: Proxy '[]) $ t)
 bsTxtIdProp :: Proxy (ys :: [Symbol]) -> Enc ("r-UTF8" ': ys) c B.ByteString -> Enc ("r-UTF8" ': ys) c B.ByteString
@@ -99,7 +99,7 @@ byteString2TextL = withUnsafeCoerce TEL.decodeUtf8
 
 -- TODO these are quick and dirty
 
--- | UTF8 encodings are defined for ByteStream only as that would not make much sense for Text
+-- | UTF8 encodings are defined for ByteString only as that would not make much sense for Text
 --
 -- >>> encodeFAll . toEncoding () $ "\xc3\xb1" :: Either UnicodeException (Enc '["r-UTF8"] () B.ByteString)
 -- Right (MkEnc Proxy () "\195\177")

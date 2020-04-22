@@ -99,7 +99,7 @@ type family Append (xs :: [k]) (ys :: [k]) :: [k] where
     Append '[] xs = xs
     Append (y ': ys) xs = y ': (Append ys xs)
 
--- | Unsafe implemenation guarted by safe type definition
+-- | Unsafe implementation guarded by safe type definition
 encodeFPart :: forall f xs xsf c str . (Functor f, EncodeFAll f xs c str) => Proxy xs -> (Enc xsf c str) -> f (Enc (Append xs xsf) c str)
 encodeFPart p (MkEnc _ conf str) = 
     let re :: f (Enc xs c str) = encodeFAll $ MkEnc Proxy conf str
@@ -111,7 +111,7 @@ encodePart :: EncodeFAll Identity (xs :: [k]) c str =>
               -> (Enc (Append xs xsf) c str) 
 encodePart p = runIdentity . encodeFPart p
 
--- | Unsafe implemenation guarted by safe type definition
+-- | Unsafe implementation guarded by safe type definition
 decodeFPart :: forall f xs xsf c str . (Functor f, DecodeFAll f xs c str) => Proxy xs -> (Enc (Append xs xsf) c str) -> f (Enc xsf c str)
 decodeFPart p (MkEnc _ conf str) = 
     let re :: f (Enc '[] c str) = decodeFAll $ MkEnc (Proxy :: Proxy xs) conf str
@@ -125,7 +125,7 @@ decodePart p = runIdentity . decodeFPart p
 
 -- Other classes --
 
--- subsets are usefull for restriction encodings
+-- subsets are useful for restriction encodings
 -- like r-UFT8 but not for other encodings.
 class Subset (x :: k) (y :: k) where
     inject :: Proxy y -> Enc (x ': xs) c str ->  Enc (y ': xs) c str

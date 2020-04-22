@@ -88,7 +88,7 @@ instance FlattenAs "enc-B64" "r-ASCII" where
 
 
 -----------------
--- Encondings  --
+-- Encodings   --
 -----------------
 
 instance Applicative f => EncodeF f (Enc xs c B.ByteString) (Enc ("enc-B64" ': xs) c B.ByteString) where
@@ -152,6 +152,3 @@ instance (UnexpectedDecodeErr f, Applicative f) => DecodeF f (Enc ("enc-B64" ': 
 
 instance (RecreateErr f, Applicative f) => RecreateF f (Enc xs c TL.Text) (Enc ("enc-B64" ': xs) c TL.Text) where
     checkPrevF = implTranF (asRecreateErr . fmap TEL.decodeUtf8 .  BL64.decode . TEL.encodeUtf8) 
-
-
-
