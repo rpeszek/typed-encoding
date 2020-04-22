@@ -10,11 +10,9 @@
 --
 -- This module uses encoding instances found in 
 --
--- * 'Data.Encoding.Instances.Base64' (Data.Encoding.Instances.Base64)
---
--- * 'Data.Encoding.Instances.ASCII' (Data.Encoding.Instances.ASCII)
---
--- * 'Data.Encoding.Instances.Encode.Sample' (Data.Encoding.Instances.Encode.Sample)
+-- * "Data.Encoding.Instances.Base64"
+-- * "Data.Encoding.Instances.ASCII"
+-- * "Data.Encoding.Instances.Encode.Sample"
 --
 
 module Examples.Overview where
