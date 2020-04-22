@@ -2,9 +2,9 @@ name:                typed-encoding
 version:             0.1.0.0
 github:              "githubuser/typed-encoding"
 license:             BSD3
-author:              "Author name here"
+author:              "Robert Peszek"
 maintainer:          "example@example.com"
-copyright:           "2020 Author name here"
+copyright:           "2020 Robert Peszek"
 
 extra-source-files:
 - README.md
@@ -17,7 +17,12 @@ extra-source-files:
 # To avoid duplicated efforts in documentation and dealing with the
 # complications of embedding Haddock markup inside cabal files, it is
 # common to point users to the README.md file.
-description:         Please see the README on GitHub at <https://github.com/githubuser/typed-encoding#readme>
+description:         
+  .
+  Type level annotations that make programming Strings safer.
+  .
+  Contains a list of Example modules.
+
 
 dependencies:
 - base >= 4.7 && < 5

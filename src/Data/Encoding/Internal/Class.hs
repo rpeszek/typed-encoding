@@ -14,9 +14,11 @@ module Data.Encoding.Internal.Class where
 
 import          Data.Encoding.Internal.Types (Enc(..) 
                                               , toEncoding
-                                              , unsafeGetPayload
+                                              , getPayload
                                               , withUnsafeCoerce
-                                              , unsafeChangePayload)
+                                              , unsafeChangePayload
+                                              , RecreateEx(..)
+                                              , UnexpectedDecodeEx(..))
 import          Data.Proxy
 import          Data.Functor.Identity
 import          GHC.TypeLits
@@ -101,7 +103,7 @@ type family Append (xs :: [k]) (ys :: [k]) :: [k] where
 encodeFPart :: forall f xs xsf c str . (Functor f, EncodeFAll f xs c str) => Proxy xs -> (Enc xsf c str) -> f (Enc (Append xs xsf) c str)
 encodeFPart p (MkEnc _ conf str) = 
     let re :: f (Enc xs c str) = encodeFAll $ MkEnc Proxy conf str
-    in  (MkEnc Proxy conf . unsafeGetPayload) <$> re 
+    in  (MkEnc Proxy conf . getPayload) <$> re 
 
 encodePart :: EncodeFAll Identity (xs :: [k]) c str => 
               Proxy xs 
@@ -113,7 +115,7 @@ encodePart p = runIdentity . encodeFPart p
 decodeFPart :: forall f xs xsf c str . (Functor f, DecodeFAll f xs c str) => Proxy xs -> (Enc (Append xs xsf) c str) -> f (Enc xsf c str)
 decodeFPart p (MkEnc _ conf str) = 
     let re :: f (Enc '[] c str) = decodeFAll $ MkEnc (Proxy :: Proxy xs) conf str
-    in  (MkEnc Proxy conf . unsafeGetPayload) <$> re 
+    in  (MkEnc Proxy conf . getPayload) <$> re 
  
 decodePart :: DecodeFAll Identity (xs :: [k]) c str => 
               Proxy xs 
@@ -148,8 +150,6 @@ class UnexpectedDecodeErr f where
 instance UnexpectedDecodeErr Identity where
     unexpectedDecodeErr msg = fail msg
 
-newtype UnexpectedDecodeEx = UnexpectedDecodeEx String deriving (Show, Eq)
-
 instance UnexpectedDecodeErr (Either UnexpectedDecodeEx) where
     unexpectedDecodeErr = Left . UnexpectedDecodeEx
 
@@ -162,8 +162,6 @@ asUnexpected (Right r) = pure r
 -- | Recovery errors are expected unless Recovery allows Identity instance
 class RecreateErr f where 
     recoveryErr :: String -> f a
-
-newtype RecreateEx = RecreateEx String deriving (Show, Eq)
 
 instance RecreateErr (Either RecreateEx) where
     recoveryErr = Left . RecreateEx

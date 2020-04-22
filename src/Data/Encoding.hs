@@ -6,7 +6,9 @@ module Data.Encoding (
     module Data.Encoding
     , module Data.Encoding.Internal.Class
     , Enc
-    , unsafeGetPayload 
+    , RecreateEx(..)
+    , UnexpectedDecodeEx(..)
+    , getPayload 
     , unsafeSetPayload
     , fromEncoding
     , toEncoding
@@ -14,7 +16,9 @@ module Data.Encoding (
  ) where
 
 import           Data.Encoding.Internal.Types (Enc
-                                              , unsafeGetPayload
+                                              , RecreateEx(..)
+                                              , UnexpectedDecodeEx(..)
+                                              , getPayload
                                               , unsafeSetPayload
                                               , toEncoding
                                               , fromEncoding

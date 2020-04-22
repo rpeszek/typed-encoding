@@ -39,8 +39,8 @@ import           Data.Functor.Identity
 --
 -- Each value is documented in a doctest style by including an equivalent ghci ready expression.
 -- These documents generate a test suite for this libarary as well.
---
--- = Basics
+
+-- * Basics
 
 -- | "Hello World" encoded as Base64
 --
@@ -102,18 +102,18 @@ helloB64B64PartDecode = decodePart (Proxy :: Proxy '["enc-B64"]) $ helloB64B64
 helloB64B64Decoded :: B.ByteString
 helloB64B64Decoded = fromEncoding . decodeAll $ helloB64B64
 
-
-helloB64B64RecoveredErr :: Either RecreateEx (Enc '["enc-B64", "enc-B64"] () B.ByteString)
-helloB64B64RecoveredErr = recreateFAll . toEncoding () $ "SGVsbG8gV29ybGQ="
--- ^ what happens when we try to recover encoded once text to @Enc '["enc-B64", "enc-B64"]@. 
+-- | what happens when we try to recover encoded once text to @Enc '["enc-B64", "enc-B64"]@. 
 --
 -- Again, notice the same expression is used as in previous recovery.
 --
 -- >>> recreateFAll . toEncoding () $ "SGVsbG8gV29ybGQ=" :: Either RecreateEx (Enc '["enc-B64", "enc-B64"] () B.ByteString)
 -- Left (RecreateEx "\"invalid padding\"")
---
--- = "do-" Encodings section
+helloB64B64RecoveredErr :: Either RecreateEx (Enc '["enc-B64", "enc-B64"] () B.ByteString)
+helloB64B64RecoveredErr = recreateFAll . toEncoding () $ "SGVsbG8gV29ybGQ="
 
+
+
+-- * "do-" Encodings
 
 -- |
 -- "do-UPPER" (from 'Data.Encoding.Instances.Encode.Sample' module) encoding applied to "Hello World"
@@ -128,14 +128,16 @@ helloB64B64RecoveredErr = recreateFAll . toEncoding () $ "SGVsbG8gV29ybGQ="
 helloUPP :: Enc '["do-UPPER"] () T.Text
 helloUPP = encodeAll . toEncoding () $ "Hello World"
 
-helloTitleRev :: Enc '["do-reverse", "do-Title"] () T.Text
-helloTitleRev = encodeAll . toEncoding () $ "HeLLo world"
--- ^ Sample compound tranformation 
+-- | Sample compound tranformation 
 -- 
 -- >>> encodeAll . toEncoding () $ "HeLLo world" :: Enc '["do-reverse", "do-Title"] () T.Text
 -- MkEnc Proxy () "dlroW olleH" 
--- 
--- = Configuration
+helloTitleRev :: Enc '["do-reverse", "do-Title"] () T.Text
+helloTitleRev = encodeAll . toEncoding () $ "HeLLo world"
+
+
+
+-- * Configuration
 
 -- | Example configuration
 data Config = Config {
@@ -175,15 +177,17 @@ helloRevLimit = encodePart (Proxy :: Proxy '["do-size-limit", "do-reverse"]) hel
 helloLimitB64 :: Enc '["enc-B64", "do-size-limit"] Config B.ByteString
 helloLimitB64 = encodeAll . toEncoding exampleConf $ "HeLlo world"
 
-helloRevLimitParDec :: Enc '["do-size-limit"] Config B.ByteString
-helloRevLimitParDec =  decodePart (Proxy :: Proxy '["enc-B64"]) $ helloLimitB64
--- ^ ... and we unwrap the B64 part only
+-- | ... and we unwrap the B64 part only
 -- 
 -- >>> decodePart (Proxy :: Proxy '["enc-B64"]) $ helloLimitB64
 -- MkEnc Proxy (Config {sizeLimit = SizeLimit {unSizeLimit = 8}}) "HeLlo wo"
---
--- = "r-" encodings section
+helloRevLimitParDec :: Enc '["do-size-limit"] Config B.ByteString
+helloRevLimitParDec =  decodePart (Proxy :: Proxy '["enc-B64"]) $ helloLimitB64
 
+
+
+
+-- * "r-" encodings section
 
 -- | ASCII char set
 -- ByteStrings are sequences of Bytes ('Data.Word.Word8'). The type

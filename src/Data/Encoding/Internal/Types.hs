@@ -6,6 +6,9 @@
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 
+-- |
+-- Internal definition of types
+
 module Data.Encoding.Internal.Types where
 
 import           Data.Proxy
@@ -23,7 +26,7 @@ toEncoding :: conf -> str -> Enc '[] conf str
 toEncoding conf str = MkEnc Proxy conf str
 
 fromEncoding :: Enc '[] conf str -> str
-fromEncoding = unsafeGetPayload
+fromEncoding = getPayload
 
 implTranF :: Functor f => (str -> f str) -> Enc enc1 conf str -> f (Enc enc2 conf str)
 implTranF f  = implTranF' (\c -> f)
@@ -40,8 +43,8 @@ implTranP' f  = implTranF' (\c -> pure . f c)
 showEnc :: forall s c str xs. (KnownSymbol s, Show c, Show str) => Enc (s ': xs) c str -> String
 showEnc (MkEnc _ c s) = "MkEnc [" ++ symbolVal (Proxy :: Proxy s) ++ " ...] " ++ show c ++ " " ++ show s
 
-unsafeGetPayload :: Enc enc conf str -> str  
-unsafeGetPayload (MkEnc _ _ str) = str
+getPayload :: Enc enc conf str -> str  
+getPayload (MkEnc _ _ str) = str
 
 unsafeSetPayload :: conf -> str -> Enc enc conf str 
 unsafeSetPayload c str = MkEnc Proxy c str
@@ -52,3 +55,10 @@ withUnsafeCoerce f (MkEnc _ conf str)  = (MkEnc Proxy conf (f str))
 unsafeChangePayload ::  (s1 -> s2) -> Enc e c s1 -> Enc e c s2
 unsafeChangePayload f (MkEnc p conf str)  = (MkEnc p conf (f str)) 
 
+-- | Representing errors in recovery (recreation of encoded types).
+newtype RecreateEx = RecreateEx String deriving (Show, Eq)
+
+-- | Type safety over encodings makes decoding process safe.
+-- However failures are still possible due to bugs or unsafe payload modifications.
+-- UnexpectedDecodeEx represents such errors.
+newtype UnexpectedDecodeEx = UnexpectedDecodeEx String deriving (Show, Eq)

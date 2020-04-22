@@ -9,7 +9,7 @@
 
 -- | Simple DIY encoding example that 'signs' Text with its length.
 --
--- This includes discussion of error handling options. 
+-- Documentation includes discussion of error handling options. 
 --
 -- My current thinking: 
 --
@@ -18,6 +18,9 @@
 --
 -- Such integrity of data should be enforced at boundaries
 -- (JSON instances, DB retrievals, etc).  This can be acomplished using provided 'RecreateF' typeclass.
+-- 
+-- This still is user decision, the errors during decoding process are considered unexpected 'UnexpectedDecodeErr'.
+-- In particular user can decide to use unsafe operations with the encoded type. See 'Examples.Unsafe'.
 
 module Examples.DiySignEncoding where
 
@@ -38,15 +41,14 @@ import           Text.Read (readMaybe)
 -- >>> :set -XOverloadedStrings -XMultiParamTypeClasses -XDataKinds
 -- >>> import Test.QuickCheck.Instances.Text()
 
--- | Not exposed method that 'encodes' 
+-- | 'encoding' function, typically should be module private 
 encodeSign :: T.Text -> T.Text
 encodeSign t = (T.pack . show . T.length $ t) <> ":" <> t
 
 
--- | Not exposed method that 'decodes'
--- This method validates the encoding.
--- With type safety in pace, encoding/decoding errors should be only unexpected situations like
--- a hacker somehow figuring out our very secret hash.
+-- | dual purpose decoding and recovery function.
+--
+-- This typically should be module private.
 --
 -- >>> decodeSign "3:abc" 
 -- Right "abc"
@@ -64,33 +66,17 @@ decodeSign t =
        else Left $ "Corrupted Signature"       
 
 
--- | Because encoding function is pure we can create instance of EncodeF 
--- that is polymorphic in effect @f@. This is done using 'EnT.implTranP' combinator.
-instance Applicative f => EncodeF f (Enc xs c T.Text) (Enc ("my-sign" ': xs) c T.Text) where
-    encodeF = EnT.implTranP encodeSign    
-
--- | Decoding is effectful to check for tampering with data.
--- Implemenation simply uses 'EnT.implTranF' combinator on the decoding function.
-instance (UnexpectedDecodeErr f, Applicative f) => DecodeF f (Enc ("my-sign" ': xs) c T.Text) (Enc xs c T.Text) where
-    decodeF = EnT.implTranF (asUnexpected . decodeSign) 
-
--- should this be different err? RecoveryErr? 
--- the issue here is that Indentity has UnexpectedDecodeErr instance
--- it should not for recovery .. only full Applicative instances would
--- then allow for non-effectful recovery ....
--- This would emphasize that other is unexpected ..
-instance (RecreateErr f, Applicative f) => RecreateF f (Enc xs c T.Text) (Enc ("my-sign" ': xs) c T.Text) where   
-    checkPrevF = EnT.implTranF (asRecreateErr . decodeSign) 
-
--- | 
--- >>> exEncoded
+-- | Encoded hello world example.
+--
+-- >>> helloSigned
 -- MkEnc Proxy () "11:Hello World"
--- >>> fromEncoding . decodeAll $ exEncoded 
+--
+-- >>> fromEncoding . decodeAll $ helloSigned 
 -- "Hello World"
-exEncoded :: Enc '["my-sign"] () T.Text
-exEncoded = encodeAll . toEncoding () $ "Hello World"
+helloSigned :: Enc '["my-sign"] () T.Text
+helloSigned = encodeAll . toEncoding () $ "Hello World"
 
--- | This demonstrates type safety, all 'T.Text' objects are exected to decode 
+-- | property checks that 'T.Text' values are exected to decode 
 -- without error after encoding.
 --
 -- prop> \t -> propEncDec
@@ -99,18 +85,46 @@ propEncDec t =
     let enc = encodeAll . toEncoding () $ t :: Enc '["my-sign"] () T.Text
     in t == (fromEncoding . decodeAll $ enc)
 
--- | Hacker example
--- The data was trasmitted over a network and got corrupted.
---
--- >>> hacker
--- Left (RecreateEx "\"Corrupted Signature\"")
 hacker :: Either RecreateEx (Enc '["my-sign"] () T.Text)
 hacker = 
-    let payload = unsafeGetPayload $ exEncoded :: T.Text
+    let payload = getPayload $ helloSigned :: T.Text
         -- | payload is sent over network and get corrupted
         newpay = payload <> " corruption" 
         -- | boundary check recovers the data
         newdata = recreateFAll . toEncoding () $ newpay :: Either RecreateEx (Enc '["my-sign"] () T.Text)
     in newdata    
+-- ^ Hacker example
+-- The data was trasmitted over a network and got corrupted.
+--
+-- >>> let payload = getPayload $ helloSigned :: T.Text
+-- >>> let newpay = payload <> " corruption" 
+-- >>> recreateFAll . toEncoding () $ newpay :: Either RecreateEx (Enc '["my-sign"] () T.Text)
+-- Left (RecreateEx "\"Corrupted Signature\"")
+--
+-- >>> recreateFAll . toEncoding () $ payload :: Either RecreateEx (Enc '["my-sign"] () T.Text)
+-- Right (MkEnc Proxy () "11:Hello World")
+--
+--
+-- __GHC labels these instances orhpan__. 
+-- They are morally not orhpan. 
+-- Using "my-sign" symbol is morally equivalent to using a newtype. 
 
+-- * Instances
 
+-- | Because encoding function is pure we can create instance of EncodeF 
+-- that is polymorphic in effect @f@. This is done using 'EnT.implTranP' combinator.
+instance Applicative f => EncodeF f (Enc xs c T.Text) (Enc ("my-sign" ': xs) c T.Text) where
+    encodeF = EnT.implTranP encodeSign    
+
+-- | Decoding is effectful to allow for troubleshooting and unsafe payload changes.
+--
+-- Implemenation simply uses 'EnT.implTranF' combinator on the 'asUnexpected' composed with decoding function.
+-- 'UnexpectedDecodeErr' has Identity instance allowing for decoding that assumes errors are not possible.
+-- For debugging purposes or when unsafe changes to "my-sign" @Error UnexpectedDecodeEx@ instance can be used.
+instance (UnexpectedDecodeErr f, Applicative f) => DecodeF f (Enc ("my-sign" ': xs) c T.Text) (Enc xs c T.Text) where
+    decodeF = EnT.implTranF (asUnexpected . decodeSign) 
+
+-- | Recovery is effectful to check for tampering with data.
+-- Implemenation simply uses 'EnT.implTranF' combinator on the recovery function.
+instance (RecreateErr f, Applicative f) => RecreateF f (Enc xs c T.Text) (Enc ("my-sign" ': xs) c T.Text) where   
+    checkPrevF = EnT.implTranF (asRecreateErr . decodeSign) 

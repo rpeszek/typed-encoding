@@ -5,12 +5,13 @@
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE OverloadedStrings #-}
 
--- | Examples of how to work with encoded data.
+-- | Examples about how to work with encoded data.
 -- This topic is (an interesting) work-in-progress.
 --
 -- Modifying encoded data would typically corrupt the encoding. 
--- Current approach is to use Unsafe wrapping class that exposes
+-- Current approach is to use 'Unsafe' wrapping class that exposes
 -- Functor and (limited) Applicative and Monad instances.
+
 module Examples.Unsafe where
 
 
@@ -26,41 +27,61 @@ import qualified Data.Encoding.Unsafe as Unsafe
 
 import           Data.Semigroup ((<>))
 
+-- $setup
+-- >>> :set -XOverloadedStrings -XMultiParamTypeClasses -XDataKinds
 
 -- | Starting example
-exAsciiE :: Either EnASCII.NonAsciiChar (Enc '["r-ASCII"] () T.Text)
-exAsciiE = encodeFAll . toEncoding () $ "HELLO" 
+exAsciiTE :: Either EnASCII.NonAsciiChar (Enc '["r-ASCII"] () T.Text)
+exAsciiTE = encodeFAll . toEncoding () $ "HELLO" 
 
--- | Example use of 'T.toLower' within encoded data
--- this operation is safe for ASCII restriction
--- but @Enc '["r-ASCII"] () T.Text@ does not expose it
--- We use Functor instance of Unsafe wrapper type to accomplish this
+-- | with either removed
+exAsciiT :: Enc '["r-ASCII"] () T.Text
+Right exAsciiT = exAsciiTE
+
+-- * Safe and Slow approach
+
+-- |
+-- 'recreateFAll' is the way to recover encoding in a safe way
 --
--- >>> exAsciiE
+-- >>> let payload = getPayload exAsciiT
+-- >>> let newPayload = payload <> " some extra stuff"
+-- >>> recreateFAll . toEncoding () $ newPayload :: Either RecreateEx (Enc '["r-ASCII"] () T.Text)
+-- Right (MkEnc Proxy () "HELLO some extra stuff")
+--
+modifiedAsciiT :: Either RecreateEx (Enc '["r-ASCII"] () T.Text)
+modifiedAsciiT =  recreateFAll . toEncoding () . ( <> " some extra stuff") . getPayload $ exAsciiT
+  
+
+-- * Unsafe but fast
+
+-- |
+-- The issue with 'recreateFAll' is that it may be expensive.
+--
+-- This apprach uses 'Data.Encoding.Unsafe.Unsafe' to perform (in general risky) operation on
+-- the internal payload.
+--  
+-- >>> exAsciiTE
 -- Right (MkEnc Proxy () "HELLO")
--- >>> exAsciiE >>= pure . Unsafe.withUnsafe (fmap T.toLower)
+-- >>> exAsciiTE >>= pure . Unsafe.withUnsafe (fmap T.toLower)
 -- Right (MkEnc Proxy () "hello")
-toLowerAscii :: Either EnASCII.NonAsciiChar (Enc '["r-ASCII"] () T.Text)
-toLowerAscii = exAsciiE >>= pure . Unsafe.withUnsafe (fmap T.toLower)
-
--- | Example use of 'T.toLower' within encoded data
+--
+-- Example uses of 'T.toLower' within encoded data
 -- this operation is safe for ASCII restriction
 -- but @Enc '["r-ASCII"] () T.Text@ does not expose it
 -- We use Functor instance of Unsafe wrapper type to accomplish this
+toLowerAscii :: Either EnASCII.NonAsciiChar (Enc '["r-ASCII"] () T.Text)
+toLowerAscii = exAsciiTE >>= pure . Unsafe.withUnsafe (fmap T.toLower)
+
+-- | 
+-- Similar example uses applicative instance of 'Unsafe.Unsafe'
 --
--- >>> let Right hELLO = exAsciiE
+-- >>> let Right hELLO = exAsciiTE
 -- >>> let Right hello = toLowerAscii
 -- >>> Unsafe.runUnsafe ((<>) <$> Unsafe.Unsafe hELLO <*> Unsafe.Unsafe hello)
 -- MkEnc Proxy () "HELLOhello"
 appendAscii :: Either EnASCII.NonAsciiChar (Enc '["r-ASCII"] () T.Text)
 appendAscii = do 
-    hELLO <- exAsciiE
+    hELLO <- exAsciiTE
     hello <- toLowerAscii
     pure $ Unsafe.runUnsafe ((<>) <$> Unsafe.Unsafe hELLO <*> Unsafe.Unsafe hello)
 
-
--- | Data.Encoding exports unsafeGetPayload
--- 
--- >>> exAsciiE >>= pure . unsafeGetPayload . Unsafe.withUnsafe (fmap T.length) 
--- Right 5
-extractSize = exAsciiE >>= pure . unsafeGetPayload . Unsafe.withUnsafe (fmap T.length)   

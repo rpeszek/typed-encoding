@@ -1,5 +1,5 @@
 # typed-encoding
-Type level annotations that make programming Strings better
+Type level annotations that make programming Strings safer.
 
 ## Motivation
 I recently had some bad experience with using ByteString and Text with `Base64` and
