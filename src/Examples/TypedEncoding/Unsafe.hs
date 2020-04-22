@@ -9,10 +9,10 @@
 -- This topic is (an interesting) work-in-progress.
 --
 -- Modifying encoded data would typically corrupt the encoding. 
--- Current approach is to use 'Data.Encoding.Unsafe.Unsafe' wrapping class that exposes
+-- Current approach is to use 'Data.TypedEncoding.Unsafe.Unsafe' wrapping class that exposes
 -- Functor and (limited) Applicative and Monad instances.
 
-module Examples.Unsafe where
+module Examples.TypedEncoding.Unsafe where
 
 
 import           Data.Proxy
@@ -21,9 +21,9 @@ import qualified Data.Text as T
 
 import           Data.Char
 
-import           Data.Encoding
-import qualified Data.Encoding.Instances.ASCII as EnASCII
-import qualified Data.Encoding.Unsafe as Unsafe
+import           Data.TypedEncoding
+import qualified Data.TypedEncoding.Instances.ASCII as EnASCII
+import qualified Data.TypedEncoding.Unsafe as Unsafe
 
 import           Data.Semigroup ((<>))
 
@@ -57,7 +57,7 @@ modifiedAsciiT =  recreateFAll . toEncoding () . ( <> " some extra stuff") . get
 -- |
 -- The issue with 'recreateFAll' is that it may be expensive.
 --
--- This apprach uses 'Data.Encoding.Unsafe.Unsafe' to perform (in general risky) operation on
+-- This apprach uses 'Data.TypedEncoding.Unsafe.Unsafe' to perform (in general risky) operation on
 -- the internal payload.
 --  
 -- >>> exAsciiTE

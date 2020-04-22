@@ -12,12 +12,12 @@
 -- Currently, these are separate functions, generalization of conversions seems hard.
 --
 -- These examples discuss handling of __subsets__ (for character sets), __leniency__, and __flattening__. 
-module Examples.Conversions where
+module Examples.TypedEncoding.Conversions where
 
-import           Data.Encoding
-import qualified Data.Encoding.Instances.Base64 as EnB64
-import qualified Data.Encoding.Instances.ASCII as EnASCII
-import qualified Data.Encoding.Instances.UTF8  as EnUTF8
+import           Data.TypedEncoding
+import qualified Data.TypedEncoding.Instances.Base64 as EnB64
+import qualified Data.TypedEncoding.Instances.ASCII as EnASCII
+import qualified Data.TypedEncoding.Instances.UTF8  as EnUTF8
 
 import           Data.Proxy
 

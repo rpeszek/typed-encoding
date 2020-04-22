@@ -5,11 +5,11 @@
 {-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE FlexibleInstances #-}
 
-module Data.Encoding.Unsafe where
+module Data.TypedEncoding.Unsafe where
 
 import           Data.Proxy
 import           Data.Functor.Identity
-import           Data.Encoding.Internal.Types
+import           Data.TypedEncoding.Internal.Types
 
  
 -- | Allows to operate within Enc. These are considered unsafe.

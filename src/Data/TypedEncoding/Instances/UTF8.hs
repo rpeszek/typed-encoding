@@ -9,11 +9,11 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE PartialTypeSignatures #-}
 -- | 
-module Data.Encoding.Instances.UTF8 where
+module Data.TypedEncoding.Instances.UTF8 where
 
-import           Data.Encoding.Instances.Support
--- import           Data.Encoding.Internal.Utils (proxiedId)
-import           Data.Encoding.Unsafe (withUnsafe)
+import           Data.TypedEncoding.Instances.Support
+-- import           Data.TypedEncoding.Internal.Utils (proxiedId)
+import           Data.TypedEncoding.Unsafe (withUnsafe)
 
 import           Data.Proxy
 import           Data.Functor.Identity
@@ -41,7 +41,7 @@ import           Data.Either
 -- >>> import Test.QuickCheck
 -- >>> import Test.QuickCheck.Instances.Text()
 -- >>> import Test.QuickCheck.Instances.ByteString()
--- >>> import Data.Encoding.Internal.Utils (proxiedId)
+-- >>> import Data.TypedEncoding.Internal.Utils (proxiedId)
 -- >>> let prxyArb = Proxy :: Proxy (Either UnicodeException (Enc '["r-UTF8"] () B.ByteString))
 -- >>> :{
 -- >>> instance Arbitrary (Enc '["r-UTF8"] () B.ByteString) where 

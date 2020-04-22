@@ -10,9 +10,9 @@
 {-# LANGUAGE TypeFamilies #-}
 -- {-# LANGUAGE PartialTypeSignatures #-}
 
-module Data.Encoding.Internal.Class where
+module Data.TypedEncoding.Internal.Class where
 
-import          Data.Encoding.Internal.Types (Enc(..) 
+import          Data.TypedEncoding.Internal.Types (Enc(..) 
                                               , toEncoding
                                               , getPayload
                                               , withUnsafeCoerce

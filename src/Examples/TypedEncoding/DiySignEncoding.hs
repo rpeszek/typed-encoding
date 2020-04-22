@@ -20,12 +20,12 @@
 -- (JSON instances, DB retrievals, etc).  This can be acomplished using provided 'RecreateF' typeclass.
 -- 
 -- This still is user decision, the errors during decoding process are considered unexpected 'UnexpectedDecodeErr'.
--- In particular user can decide to use unsafe operations with the encoded type. See 'Examples.Unsafe'.
+-- In particular user can decide to use unsafe operations with the encoded type. See 'Examples.TypedEncoding.Unsafe'.
 
-module Examples.DiySignEncoding where
+module Examples.TypedEncoding.DiySignEncoding where
 
-import           Data.Encoding
-import qualified Data.Encoding.Instances.Support as EnT
+import           Data.TypedEncoding
+import qualified Data.TypedEncoding.Instances.Support as EnT
 
 import           Data.Proxy
 import           Data.Functor.Identity

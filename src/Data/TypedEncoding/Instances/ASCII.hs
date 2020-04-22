@@ -13,9 +13,9 @@
 --
 -- >>> encodeFAll . toEncoding () $ "\194\160" :: Either NonAsciiChar (Enc '["r-ASCII"] () T.Text)
 -- Left (NonAsciiChar '\194')
-module Data.Encoding.Instances.ASCII where
+module Data.TypedEncoding.Instances.ASCII where
 
-import           Data.Encoding.Instances.Support
+import           Data.TypedEncoding.Instances.Support
 
 import           Data.Proxy
 import           Data.Functor.Identity
@@ -32,8 +32,8 @@ import qualified Data.ByteString.Char8 as B8
 import qualified Data.ByteString.Lazy.Char8 as BL8
 
 import           Data.Char
-import           Data.Encoding.Internal.Utils (explainBool)
-import           Data.Encoding.Unsafe (withUnsafe)
+import           Data.TypedEncoding.Internal.Utils (explainBool)
+import           Data.TypedEncoding.Unsafe (withUnsafe)
 import           Control.Arrow
 
 -- tst = encodeFAll . toEncoding () $ "Hello World" :: Either NonAsciiChar (Enc '["r-ASCII"] () T.Text)

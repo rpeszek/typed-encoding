@@ -9,7 +9,7 @@
 -- |
 -- Internal definition of types
 
-module Data.Encoding.Internal.Types where
+module Data.TypedEncoding.Internal.Types where
 
 import           Data.Proxy
 import           Data.Functor.Identity

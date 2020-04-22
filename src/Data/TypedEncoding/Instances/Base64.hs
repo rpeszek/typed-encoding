@@ -5,10 +5,10 @@
 {-# LANGUAGE FlexibleContexts #-}
 
 
-module Data.Encoding.Instances.Base64 where
+module Data.TypedEncoding.Instances.Base64 where
 
-import           Data.Encoding
-import           Data.Encoding.Instances.Support
+import           Data.TypedEncoding
+import           Data.TypedEncoding.Instances.Support
 
 import           Data.Proxy
 import           Data.Functor.Identity

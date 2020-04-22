@@ -9,22 +9,22 @@
 --
 -- Here is list of instance modules available in typed-econdings library itself
 --
--- * "Data.Encoding.Instances.Base64"
--- * "Data.Encoding.Instances.ASCII" 
--- * "Data.Encoding.Instances.UTF8" 
--- * "Data.Encoding.Instances.Encode.Sample" 
+-- * "Data.TypedEncoding.Instances.Base64"
+-- * "Data.TypedEncoding.Instances.ASCII" 
+-- * "Data.TypedEncoding.Instances.UTF8" 
+-- * "Data.TypedEncoding.Instances.Encode.Sample" 
 -- 
 -- To implement a new encoding import this module and
 --
--- * "Data.Encoding.Instances.Support"
+-- * "Data.TypedEncoding.Instances.Support"
 --
 -- Examples of how to use this library are included in
 --
--- * "Examples"    
-module Data.Encoding (
-    module Data.Encoding
+-- * "Examples.TypedEncoding"    
+module Data.TypedEncoding (
+    module Data.TypedEncoding
     -- * Classes
-    , module Data.Encoding.Internal.Class
+    , module Data.TypedEncoding.Internal.Class
     -- * Types
     , Enc
     , RecreateEx(..)
@@ -37,7 +37,7 @@ module Data.Encoding (
     , showEnc
  ) where
 
-import           Data.Encoding.Internal.Types (Enc
+import           Data.TypedEncoding.Internal.Types (Enc
                                               , RecreateEx(..)
                                               , UnexpectedDecodeEx(..)
                                               , getPayload
@@ -46,6 +46,6 @@ import           Data.Encoding.Internal.Types (Enc
                                               , fromEncoding
                                               , showEnc
                                               )
-import           Data.Encoding.Internal.Class
+import           Data.TypedEncoding.Internal.Class
 
 

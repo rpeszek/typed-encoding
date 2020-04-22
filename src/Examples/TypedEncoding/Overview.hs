@@ -10,17 +10,17 @@
 --
 -- This module uses encoding instances found in 
 --
--- * "Data.Encoding.Instances.Base64"
--- * "Data.Encoding.Instances.ASCII"
--- * "Data.Encoding.Instances.Encode.Sample"
+-- * "Data.TypedEncoding.Instances.Base64"
+-- * "Data.TypedEncoding.Instances.ASCII"
+-- * "Data.TypedEncoding.Instances.Encode.Sample"
 --
 
-module Examples.Overview where
+module Examples.TypedEncoding.Overview where
 
-import           Data.Encoding
-import           Data.Encoding.Instances.Base64
-import           Data.Encoding.Instances.ASCII
-import           Data.Encoding.Instances.Encode.Sample
+import           Data.TypedEncoding
+import           Data.TypedEncoding.Instances.Base64
+import           Data.TypedEncoding.Instances.ASCII
+import           Data.TypedEncoding.Instances.Encode.Sample
  
 import           GHC.TypeLits
 import qualified Data.ByteString as B
@@ -114,7 +114,7 @@ helloB64B64RecoveredErr = recreateFAll . toEncoding () $ "SGVsbG8gV29ybGQ="
 -- * "do-" Encodings
 
 -- |
--- "do-UPPER" (from 'Data.Encoding.Instances.Encode.Sample' module) encoding applied to "Hello World"
+-- "do-UPPER" (from 'Data.TypedEncoding.Instances.Encode.Sample' module) encoding applied to "Hello World"
 --
 -- Notice a namespace thing going on, "enc-" is encoding, "do-" is some tranformation. 
 -- These are typically not reversable, some could be recoverable.

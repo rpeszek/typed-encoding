@@ -41,9 +41,9 @@ a form of type directed program synthesis - programs become a boilerplate and th
 
 Here are some code examples:
    - [Overview](src/Examples/Overview.hs)
-   - [Conversions between encodings](src/Examples/Conversions.hs)
-   - [Adding a new encoding, error handling](src/Examples/DiySignEncoding.hs)
-   - [Unsafe - working inside encodings](src/Examples/Unsafe.hs)
+   - [Conversions between encodings](src/Examples/TypedEncoding/Conversions.hs)
+   - [Adding a new encoding, error handling](src/Examples/TypedEncoding/DiySignEncoding.hs)
+   - [Unsafe - working inside encodings](src/Examples/TypedEncoding/Unsafe.hs)
 
 ## Dependencies
 

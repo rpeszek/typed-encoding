@@ -10,14 +10,14 @@
 
 -- | This module defines some sample "do-" encodings
 -- currently for example use only.
-module Data.Encoding.Instances.Encode.Sample where
+module Data.TypedEncoding.Instances.Encode.Sample where
 
 import qualified Data.Text as T
 import qualified Data.Text.Lazy as TL
 import qualified Data.ByteString as B
 -- import qualified Data.ByteString.Lazy as BL
 
-import           Data.Encoding.Instances.Support
+import           Data.TypedEncoding.Instances.Support
 
 import           Data.Proxy
 import           GHC.TypeLits
