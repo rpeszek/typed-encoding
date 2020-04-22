@@ -9,7 +9,7 @@
 -- This topic is (an interesting) work-in-progress.
 --
 -- Modifying encoded data would typically corrupt the encoding. 
--- Current approach is to use 'Unsafe' wrapping class that exposes
+-- Current approach is to use 'Data.Encoding.Unsafe.Unsafe' wrapping class that exposes
 -- Functor and (limited) Applicative and Monad instances.
 
 module Examples.Unsafe where

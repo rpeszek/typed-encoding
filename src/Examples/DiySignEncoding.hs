@@ -7,7 +7,7 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 -- {-# LANGUAGE PartialTypeSignatures #-}
 
--- | Simple DIY encoding example that 'signs' Text with its length.
+-- | Simple DIY encoding example that "signs" Text with its length.
 --
 -- Documentation includes discussion of error handling options. 
 --
@@ -41,7 +41,7 @@ import           Text.Read (readMaybe)
 -- >>> :set -XOverloadedStrings -XMultiParamTypeClasses -XDataKinds
 -- >>> import Test.QuickCheck.Instances.Text()
 
--- | 'encoding' function, typically should be module private 
+-- | encoding function, typically should be module private 
 encodeSign :: T.Text -> T.Text
 encodeSign t = (T.pack . show . T.length $ t) <> ":" <> t
 

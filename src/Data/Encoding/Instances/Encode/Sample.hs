@@ -8,6 +8,8 @@
 {-# LANGUAGE UndecidableInstances #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 
+-- | This module defines some sample "do-" encodings
+-- currently for example use only.
 module Data.Encoding.Instances.Encode.Sample where
 
 import qualified Data.Text as T
