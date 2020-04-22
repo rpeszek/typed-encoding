@@ -5,6 +5,26 @@
 -- |
 -- Main Module in typed-econdings. 
 --
+-- This library allows to specify and work with types like
+--
+-- @
+-- -- Base 64 encoded bytes
+-- Enc '["enc-B64"] ByteString
+--
+-- -- Base 64 encoded UTF8 bytes
+-- Enc '["enc-B64", "r-UTF8"] ByteString
+--
+-- -- Text that contains only ASCII characters
+-- Enc '["r-ASCII"] Text
+-- @
+--
+-- or to do transformations to strings like
+--
+-- @
+-- upper :: Text -> Enc '["do-UPPER"] Text
+-- upper = ...
+-- @
+--
 -- To use this library import this module and one or more "instance" modules.
 --
 -- Here is list of instance modules available in typed-econdings library itself
@@ -14,6 +34,9 @@
 -- * "Data.TypedEncoding.Instances.UTF8" 
 -- * "Data.TypedEncoding.Instances.Encode.Sample" 
 -- 
+-- This list is not intended to be exaustive, rather separate libraries
+-- can provide instances for other encodings and transformations.
+--
 -- To implement a new encoding import this module and
 --
 -- * "Data.TypedEncoding.Instances.Support"
