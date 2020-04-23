@@ -31,7 +31,7 @@ import           Data.Semigroup ((<>))
 -- >>> :set -XOverloadedStrings -XMultiParamTypeClasses -XDataKinds
 
 -- | Starting example
-exAsciiTE :: Either EnASCII.NonAsciiChar (Enc '["r-ASCII"] () T.Text)
+exAsciiTE :: Either EncodeEx (Enc '["r-ASCII"] () T.Text)
 exAsciiTE = encodeFAll . toEncoding () $ "HELLO" 
 
 -- | with either removed
@@ -69,7 +69,7 @@ modifiedAsciiT =  recreateFAll . toEncoding () . ( <> " some extra stuff") . get
 -- this operation is safe for ASCII restriction
 -- but @Enc '["r-ASCII"] () T.Text@ does not expose it
 -- We use Functor instance of Unsafe wrapper type to accomplish this
-toLowerAscii :: Either EnASCII.NonAsciiChar (Enc '["r-ASCII"] () T.Text)
+toLowerAscii :: Either EncodeEx (Enc '["r-ASCII"] () T.Text)
 toLowerAscii = exAsciiTE >>= pure . Unsafe.withUnsafe (fmap T.toLower)
 
 -- | 
@@ -79,7 +79,7 @@ toLowerAscii = exAsciiTE >>= pure . Unsafe.withUnsafe (fmap T.toLower)
 -- >>> let Right hello = toLowerAscii
 -- >>> Unsafe.runUnsafe ((<>) <$> Unsafe.Unsafe hELLO <*> Unsafe.Unsafe hello)
 -- MkEnc Proxy () "HELLOhello"
-appendAscii :: Either EnASCII.NonAsciiChar (Enc '["r-ASCII"] () T.Text)
+appendAscii :: Either EncodeEx (Enc '["r-ASCII"] () T.Text)
 appendAscii = do 
     hELLO <- exAsciiTE
     hello <- toLowerAscii

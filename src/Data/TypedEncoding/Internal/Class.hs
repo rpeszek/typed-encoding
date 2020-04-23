@@ -145,30 +145,30 @@ instance HasA a () where
 -- | With type safety in pace decoding errors should be unexpected
 -- this class can be used to provide extra info if decoding could fail
 class UnexpectedDecodeErr f where 
-    unexpectedDecodeErr :: String -> f a
+    unexpectedDecodeErr :: UnexpectedDecodeEx -> f a
 
 instance UnexpectedDecodeErr Identity where
-    unexpectedDecodeErr msg = fail msg
+    unexpectedDecodeErr x = fail $ show x
 
 instance UnexpectedDecodeErr (Either UnexpectedDecodeEx) where
-    unexpectedDecodeErr = Left . UnexpectedDecodeEx
+    unexpectedDecodeErr = Left 
 
-asUnexpected :: (UnexpectedDecodeErr f, Applicative f, Show err) => Either err a -> f a
-asUnexpected (Left err) = unexpectedDecodeErr $ show err
-asUnexpected (Right r) = pure r
+asUnexpected :: (UnexpectedDecodeErr f, Applicative f, Show err, KnownSymbol x) => Proxy x -> Either err a -> f a
+asUnexpected p (Left err) = unexpectedDecodeErr $ UnexpectedDecodeEx p err
+asUnexpected _ (Right r) = pure r
 
--- 
+-- TODO using RecreateErr typeclass is overkill
 
 -- | Recovery errors are expected unless Recovery allows Identity instance
 class RecreateErr f where 
-    recoveryErr :: String -> f a
+    recoveryErr :: RecreateEx -> f a
 
 instance RecreateErr (Either RecreateEx) where
-    recoveryErr = Left . RecreateEx
+    recoveryErr = Left  
 
-asRecreateErr :: (RecreateErr f, Applicative f, Show err) => Either err a -> f a
-asRecreateErr (Left err) = recoveryErr $ show err
-asRecreateErr (Right r) = pure r
+asRecreateErr :: (RecreateErr f, Applicative f, Show err, KnownSymbol x) => Proxy x -> Either err a -> f a
+asRecreateErr p (Left err) = recoveryErr $ RecreateEx p err
+asRecreateErr _ (Right r) = pure r
 
 
 -- Utils --

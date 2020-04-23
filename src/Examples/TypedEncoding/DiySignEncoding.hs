@@ -99,7 +99,7 @@ hacker =
 -- >>> let payload = getPayload $ helloSigned :: T.Text
 -- >>> let newpay = payload <> " corruption" 
 -- >>> recreateFAll . toEncoding () $ newpay :: Either RecreateEx (Enc '["my-sign"] () T.Text)
--- Left (RecreateEx "\"Corrupted Signature\"")
+-- Left (RecreateEx "my-sign" ("Corrupted Signature"))
 --
 -- >>> recreateFAll . toEncoding () $ payload :: Either RecreateEx (Enc '["my-sign"] () T.Text)
 -- Right (MkEnc Proxy () "11:Hello World")
@@ -111,20 +111,22 @@ hacker =
 
 -- * Instances
 
+prxyMySign = Proxy :: Proxy "my-sign"
+
 -- | Because encoding function is pure we can create instance of EncodeF 
 -- that is polymorphic in effect @f@. This is done using 'EnT.implTranP' combinator.
 instance Applicative f => EncodeF f (Enc xs c T.Text) (Enc ("my-sign" ': xs) c T.Text) where
-    encodeF = EnT.implTranP encodeSign    
+    encodeF = EnT.implEncodeP encodeSign    
 
 -- | Decoding is effectful to allow for troubleshooting and unsafe payload changes.
 --
--- Implementation simply uses 'EnT.implTranF' combinator on the 'asUnexpected' composed with decoding function.
+-- Implementation simply uses 'EnT.implDecodeF' combinator on the 'asUnexpected' composed with decoding function.
 -- 'UnexpectedDecodeErr' has Identity instance allowing for decoding that assumes errors are not possible.
 -- For debugging purposes or when unsafe changes to "my-sign" @Error UnexpectedDecodeEx@ instance can be used.
 instance (UnexpectedDecodeErr f, Applicative f) => DecodeF f (Enc ("my-sign" ': xs) c T.Text) (Enc xs c T.Text) where
-    decodeF = EnT.implTranF (asUnexpected . decodeSign) 
+    decodeF = EnT.implDecodeF (asUnexpected prxyMySign . decodeSign) 
 
 -- | Recovery is effectful to check for tampering with data.
--- Implementation simply uses 'EnT.implTranF' combinator on the recovery function.
+-- Implementation simply uses 'EnT.implCheckPrevF' combinator on the recovery function.
 instance (RecreateErr f, Applicative f) => RecreateF f (Enc xs c T.Text) (Enc ("my-sign" ': xs) c T.Text) where   
-    checkPrevF = EnT.implTranF (asRecreateErr . decodeSign) 
+    checkPrevF = EnT.implCheckPrevF (asRecreateErr prxyMySign . decodeSign) 

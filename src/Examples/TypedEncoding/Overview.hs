@@ -64,7 +64,7 @@ helloB64Decoded = fromEncoding . decodeAll $ helloB64
 -- Right (MkEnc Proxy () "SGVsbG8gV29ybGQ=")
 --
 -- >>> recreateFAll . toEncoding () $ "SGVsbG8gV29ybGQ" :: Either RecreateEx (Enc '["enc-B64"] () B.ByteString)
--- Left (RecreateEx "\"invalid padding\"")
+-- Left (RecreateEx "enc-B64" ("invalid padding"))
 helloB64Recovered :: Either RecreateEx (Enc '["enc-B64"] () B.ByteString)
 helloB64Recovered = recreateFAll . toEncoding () $ "SGVsbG8gV29ybGQ="
 
@@ -105,7 +105,7 @@ helloB64B64Decoded = fromEncoding . decodeAll $ helloB64B64
 -- Again, notice the same expression is used as in previous recovery.
 --
 -- >>> recreateFAll . toEncoding () $ "SGVsbG8gV29ybGQ=" :: Either RecreateEx (Enc '["enc-B64", "enc-B64"] () B.ByteString)
--- Left (RecreateEx "\"invalid padding\"")
+-- Left (RecreateEx "enc-B64" ("invalid padding"))
 helloB64B64RecoveredErr :: Either RecreateEx (Enc '["enc-B64", "enc-B64"] () B.ByteString)
 helloB64B64RecoveredErr = recreateFAll . toEncoding () $ "SGVsbG8gV29ybGQ="
 
@@ -197,21 +197,21 @@ helloRevLimitParDec =  decodePart (Proxy :: Proxy '["enc-B64"]) $ helloLimitB64
 --
 -- Note naming thing: "r-" is partial identity ("r-" is from restriction).
 --
--- >>>  encodeFAll . toEncoding () $ "HeLlo world" :: Either NonAsciiChar (Enc '["r-ASCII"] () B.ByteString) 
+-- >>>  encodeFAll . toEncoding () $ "HeLlo world" :: Either EncodeEx (Enc '["r-ASCII"] () B.ByteString) 
 -- Right (MkEnc Proxy () "HeLlo world")
-helloAscii :: Either NonAsciiChar (Enc '["r-ASCII"] () B.ByteString)
+helloAscii :: Either EncodeEx (Enc '["r-ASCII"] () B.ByteString)
 helloAscii = encodeFAll . toEncoding () $ "HeLlo world" 
 
 -- | Arguably the type we used for helloB64 was too permissive.
 -- a better version is here:
 --
--- >>> encodeFAll . toEncoding () $ "Hello World" :: Either NonAsciiChar (Enc '["enc-B64", "r-ASCII"] () B.ByteString)
+-- >>> encodeFAll . toEncoding () $ "Hello World" :: Either EncodeEx (Enc '["enc-B64", "r-ASCII"] () B.ByteString)
 -- Right (MkEnc Proxy () "SGVsbG8gV29ybGQ=") 
-helloAsciiB64 :: Either NonAsciiChar (Enc '["enc-B64", "r-ASCII"] () B.ByteString)
+helloAsciiB64 :: Either EncodeEx (Enc '["enc-B64", "r-ASCII"] () B.ByteString)
 helloAsciiB64 = encodeFAll . toEncoding () $ "Hello World"
 
 -- |
 -- >>> decodePart (Proxy :: Proxy '["enc-B64"]) <$> helloAsciiB64
 -- Right (MkEnc Proxy () "Hello World")
-helloAsciiB64PartDec :: Either NonAsciiChar (Enc '["r-ASCII"] () B.ByteString)
+helloAsciiB64PartDec :: Either EncodeEx (Enc '["r-ASCII"] () B.ByteString)
 helloAsciiB64PartDec = decodePart (Proxy :: Proxy '["enc-B64"]) <$> helloAsciiB64 

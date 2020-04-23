@@ -23,7 +23,6 @@ import           Data.Proxy
 
 import qualified Data.Text as T
 import qualified Data.ByteString as B
-import           Data.Text.Encoding.Error (UnicodeException)
 
 -- $setup
 -- >>> :set -XOverloadedStrings -XMultiParamTypeClasses -XDataKinds
@@ -37,11 +36,11 @@ import           Data.Text.Encoding.Error (UnicodeException)
 -- * Moving between Text and ByteString
 
 
-eHelloAsciiB :: Either EnASCII.NonAsciiChar (Enc '["r-ASCII"] () B.ByteString)
+eHelloAsciiB :: Either EncodeEx (Enc '["r-ASCII"] () B.ByteString)
 eHelloAsciiB = encodeFAll . toEncoding () $ "HeLlo world" 
 -- ^ Example value to play with
 --
--- >>>  encodeFAll . toEncoding () $ "HeLlo world" :: Either EnASCII.NonAsciiChar (Enc '["r-ASCII"] () B.ByteString) 
+-- >>>  encodeFAll . toEncoding () $ "HeLlo world" :: Either EncodeEx (Enc '["r-ASCII"] () B.ByteString) 
 -- Right (MkEnc Proxy () "HeLlo world")
 
 Right helloAsciiB = eHelloAsciiB
@@ -65,7 +64,7 @@ helloUtf8B :: Enc '["r-UTF8"] () B.ByteString
 helloUtf8B = inject Proxy helloAsciiB
 -- ^ To get UTF8 annotation, instead of doing this: 
 --
--- >>> encodeFAll . toEncoding () $ "HeLlo world" :: Either UnicodeException (Enc '["r-UTF8"] () B.ByteString)
+-- >>> encodeFAll . toEncoding () $ "HeLlo world" :: Either EncodeEx (Enc '["r-UTF8"] () B.ByteString)
 -- Right (MkEnc Proxy () "HeLlo world")
 -- 
 -- We should be able to convert the ASCII version.
@@ -133,7 +132,7 @@ lenientSomething = recreateAll . toEncoding () $ "abc==CB"
 -- lenient algorithms are not partial and automatically fix invalid input:
 --
 -- >>> recreateFAll . toEncoding () $ "abc==CB" :: Either RecreateEx (Enc '["enc-B64"] () B.ByteString)
--- Left (RecreateEx "\"invalid padding\"")
+-- Left (RecreateEx "enc-B64" ("invalid padding"))
 --
 -- This library allows to recover to "enc-B64-len" which is different than "enc-B64"
 --

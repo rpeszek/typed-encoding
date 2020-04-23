@@ -50,6 +50,7 @@ module Data.TypedEncoding (
     , module Data.TypedEncoding.Internal.Class
     -- * Types
     , Enc
+    , EncodeEx(..)
     , RecreateEx(..)
     , UnexpectedDecodeEx(..)
     -- * Combinators
@@ -63,6 +64,7 @@ module Data.TypedEncoding (
 import           Data.TypedEncoding.Internal.Types (Enc
                                               , RecreateEx(..)
                                               , UnexpectedDecodeEx(..)
+                                              , EncodeEx(..)
                                               , getPayload
                                               , unsafeSetPayload
                                               , toEncoding
