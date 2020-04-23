@@ -2,42 +2,40 @@
 Type level annotations that make programming Strings safer.
 
 ## Motivation
-I recently had some bad experience with using ByteString and Text with `Base64` and
-`quoted-printable` encoding.
-I was troubleshooting text being double encoded or not encoded at all. The decoded text ended up being converted to `Data.Text` but it was a binary image...   
-Issues like double encoding do not manifest themselves with run-time errors.  The issues are discovered by visually inspecting generated documents.
-What if the encodings were visible at the type level...
+I have recently spent a lot of time troubleshooting various `Base64`, `quoted-printable`, and `Utf8` encoding issues.  
+I decided to write a library that will help avoiding issues like these.
+
+This library allows to specify and work with types like
 
 ```Haskell
-myData :: Enc '["enc-B64"] ByteString
-```
-that would be really nice! But what would be even nicer if we could do something like
-```Haskell
+-- some data encoded in base 64
+mydata :: Enc '["enc-B64"] ByteString
+
+-- some text (utf8) data encoded in base 64 
 myData :: Enc '["enc-B64", "r-UTF8"] ByteString
 ```
-So, after decoding Base64 I would know that what is left is not some jpeg image...
 
-## About this library
-... but this approach seems to me to be much more...
+and provides ways for 
+   - encoding
+   - decoding
+   - recreation (encoding validation)
+   - type conversions
+
+... but this approach seems to be a bit more...
 
 ```Haskell
 -- upper cased text encoded as base64
 example :: Enc '["enc-B64", "do-UPPER"] () T.Text
 example = encodeAll . toEncoding () $ "some text goes here"
 ```
-It becomes a declarative style of applying string transformations.
+
+It becomes a type directed, declarative approach to string transformations.
 
 Transformations can be
    - used with parameters.
    - applied or undone partially (if encoding is reversible)
    - effectful
 
-And these annotations are not only for transformations.  Annotations can be used
-to restrict type to smaller set of values (character sets like `r-ASCII`, `r-UTF8`), 
-they can be converted to other annotations (eg. `r-ASCII` is subset of `r-UTF8`) ...
-
-The approach seems like a different take on programming: 
-a form of type directed program synthesis - programs become a boilerplate and the game is played at the type level. 
 
 Here are some code examples:
    - [Overview](src/Examples/Overview.hs)
@@ -50,6 +48,6 @@ Here are some code examples:
 Currently it uses
    - `base64-bytestring` because it was my driving example
    - TODO `aeson` because it makes sense to define consistent JSON instances for `Enc`
-   - I will try to separate other deps like `servant` into separate libs if there is interest
+   - I will try to separate other deps like `servant`, specific encoding libraries, etc into separate libs if there is interest
 
 

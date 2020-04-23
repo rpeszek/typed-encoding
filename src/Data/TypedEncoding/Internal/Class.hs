@@ -94,12 +94,11 @@ recreateAll = runIdentity . recreateFAll
 
                     
 
--- | TODO use singletons def instead?
+-- | TODO use singletons definition instead?
 type family Append (xs :: [k]) (ys :: [k]) :: [k] where
     Append '[] xs = xs
     Append (y ': ys) xs = y ': (Append ys xs)
 
--- | Unsafe implementation guarded by safe type definition
 encodeFPart :: forall f xs xsf c str . (Functor f, EncodeFAll f xs c str) => Proxy xs -> (Enc xsf c str) -> f (Enc (Append xs xsf) c str)
 encodeFPart p (MkEnc _ conf str) = 
     let re :: f (Enc xs c str) = encodeFAll $ MkEnc Proxy conf str
