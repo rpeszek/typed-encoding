@@ -50,4 +50,6 @@ Currently it uses
    - TODO `aeson` because it makes sense to define consistent JSON instances for `Enc`
    - I will try to separate other deps like `servant`, specific encoding libraries, etc into separate libs if there is interest. I consider orphan instances to be OK in this context. (GHC will classify them as such despite use of unique symbols.)
 
-
+## Plans, some TODOs
+   - lensifying conversions 
+   - better implementation type safety
