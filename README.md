@@ -38,7 +38,7 @@ Transformations can be
 
 
 Here are some code examples:
-   - [Overview](src/Examples/Overview.hs)
+   - [Overview](src/Examples/TypedEncoding/Overview.hs)
    - [Conversions between encodings](src/Examples/TypedEncoding/Conversions.hs)
    - [Adding a new encoding, error handling](src/Examples/TypedEncoding/DiySignEncoding.hs)
    - [Unsafe - working inside encodings](src/Examples/TypedEncoding/Unsafe.hs)
