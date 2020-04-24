@@ -45,6 +45,9 @@ import           Data.Functor.Identity
 -- >>> helloB64 
 -- MkEnc Proxy () "SGVsbG8gV29ybGQ="
 --
+-- >>> displ helloB64
+-- "MkEnc '[enc-B64] () (ByteString SGVsbG8gV29ybGQ=)"
+-- 
 -- >>> encodeAll . toEncoding () $ "Hello World" :: Enc '["enc-B64"] () B.ByteString
 -- MkEnc Proxy () "SGVsbG8gV29ybGQ="
 helloB64 :: Enc '["enc-B64"] () B.ByteString
@@ -73,6 +76,9 @@ helloB64Recovered = recreateFAll . toEncoding () $ "SGVsbG8gV29ybGQ="
 --
 -- >>> encodeAll . toEncoding () $ "Hello World" :: Enc '["enc-B64","enc-B64"] () B.ByteString  
 -- MkEnc Proxy () "U0dWc2JHOGdWMjl5YkdRPQ=="
+--
+-- >>> displ helloB64B64
+-- "MkEnc '[enc-B64,enc-B64] () (ByteString U0dWc2JHOGdWMjl5YkdRPQ==)"
 helloB64B64 :: Enc '["enc-B64","enc-B64"] () B.ByteString
 helloB64B64 = encodeAll . toEncoding () $ "Hello World"
 

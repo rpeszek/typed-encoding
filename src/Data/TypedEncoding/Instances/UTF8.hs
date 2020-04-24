@@ -63,16 +63,16 @@ emptyUTF8B c = unsafeSetPayload c ""
 
 -- | Type-safer version of @Data.Text.Encoding.encodeUtf8@
 --
--- >>> text2ByteStringS $ toEncoding () ("text" :: T.Text)
--- MkEnc Proxy () "text"
+-- >>> displ $ text2ByteStringS $ toEncoding () ("text" :: T.Text)
+-- "MkEnc '[r-UTF8] () (ByteString text)"
 text2ByteStringS :: Enc ys c T.Text -> Enc ("r-UTF8" ': ys) c B.ByteString
 text2ByteStringS = withUnsafeCoerce TE.encodeUtf8
 
 -- | Type-safer version of Data.Text.Encoding.decodeUtf8
 --
 -- >>> let Right tst = encodeFAll . toEncoding () $ "Hello World" :: Either EncodeEx (Enc '["r-UTF8"] () B.ByteString)
--- >>> byteString2TextS tst
--- MkEnc Proxy () "Hello World"
+-- >>> displ $ byteString2TextS tst
+-- "MkEnc '[] () (Text Hello World)"
 byteString2TextS :: Enc ("r-UTF8" ': ys) c B.ByteString -> Enc ys c T.Text 
 byteString2TextS = withUnsafeCoerce TE.decodeUtf8
 

@@ -67,8 +67,6 @@ implTranP' f  = implTranF' (\c -> pure . f c)
 implEncodeP' :: Applicative f => (conf -> str -> str) -> Enc enc1 conf str -> f (Enc enc2 conf str)
 implEncodeP' = implTranP'
 
-showEnc :: forall s c str xs. (KnownSymbol s, Show c, Show str) => Enc (s ': xs) c str -> String
-showEnc (MkEnc _ c s) = "MkEnc [" ++ symbolVal (Proxy :: Proxy s) ++ " ...] " ++ show c ++ " " ++ show s
 
 getPayload :: Enc enc conf str -> str  
 getPayload (MkEnc _ _ str) = str

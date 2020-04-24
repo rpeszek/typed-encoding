@@ -12,18 +12,28 @@
 
 module Data.TypedEncoding.Internal.Class where
 
-import          Data.TypedEncoding.Internal.Types (Enc(..) 
+import           Data.TypedEncoding.Internal.Types (Enc(..) 
                                               , toEncoding
                                               , getPayload
                                               , withUnsafeCoerce
                                               , unsafeChangePayload
                                               , RecreateEx(..)
                                               , UnexpectedDecodeEx(..))
-import          Data.Proxy
-import          Data.Functor.Identity
-import          GHC.TypeLits
-import          Data.Semigroup ((<>))
+import           Data.Proxy
+import           Data.Functor.Identity
+import           GHC.TypeLits
+import           Data.Semigroup ((<>))
+import qualified Data.ByteString.Char8 as B
+import qualified Data.ByteString.Lazy.Char8 as BL
+import qualified Data.Text as T
+import qualified Data.Text.Lazy as TL
 
+import qualified Data.List as L
+
+
+-- $setup
+-- >>> :set -XScopedTypeVariables -XKindSignatures -XMultiParamTypeClasses -XDataKinds -XPolyKinds -XFlexibleInstances -XFlexibleContexts
+-- >>> import Data.TypedEncoding.Internal.Types (unsafeSetPayload)
 
 class EncodeF f instr outstr where    
     encodeF :: instr -> f outstr
@@ -168,6 +178,41 @@ instance RecreateErr (Either RecreateEx) where
 asRecreateErr :: (RecreateErr f, Applicative f, Show err, KnownSymbol x) => Proxy x -> Either err a -> f a
 asRecreateErr p (Left err) = recoveryErr $ RecreateEx p err
 asRecreateErr _ (Right r) = pure r
+
+
+-- * Display 
+
+-- | Human friendly version of Show
+class Displ x where 
+    displ :: x -> String
+
+instance Displ String where
+    displ = id    
+instance Displ T.Text where
+    displ x = "(Text " ++ T.unpack x ++ ")"
+instance Displ TL.Text where
+    displ x = "(TL.Text " ++ TL.unpack x ++ ")"
+instance Displ B.ByteString where
+    displ x = "(ByteString " ++ B.unpack x ++ ")" 
+instance Displ BL.ByteString where
+    displ x = "(ByteString " ++ BL.unpack x ++ ")" 
+
+
+instance Displ (Proxy '[]) where
+    displ _ = ""
+
+-- |
+-- >>> displ (Proxy :: Proxy ["FIRST", "SECOND"])
+-- "FIRST,SECOND"
+instance (pxs ~ Proxy xs, Displ pxs, KnownSymbol x) => Displ (Proxy (x ': xs)) where
+    displ _ =  L.dropWhileEnd (',' ==) $  symbolVal (Proxy :: Proxy x) ++ "," ++ displ (Proxy :: Proxy xs)
+
+-- >>> let disptest = unsafeSetPayload () "hello" :: Enc '["TEST"] () T.Text
+-- >>> displ disptest
+-- "MkEnc '[TEST] () hello"
+instance (Displ (Proxy xs), Show c, Displ str) => Displ ( Enc xs c str) where
+    displ (MkEnc p c s) = 
+        "MkEnc '[" ++ displ p ++ "] " ++ show c ++ " " ++ displ s
 
 
 -- Utils --

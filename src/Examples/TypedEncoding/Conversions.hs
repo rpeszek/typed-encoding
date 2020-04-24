@@ -52,11 +52,8 @@ helloAsciiT = EnASCII.byteString2TextS helloAsciiB
 --
 -- Currently separate function is defined for each allowed conversion. 
 --
--- >>> EnASCII.byteString2TextS helloAsciiB
--- MkEnc Proxy () "HeLlo world"
--- >>> :t EnASCII.byteString2TextS helloAsciiB
--- EnASCII.byteString2TextS helloAsciiB :: Enc '["r-ASCII"] () T.Text
-
+-- >>> displ $ EnASCII.byteString2TextS helloAsciiB
+-- "MkEnc '[r-ASCII] () (Text HeLlo world)"
 
 -- * Subsets
 
@@ -73,8 +70,8 @@ helloUtf8B = inject Proxy helloAsciiB
 --
 -- @inject@ method accepts proxy to specify superset to use.
 --
--- >>> showEnc $ inject (Proxy :: Proxy "r-UTF8") helloAsciiB
--- "MkEnc [r-UTF8 ...] () \"HeLlo world\""
+-- >>> displ $ inject (Proxy :: Proxy "r-UTF8") helloAsciiB
+-- "MkEnc '[r-UTF8] () (ByteString HeLlo world)"
 
 
 
@@ -84,8 +81,8 @@ helloUtf8B64B :: Enc '["enc-B64", "r-UTF8"] () B.ByteString
 helloUtf8B64B = encodePart (Proxy :: Proxy '["enc-B64"]) helloUtf8B 
 -- ^ We put Base64 on the UFT8 ByteString
 --
--- >>> encodePart (Proxy :: Proxy '["enc-B64"]) helloUtf8B
--- MkEnc Proxy () "SGVMbG8gd29ybGQ="
+-- >>> displ $ encodePart (Proxy :: Proxy '["enc-B64"]) helloUtf8B
+-- "MkEnc '[enc-B64,r-UTF8] () (ByteString SGVMbG8gd29ybGQ=)"
 
 helloUtf8B64T :: Enc '["enc-B64"] () T.Text
 helloUtf8B64T = EnB64.byteString2TextS helloUtf8B64B  
@@ -138,8 +135,8 @@ lenientSomething = recreateAll . toEncoding () $ "abc==CB"
 --
 -- 'EnB64.acceptLenientS' allows to convert "enc-B64-len" to "enc-B64"
 --
--- >>> EnB64.acceptLenientS lenientSomething
--- MkEnc Proxy () "abc="
+-- >>> displ $ EnB64.acceptLenientS lenientSomething
+-- "MkEnc '[enc-B64] () (ByteString abc=)"
 --
 -- This is now properly encoded data
 --

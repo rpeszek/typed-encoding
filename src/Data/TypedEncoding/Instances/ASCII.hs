@@ -60,8 +60,8 @@ text2ByteStringL  = withUnsafe (fmap TEL.encodeUtf8)
 -- | allow to treat ASCII encodings as UTF8 forgetting about B64 encoding
 -- 
 -- >>> let Right tstAscii = encodeFAll . toEncoding () $ "Hello World" :: Either EncodeEx (Enc '["r-ASCII"] () T.Text)
--- >>> showEnc (inject (Proxy :: Proxy "r-UTF8") tstAscii)
--- "MkEnc [r-UTF8 ...] () \"Hello World\""
+-- >>> displ (inject (Proxy :: Proxy "r-UTF8") tstAscii)
+-- "MkEnc '[r-UTF8] () (Text Hello World)"
 instance Subset "r-ASCII" "r-UTF8" where
 
 -----------------

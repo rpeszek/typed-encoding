@@ -103,13 +103,6 @@ hacker =
 --
 -- >>> recreateFAll . toEncoding () $ payload :: Either RecreateEx (Enc '["my-sign"] () T.Text)
 -- Right (MkEnc Proxy () "11:Hello World")
---
---
--- __GHC labels these instances orphan__. 
--- They are morally not orphan. 
--- Using "my-sign" symbol is morally equivalent to using a newtype. 
-
--- * Instances
 
 prxyMySign = Proxy :: Proxy "my-sign"
 

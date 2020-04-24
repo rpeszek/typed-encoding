@@ -77,8 +77,8 @@ toLowerAscii = exAsciiTE >>= pure . Unsafe.withUnsafe (fmap T.toLower)
 --
 -- >>> let Right hELLO = exAsciiTE
 -- >>> let Right hello = toLowerAscii
--- >>> Unsafe.runUnsafe ((<>) <$> Unsafe.Unsafe hELLO <*> Unsafe.Unsafe hello)
--- MkEnc Proxy () "HELLOhello"
+-- >>> displ $ Unsafe.runUnsafe ((<>) <$> Unsafe.Unsafe hELLO <*> Unsafe.Unsafe hello)
+-- "MkEnc '[r-ASCII] () (Text HELLOhello)"
 appendAscii :: Either EncodeEx (Enc '["r-ASCII"] () T.Text)
 appendAscii = do 
     hELLO <- exAsciiTE
