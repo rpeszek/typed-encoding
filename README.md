@@ -1,5 +1,5 @@
 # typed-encoding
-Type level annotations that make programming Strings safer.
+Type level annotations that make programming strings safer.
 
 ## Motivation
 I have recently spent a lot of time troubleshooting various `Base64`, `quoted-printable`, and `Utf8` encoding issues.  
