@@ -1,27 +1,28 @@
 name:                typed-encoding
 version:             0.1.0.0
-github:              "githubuser/typed-encoding"
+github:              "rpeszek/typed-encoding"
 license:             BSD3
 author:              "Robert Peszek"
-maintainer:          "example@example.com"
+maintainer:          "robpeszek@gmail.com"
 copyright:           "2020 Robert Peszek"
+
 
 extra-source-files:
 - README.md
 - ChangeLog.md
 
 # Metadata used when publishing your package
-# synopsis:            Short description of your package
-# category:            Web
+synopsis:            Type safe string transformations
+category:            Web
 
 # To avoid duplicated efforts in documentation and dealing with the
 # complications of embedding Haddock markup inside cabal files, it is
 # common to point users to the README.md file.
-description:         
-  .
-  Type level annotations that make programming Strings safer.
-  .
-  Contains a list of Example modules.
+description:  See README.md in the project github repository.       
+#   .
+#   Type level annotations that make programming Strings safer.
+#   .
+#   Contains a list of Example modules.
 
 
 dependencies:
