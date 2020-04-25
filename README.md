@@ -35,13 +35,10 @@ Transformations can be
    - used with parameters.
    - applied or undone partially (if encoding is reversible)
  
+## Examples 
 
-Here are some code examples:
-   - [Overview](src/Examples/TypedEncoding/Overview.hs)
-   - [Conversions between encodings](src/Examples/TypedEncoding/Conversions.hs)
-   - [Adding a new encoding, error handling](src/Examples/TypedEncoding/DiySignEncoding.hs)
-   - [Unsafe - working inside encodings](src/Examples/TypedEncoding/Unsafe.hs)
-
+Please see `Examples.TypedEncoding` it the module list.
+ 
 ## Dependencies on other encoding libs
 
 Currently it uses
@@ -53,4 +50,8 @@ Currently it uses
    - better implementation type safety
 
 ## Tested with
-   - stack lts-14.27
+   - stack (1.9.3) lts-14.27 (ghc-8.6.5)
+
+## Known issues
+   - running test suite: cabal has problems with doctest, use stack  
+   https://github.com/haskell/cabal/issues/6087   
