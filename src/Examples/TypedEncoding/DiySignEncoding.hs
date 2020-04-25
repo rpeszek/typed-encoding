@@ -111,7 +111,7 @@ prxyMySign = Proxy :: Proxy "my-sign"
 instance Applicative f => EncodeF f (Enc xs c T.Text) (Enc ("my-sign" ': xs) c T.Text) where
     encodeF = EnT.implEncodeP encodeSign    
 
--- | Decoding is effectful to allow for troubleshooting and unsafe payload changes.
+-- | Decoding allows effectful @f@ to allow for troubleshooting and unsafe payload changes.
 --
 -- Implementation simply uses 'EnT.implDecodeF' combinator on the 'asUnexpected' composed with decoding function.
 -- 'UnexpectedDecodeErr' has Identity instance allowing for decoding that assumes errors are not possible.
@@ -119,7 +119,7 @@ instance Applicative f => EncodeF f (Enc xs c T.Text) (Enc ("my-sign" ': xs) c T
 instance (UnexpectedDecodeErr f, Applicative f) => DecodeF f (Enc ("my-sign" ': xs) c T.Text) (Enc xs c T.Text) where
     decodeF = EnT.implDecodeF (asUnexpected prxyMySign . decodeSign) 
 
--- | Recovery is effectful to check for tampering with data.
+-- | Recreation allows effectful @f@ to check for tampering with data.
 -- Implementation simply uses 'EnT.implCheckPrevF' combinator on the recovery function.
 instance (RecreateErr f, Applicative f) => RecreateF f (Enc xs c T.Text) (Enc ("my-sign" ': xs) c T.Text) where   
     checkPrevF = EnT.implCheckPrevF (asRecreateErr prxyMySign . decodeSign) 

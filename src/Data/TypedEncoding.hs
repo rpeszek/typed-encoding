@@ -51,7 +51,7 @@
 --
 -- == "do-" transformations
 --
--- * /encoding/ applies transformation to the string (could be partial/effectful)
+-- * /encoding/ applies transformation to the string (could be partial)
 -- * /decoding/ - typically none
 -- * /recreation/ - typically none but, if present, verifies the payload has expected data (e.g. only uppercase chars for "do-UPPER")
 --
@@ -59,7 +59,7 @@
 --
 -- == "enc-" data encoding that is not "r-"
 --
--- * /encoding/ applies encoding transformation to the string (could be partial/effectful)
+-- * /encoding/ applies encoding transformation to the string (could be partial)
 -- * /decoding/ reverses the transformation (can be used as pure function)
 -- * /recreation/ verifies that the payload has correctly encoded data
 --

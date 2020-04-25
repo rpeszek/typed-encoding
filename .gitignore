@@ -2,5 +2,5 @@
 *~
 .history/
 *.cabal
-
+*.tar.gz
 Temp*

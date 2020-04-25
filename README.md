@@ -34,8 +34,7 @@ It becomes a type directed, declarative approach to string transformations.
 Transformations can be
    - used with parameters.
    - applied or undone partially (if encoding is reversible)
-   - effectful
-
+ 
 
 Here are some code examples:
    - [Overview](src/Examples/TypedEncoding/Overview.hs)
