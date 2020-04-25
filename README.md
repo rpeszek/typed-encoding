@@ -53,5 +53,5 @@ Currently it uses
    - stack (1.9.3) lts-14.27 (ghc-8.6.5)
 
 ## Known issues
-   - running testsuite: cabal has problems with doctest, use stack
+   - running test suite: cabal has problems with doctest, use stack  
    https://github.com/haskell/cabal/issues/6087   
