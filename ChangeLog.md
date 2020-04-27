@@ -3,7 +3,8 @@
 ## Unreleased changes
  - breaking
     - Data.TypedEncoding.Instances modules reorganized
-    - Data.TypedEncoding.Internal.Class reorganized
+    - Data.TypedEncoding.Internal.Class modules reorganized
+    - Data.TypedEncoding.Internal.Utils module renamed
  - new functionality
     - IsStringR - added reversed IsString class
     - ToEncString - class allowing to convert types to `Enc` strings

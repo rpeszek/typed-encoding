@@ -12,7 +12,7 @@
 module Data.TypedEncoding.Instances.Restriction.UTF8 where
 
 import           Data.TypedEncoding.Instances.Support
--- import           Data.TypedEncoding.Internal.Utils (proxiedId)
+-- import           Data.TypedEncoding.Internal.Util (proxiedId)
 import           Data.TypedEncoding.Unsafe (withUnsafe)
 
 import           Data.Proxy
@@ -41,7 +41,7 @@ import           Data.Either
 -- >>> import Test.QuickCheck
 -- >>> import Test.QuickCheck.Instances.Text()
 -- >>> import Test.QuickCheck.Instances.ByteString()
--- >>> import Data.TypedEncoding.Internal.Utils (proxiedId)
+-- >>> import Data.TypedEncoding.Internal.Util (proxiedId)
 -- >>> let prxyArb = Proxy :: Proxy (Either EncodeEx (Enc '["r-UTF8"] () B.ByteString))
 -- >>> :{
 -- >>> instance Arbitrary (Enc '["r-UTF8"] () B.ByteString) where 

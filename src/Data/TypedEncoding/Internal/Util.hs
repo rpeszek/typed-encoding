@@ -1,4 +1,4 @@
-module Data.TypedEncoding.Internal.Utils where
+module Data.TypedEncoding.Internal.Util where
 
 import           Data.Proxy
 

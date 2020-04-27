@@ -32,7 +32,7 @@ import qualified Data.ByteString.Char8 as B8
 import qualified Data.ByteString.Lazy.Char8 as BL8
 
 import           Data.Char
-import           Data.TypedEncoding.Internal.Utils (explainBool)
+import           Data.TypedEncoding.Internal.Util (explainBool)
 import           Data.TypedEncoding.Unsafe (withUnsafe)
 import           Control.Arrow
 
