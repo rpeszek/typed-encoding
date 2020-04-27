@@ -15,9 +15,9 @@
 module Examples.TypedEncoding.Conversions where
 
 import           Data.TypedEncoding
-import qualified Data.TypedEncoding.Instances.Base64 as EnB64
-import qualified Data.TypedEncoding.Instances.ASCII as EnASCII
-import qualified Data.TypedEncoding.Instances.UTF8  as EnUTF8
+import qualified Data.TypedEncoding.Instances.Enc.Base64 as EnB64
+import qualified Data.TypedEncoding.Instances.Restriction.ASCII as EnASCII
+import qualified Data.TypedEncoding.Instances.Restriction.UTF8  as EnUTF8
 
 import           Data.Proxy
 

@@ -5,7 +5,7 @@
 {-# LANGUAGE FlexibleContexts #-}
 
 
-module Data.TypedEncoding.Instances.Base64 where
+module Data.TypedEncoding.Instances.Enc.Base64 where
 
 import           Data.TypedEncoding
 import           Data.TypedEncoding.Instances.Support

@@ -13,7 +13,7 @@
 --
 -- >>> encodeFAll . toEncoding () $ "\194\160" :: Either EncodeEx (Enc '["r-ASCII"] () T.Text)
 -- Left (EncodeEx "r-ASCII" (NonAsciiChar '\194'))
-module Data.TypedEncoding.Instances.ASCII where
+module Data.TypedEncoding.Instances.Restriction.ASCII where
 
 import           Data.TypedEncoding.Instances.Support
 

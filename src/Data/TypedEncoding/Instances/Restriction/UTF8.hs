@@ -9,7 +9,7 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE PartialTypeSignatures #-}
 -- | 
-module Data.TypedEncoding.Instances.UTF8 where
+module Data.TypedEncoding.Instances.Restriction.UTF8 where
 
 import           Data.TypedEncoding.Instances.Support
 -- import           Data.TypedEncoding.Internal.Utils (proxiedId)

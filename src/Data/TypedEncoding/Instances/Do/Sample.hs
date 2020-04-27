@@ -10,7 +10,7 @@
 
 -- | This module defines some sample "do-" encodings
 -- currently for example use only.
-module Data.TypedEncoding.Instances.Encode.Sample where
+module Data.TypedEncoding.Instances.Do.Sample where
 
 import qualified Data.Text as T
 import qualified Data.Text.Lazy as TL

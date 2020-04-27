@@ -71,10 +71,10 @@
 --
 -- Here is list of instance modules available in typed-encoding library itself
 --
--- * "Data.TypedEncoding.Instances.Base64"
--- * "Data.TypedEncoding.Instances.ASCII" 
--- * "Data.TypedEncoding.Instances.UTF8" 
--- * "Data.TypedEncoding.Instances.Encode.Sample" 
+-- * "Data.TypedEncoding.Instances.Enc.Base64"
+-- * "Data.TypedEncoding.Instances.Restriction.ASCII" 
+-- * "Data.TypedEncoding.Instances.Restriction.UTF8" 
+-- * "Data.TypedEncoding.Instances.Do.Sample" 
 -- 
 -- This list is not intended to be exhaustive, rather separate libraries
 -- can provide instances for other encodings and transformations.
