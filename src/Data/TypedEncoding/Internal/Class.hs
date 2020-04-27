@@ -8,7 +8,8 @@
 {-# LANGUAGE UndecidableInstances #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeFamilies #-}
--- {-# LANGUAGE PartialTypeSignatures #-}
+{-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE AllowAmbiguousTypes #-}
 
 module Data.TypedEncoding.Internal.Class where
 
@@ -102,7 +103,15 @@ recreateAll :: RecreateFAll Identity (xs :: [k]) c str =>
               -> (Enc xs c str)
 recreateAll = runIdentity . recreateFAll             
 
-                    
+-- | Generalized Java toString, it encodes @a@ as @Enc@
+-- It is here to generate data that can be then partially encoded
+-- using encoding combinators.
+-- It is not part of encodeFAll, so it does not need @f@ effect.
+-- TODO would be nice to have EncodeFAll1 and DecodeFAll1 that starts
+-- end stops at frist encoding.
+class KnownSymbol x => ToEncString x str a where
+    toEncString :: a -> Enc '[x] () str
+
 
 -- | TODO use singletons definition instead?
 type family Append (xs :: [k]) (ys :: [k]) :: [k] where

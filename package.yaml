@@ -30,6 +30,7 @@ dependencies:
 - bytestring
 - text
 - base64-bytestring
+# - symbols
 
 
 library:

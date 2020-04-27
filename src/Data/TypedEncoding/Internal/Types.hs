@@ -39,6 +39,9 @@ implTranF f  = implTranF' (\c -> f)
 implEncodeF :: (Show err, KnownSymbol x) => Proxy x -> (str -> Either err str) ->  Enc enc1 conf str -> Either EncodeEx (Enc enc2 conf str) 
 implEncodeF p f = implTranF (either (Left . EncodeEx p) Right . f) 
 
+-- implEncodeF_ :: forall err x str conf enc1 enc2. (Show err, KnownSymbol x) => (str -> Either err str) ->  Enc enc1 conf str -> Either EncodeEx (Enc enc2 conf str) 
+-- implEncodeF_ f = implTranF (either (Left . EncodeEx (Proxy :: Proxy x)) Right . f) 
+
 implDecodeF :: Functor f => (str -> f str) -> Enc enc1 conf str -> f (Enc enc2 conf str)
 implDecodeF = implTranF
 

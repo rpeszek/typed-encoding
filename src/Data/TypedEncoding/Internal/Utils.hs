@@ -7,6 +7,7 @@ explainBool _ (a, True) = Right a
 explainBool f (a, False) = Left $ f a 
 
 
+
 proxiedId :: Proxy a -> a -> a
 proxiedId _ = id
 
