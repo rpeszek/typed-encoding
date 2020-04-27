@@ -7,6 +7,7 @@
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE UndecidableInstances #-}
 {-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TypeApplications #-}
 
 -- | This module defines some sample "do-" encodings
 -- currently for example use only.
@@ -27,7 +28,7 @@ import           Data.Char
 instance Applicative f => EncodeF f (Enc xs c T.Text) (Enc ("do-UPPER" ': xs) c T.Text) where
     encodeF = implEncodeP T.toUpper
 instance (RecreateErr f, Applicative f) => RecreateF f (Enc xs c T.Text) (Enc ("do-UPPER" ': xs) c T.Text) where
-    checkPrevF = implCheckPrevF (asRecreateErr (Proxy :: Proxy "do-UPPER") . (\t -> 
+    checkPrevF = implCheckPrevF (asRecreateErr_ @"do-UPPER" . (\t -> 
                                  let (g,b) = T.partition isUpper t
                                  in if T.null b
                                     then Right t

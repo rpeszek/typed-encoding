@@ -4,6 +4,7 @@
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TypeApplications #-}
 
 -- | Strings can move to 'Enc "r-ASCII' only if they contain only ascii characters.
 -- they always decode back
@@ -80,28 +81,28 @@ instance Applicative f => DecodeF f (Enc ("r-ASCII" ': xs) c Char) (Enc xs c Cha
 instance EncodeF (Either EncodeEx) (Enc xs c T.Text) (Enc ("r-ASCII" ': xs) c T.Text) where
     encodeF = implEncodeF prxyAscii (encodeImpl T.partition T.head T.null)
 instance (RecreateErr f, Applicative f) => RecreateF f (Enc xs c T.Text) (Enc ("r-ASCII" ': xs) c T.Text) where
-    checkPrevF = implCheckPrevF (asRecreateErr prxyAscii . encodeImpl T.partition T.head T.null)
+    checkPrevF = implCheckPrevF (asRecreateErr_ @"r-ASCII" . encodeImpl T.partition T.head T.null)
 instance Applicative f => DecodeF f (Enc ("r-ASCII" ': xs) c T.Text) (Enc xs c T.Text) where
     decodeF = implTranP id 
 
 instance EncodeF (Either EncodeEx) (Enc xs c TL.Text) (Enc ("r-ASCII" ': xs) c TL.Text) where
     encodeF = implEncodeF prxyAscii (encodeImpl TL.partition TL.head TL.null)
 instance (RecreateErr f, Applicative f) => RecreateF f (Enc xs c TL.Text) (Enc ("r-ASCII" ': xs) c TL.Text) where 
-    checkPrevF = implCheckPrevF (asRecreateErr prxyAscii . encodeImpl TL.partition TL.head TL.null)
+    checkPrevF = implCheckPrevF (asRecreateErr_ @"r-ASCII" . encodeImpl TL.partition TL.head TL.null)
 instance Applicative f => DecodeF f (Enc ("r-ASCII" ': xs) c TL.Text) (Enc xs c TL.Text) where
     decodeF = implTranP id 
 
 instance EncodeF (Either EncodeEx) (Enc xs c B.ByteString) (Enc ("r-ASCII" ': xs) c B.ByteString) where
     encodeF = implEncodeF prxyAscii (encodeImpl (\p -> B8.filter p &&& B8.filter (not . p)) B8.head B8.null)
 instance (RecreateErr f, Applicative f) => RecreateF f (Enc xs c B.ByteString) (Enc ("r-ASCII" ': xs) c B.ByteString) where
-    checkPrevF = implCheckPrevF (asRecreateErr prxyAscii . encodeImpl (\p -> B8.filter p &&& B8.filter (not . p)) B8.head B8.null)
+    checkPrevF = implCheckPrevF (asRecreateErr_ @"r-ASCII" . encodeImpl (\p -> B8.filter p &&& B8.filter (not . p)) B8.head B8.null)
 instance Applicative f => DecodeF f (Enc ("r-ASCII" ': xs) c B.ByteString) (Enc xs c B.ByteString) where
     decodeF = implTranP id 
 
 instance EncodeF (Either EncodeEx) (Enc xs c BL.ByteString) (Enc ("r-ASCII" ': xs) c BL.ByteString) where
     encodeF = implEncodeF prxyAscii (encodeImpl (\p -> BL8.filter p &&& BL8.filter (not . p)) BL8.head BL8.null)
 instance (RecreateErr f, Applicative f) => RecreateF f (Enc xs c BL.ByteString) (Enc ("r-ASCII" ': xs) c BL.ByteString) where
-    checkPrevF = implCheckPrevF (asRecreateErr prxyAscii . encodeImpl (\p -> BL8.filter p &&& BL8.filter (not . p)) BL8.head BL8.null)
+    checkPrevF = implCheckPrevF (asRecreateErr_ @"r-ASCII" . encodeImpl (\p -> BL8.filter p &&& BL8.filter (not . p)) BL8.head BL8.null)
 instance Applicative f => DecodeF f (Enc ("r-ASCII" ': xs) c BL.ByteString) (Enc xs c BL.ByteString) where
     decodeF = implTranP id 
 

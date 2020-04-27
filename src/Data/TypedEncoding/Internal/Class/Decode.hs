@@ -8,7 +8,6 @@
 {-# LANGUAGE UndecidableInstances #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeFamilies #-}
-{-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE AllowAmbiguousTypes #-}
 
 module Data.TypedEncoding.Internal.Class.Decode where
@@ -52,13 +51,20 @@ decodeFPart :: forall f xs xsf c str . (Functor f, DecodeFAll f xs c str) => Pro
 decodeFPart p (MkEnc _ conf str) = 
     let re :: f (Enc '[] c str) = decodeFAll $ MkEnc (Proxy :: Proxy xs) conf str
     in  (MkEnc Proxy conf . getPayload) <$> re 
- 
+
+decodeFPart_ :: forall (xs :: [Symbol]) xsf f c str . (Functor f, DecodeFAll f xs c str) =>  (Enc (Append xs xsf) c str) -> f (Enc xsf c str)
+decodeFPart_ = decodeFPart (Proxy :: Proxy xs) 
+
 decodePart :: DecodeFAll Identity (xs :: [k]) c str => 
               Proxy xs 
               -> (Enc (Append xs xsf) c str) 
               -> (Enc xsf c str) 
 decodePart p = runIdentity . decodeFPart p
 
+decodePart_ :: forall (xs :: [Symbol]) xsf c str .  DecodeFAll Identity xs c str => 
+              (Enc (Append xs xsf) c str) 
+              -> (Enc xsf c str)
+decodePart_ = decodePart (Proxy :: Proxy xs)              
 
 -- | With type safety in pace decoding errors should be unexpected
 -- this class can be used to provide extra info if decoding could fail
@@ -71,6 +77,9 @@ instance UnexpectedDecodeErr Identity where
 instance UnexpectedDecodeErr (Either UnexpectedDecodeEx) where
     unexpectedDecodeErr = Left 
 
-asUnexpected :: (UnexpectedDecodeErr f, Applicative f, Show err, KnownSymbol x) => Proxy x -> Either err a -> f a
+asUnexpected :: (KnownSymbol x, UnexpectedDecodeErr f, Applicative f, Show err) => Proxy x -> Either err a -> f a
 asUnexpected p (Left err) = unexpectedDecodeErr $ UnexpectedDecodeEx p err
 asUnexpected _ (Right r) = pure r
+
+asUnexpected_ :: forall x f err a . (KnownSymbol x, UnexpectedDecodeErr f, Applicative f, Show err) => Either err a -> f a
+asUnexpected_ = asUnexpected (Proxy :: Proxy x)

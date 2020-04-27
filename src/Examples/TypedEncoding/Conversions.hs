@@ -4,6 +4,7 @@
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TypeApplications #-}
 
 -- | Examples or moving between type annotated encodings
 --
@@ -78,7 +79,7 @@ helloUtf8B = inject Proxy helloAsciiB
 -- * More complex rules
 
 helloUtf8B64B :: Enc '["enc-B64", "r-UTF8"] () B.ByteString
-helloUtf8B64B = encodePart (Proxy :: Proxy '["enc-B64"]) helloUtf8B 
+helloUtf8B64B = encodePart_ @'["enc-B64"] helloUtf8B 
 -- ^ We put Base64 on the UFT8 ByteString
 --
 -- >>> displ $ encodePart (Proxy :: Proxy '["enc-B64"]) helloUtf8B

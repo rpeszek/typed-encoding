@@ -7,6 +7,7 @@
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE AllowAmbiguousTypes #-}
 {-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TypeApplications #-}
 
 -- | Common restrictions "r-" instances
 module Data.TypedEncoding.Instances.Restriction.Common where
@@ -34,7 +35,7 @@ instance (IsStringR str, IsString str) =>  EncodeF (Either EncodeEx) (Enc xs c s
     encodeF = implEncodeF prxyWord8Decimal (verifyWithRead (Proxy :: Proxy Word8) "Word8-decimal")
     -- encodeF = implEncodeF (Proxy :: Proxy "r-Word8-decimal") (verifyWithRead (Proxy :: Proxy Word8) "Word8-decimal")
 instance (IsStringR str, IsString str, RecreateErr f, Applicative f) => RecreateF f (Enc xs c str) (Enc ("r-Word8-decimal" ': xs) c str) where
-    checkPrevF = implCheckPrevF (asRecreateErr prxyWord8Decimal . verifyWithRead (Proxy :: Proxy Word8) "Word8-decimal")
+    checkPrevF = implCheckPrevF (asRecreateErr_ @"r-Word8-decimal" . verifyWithRead (Proxy :: Proxy Word8) "Word8-decimal")
 instance (IsStringR str, IsString str, Applicative f) => DecodeF f (Enc ("r-Word8-decimal" ': xs) c str) (Enc xs c str) where
     decodeF = implTranP id 
 

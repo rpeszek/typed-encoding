@@ -66,3 +66,7 @@ instance RecreateErr (Either RecreateEx) where
 asRecreateErr :: (RecreateErr f, Applicative f, Show err, KnownSymbol x) => Proxy x -> Either err a -> f a
 asRecreateErr p (Left err) = recoveryErr $ RecreateEx p err
 asRecreateErr _ (Right r) = pure r
+
+
+asRecreateErr_ :: forall x f err a . (RecreateErr f, Applicative f, Show err, KnownSymbol x) => Either err a -> f a
+asRecreateErr_ = asRecreateErr (Proxy :: Proxy x)
