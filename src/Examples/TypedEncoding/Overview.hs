@@ -172,10 +172,10 @@ helloTitle = encodeAll . toEncoding exampleConf $ "hello wOrld"
 --
 -- Instead, encode previously defined 'helloTitle' by reversing it and adding size limit
 --
--- >>> encodePart (Proxy :: Proxy '["do-size-limit", "do-reverse"]) helloTitle :: Enc '["do-size-limit", "do-reverse", "do-Title"] Config T.Text
+-- >>> encodePart_ @'["do-size-limit", "do-reverse"] helloTitle :: Enc '["do-size-limit", "do-reverse", "do-Title"] Config T.Text
 -- MkEnc Proxy (Config {sizeLimit = SizeLimit {unSizeLimit = 8}}) "dlroW ol"
 helloRevLimit :: Enc '["do-size-limit", "do-reverse", "do-Title"] Config T.Text
-helloRevLimit = encodePart (Proxy :: Proxy '["do-size-limit", "do-reverse"]) helloTitle
+helloRevLimit = encodePart_ @'["do-size-limit", "do-reverse"] helloTitle
 
 -- >>> encodeAll . toEncoding exampleConf $ "HeLlo world" :: Enc '["enc-B64", "do-size-limit"] Config B.ByteString
 -- MkEnc Proxy (Config {sizeLimit = SizeLimit {unSizeLimit = 8}}) "SGVMbG8gd28="

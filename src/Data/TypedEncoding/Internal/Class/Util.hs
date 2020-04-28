@@ -11,8 +11,6 @@
 
 module Data.TypedEncoding.Internal.Class.Util where
 
-import           Data.TypedEncoding.Internal.Types (Enc(..))
-
 import qualified Data.ByteString.Char8 as B
 import qualified Data.ByteString.Lazy.Char8 as BL
 import qualified Data.Text as T
@@ -64,10 +62,5 @@ instance Displ (Proxy '[]) where
 instance (pxs ~ Proxy xs, Displ pxs, KnownSymbol x) => Displ (Proxy (x ': xs)) where
     displ _ =  L.dropWhileEnd (',' ==) $  symbolVal (Proxy :: Proxy x) ++ "," ++ displ (Proxy :: Proxy xs)
 
--- >>> let disptest = unsafeSetPayload () "hello" :: Enc '["TEST"] () T.Text
--- >>> displ disptest
--- "MkEnc '[TEST] () hello"
-instance (Displ (Proxy xs), Show c, Displ str) => Displ ( Enc xs c str) where
-    displ (MkEnc p c s) = 
-        "MkEnc '[" ++ displ p ++ "] " ++ show c ++ " " ++ displ s
+
 

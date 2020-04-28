@@ -4,7 +4,10 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE AllowAmbiguousTypes #-}
 
 -- |
 -- Internal definition of types
@@ -14,6 +17,11 @@ module Data.TypedEncoding.Internal.Types where
 import           Data.Proxy
 import           Data.Functor.Identity
 import           GHC.TypeLits
+import           Data.TypedEncoding.Internal.Class.Util
+
+-- $setup
+-- >>> :set -XOverloadedStrings -XMultiParamTypeClasses -XDataKinds -XAllowAmbiguousTypes
+-- >>> import qualified Data.Text as T
 
 -- Not a Functor on purpose
 data Enc enc conf str where
@@ -21,7 +29,16 @@ data Enc enc conf str where
     -- particular encoding instances may expose smart constructors for limited data types
     MkEnc :: Proxy enc -> conf -> str -> Enc enc conf str
     deriving (Show, Eq) 
- 
+
+-- |
+-- >>> let disptest = unsafeSetPayload () "hello" :: Enc '["TEST"] () T.Text
+-- >>> displ disptest
+-- "MkEnc '[TEST] () (Text hello)"
+instance (Displ (Proxy xs), Show c, Displ str) => Displ ( Enc xs c str) where
+    displ (MkEnc p c s) = 
+        "MkEnc '[" ++ displ p ++ "] " ++ show c ++ " " ++ displ s
+
+
 toEncoding :: conf -> str -> Enc '[] conf str
 toEncoding conf str = MkEnc Proxy conf str
 
@@ -83,7 +100,53 @@ withUnsafeCoerce f (MkEnc _ conf str)  = (MkEnc Proxy conf (f str))
 unsafeChangePayload ::  (s1 -> s2) -> Enc e c s1 -> Enc e c s2
 unsafeChangePayload f (MkEnc p conf str)  = (MkEnc p conf (f str)) 
 
+-- * Untyped Enc
 
+type SomeAnn = String
+
+data SomeEnc conf str where
+    -- | constructor is to be treated as Unsafe to Encode and Decode instance implementations
+    -- particular encoding instances may expose smart constructors for limited data types
+    MkSomeEnc :: SomeAnn -> conf -> str -> SomeEnc conf str
+    deriving (Show, Eq) 
+
+getSomePayload :: SomeEnc conf str -> str
+getSomePayload = snd . getSomeEncPayload
+
+getSomeEncPayload :: SomeEnc conf str -> (SomeAnn, str) 
+getSomeEncPayload (MkSomeEnc t _ s) = (t,s)
+
+toSomeEnc :: forall xs c str . (Displ (Proxy xs)) => Enc xs c str -> SomeEnc c str 
+toSomeEnc (MkEnc p c s) = 
+        MkSomeEnc ("[" ++ displ p ++ "]") c s   
+
+
+fromSomeEnc :: forall xs c str . (Displ (Proxy xs)) => SomeEnc c str -> Maybe (Enc xs c str)
+fromSomeEnc (MkSomeEnc xs c s) = 
+    let p = Proxy :: Proxy xs
+    in if "[" ++ displ p ++ "]" == xs
+       then Just $ MkEnc p c s
+       else Nothing
+
+-- |
+-- >>> let encsometest = MkSomeEnc "[TEST]" () $ T.pack "hello"
+-- >>> proc_toSomeEncFromSomeEnc @'["TEST"] encsometest
+-- True
+-- >>> proc_toSomeEncFromSomeEnc @'["TEST1"] encsometest
+-- False
+proc_toSomeEncFromSomeEnc :: forall xs c str . (Displ (Proxy xs), Eq c, Eq str) => SomeEnc c str -> Bool
+proc_toSomeEncFromSomeEnc x = (== Just x) . fmap (toSomeEnc @ xs) . fromSomeEnc $ x
+
+-- |
+-- >>> let enctest = unsafeSetPayload () "hello" :: Enc '["TEST"] () T.Text
+-- >>> proc_fromSomeEncToSomeEnc enctest
+-- True
+proc_fromSomeEncToSomeEnc :: forall xs c str . (Displ (Proxy xs), Eq c, Eq str) => Enc xs c str -> Bool
+proc_fromSomeEncToSomeEnc x = (== Just x) . fromSomeEnc . toSomeEnc $ x
+
+instance (Show c, Displ str) => Displ (SomeEnc c str) where
+    displ (MkSomeEnc xs c s) = 
+        "MkSomeEnc " ++ xs ++ show c ++ " " ++ displ s
 
 -- | Represents errors in recovery (recreation of encoded types).
 data RecreateEx where
