@@ -32,11 +32,11 @@ type family Append (xs :: [k]) (ys :: [k]) :: [k] where
 
 
 -- | Polymorphic data payloads used to encode/decode
-class HasA c a where
-    has :: Proxy a -> c -> a
+class HasA a c where
+    has :: c -> a
 
-instance HasA a () where
-    has _ = const ()
+instance HasA () c where
+    has = const ()
 
 -- * Some Annotation
 

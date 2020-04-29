@@ -26,7 +26,6 @@ import           Data.TypedEncoding.Internal.Class.Recreate
 
 import           Data.TypedEncoding.Internal.Types (Enc(..) 
                                                    , withUnsafeCoerce)
-import           Data.Proxy
 import           Data.Functor.Identity
 import           GHC.TypeLits
 import           Data.Semigroup ((<>))
@@ -56,13 +55,13 @@ fromEncString = runIdentity . fromEncStringF
 
 -- subsets are useful for restriction encodings
 -- like r-UFT8 but not for other encodings.
-class Subset (x :: k) (y :: k) where
-    inject :: Proxy y -> Enc (x ': xs) c str ->  Enc (y ': xs) c str
-    inject _ = withUnsafeCoerce id
+class Superset (y :: Symbol) (x :: Symbol) where
+    inject :: Enc (x ': xs) c str ->  Enc (y ': xs) c str
+    inject = withUnsafeCoerce id
 
-class FlattenAs (x :: k) (y :: k) where
-    flattenAs :: Proxy y -> Enc (x ': xs) c str ->  Enc '[y] c str
-    flattenAs _ = withUnsafeCoerce id
+class FlattenAs (y :: Symbol) (x :: Symbol) where
+    flattenAs ::  Enc (x ': xs) c str ->  Enc '[y] c str
+    flattenAs = withUnsafeCoerce id
 
 
 

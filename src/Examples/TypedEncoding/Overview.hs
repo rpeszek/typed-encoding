@@ -150,8 +150,8 @@ data Config = Config {
   } deriving (Show)
 exampleConf = Config (SizeLimit 8) 
 
-instance HasA Config SizeLimit where
-   has _ = sizeLimit  
+instance HasA SizeLimit Config where
+   has = sizeLimit  
 
 -- | `helloTitle' is needed in following examples
 --

@@ -37,9 +37,8 @@ import           Data.TypedEncoding.Internal.Util (explainBool)
 import           Data.TypedEncoding.Unsafe (withUnsafe)
 import           Control.Arrow
 
--- tst = encodeFAll . toEncoding () $ "Hello World" :: Either EncodeEx (Enc '["r-ASCII"] () T.Text)
--- tst2 = encodeFAll . toEncoding () $ "\194\160" :: Either EncodeEx (Enc '["r-ASCII"] () T.Text)
--- tst3 = encodeFAll . toEncoding () $ "\194\160" :: Either EncodeEx (Enc '["r-ASCII"] () B.ByteString)
+-- $setup
+-- >>> :set -XDataKinds -XTypeApplications
 
 -----------------
 -- Conversions --
@@ -61,9 +60,9 @@ text2ByteStringL  = withUnsafe (fmap TEL.encodeUtf8)
 -- | allow to treat ASCII encodings as UTF8 forgetting about B64 encoding
 -- 
 -- >>> let Right tstAscii = encodeFAll . toEncoding () $ "Hello World" :: Either EncodeEx (Enc '["r-ASCII"] () T.Text)
--- >>> displ (inject (Proxy :: Proxy "r-UTF8") tstAscii)
+-- >>> displ (inject @ "r-UTF8" tstAscii)
 -- "MkEnc '[r-UTF8] () (Text Hello World)"
-instance Subset "r-ASCII" "r-UTF8" where
+instance Superset "r-UTF8" "r-ASCII" where
 
 -----------------
 -- Encondings  --
@@ -118,3 +117,6 @@ encodeImpl partitionf headf nullf t =
                     then Right tascii
                     else Left . NonAsciiChar $ headf nonascii 
 
+-- tst = encodeFAll . toEncoding () $ "Hello World" :: Either EncodeEx (Enc '["r-ASCII"] () T.Text)
+-- tst2 = encodeFAll . toEncoding () $ "\194\160" :: Either EncodeEx (Enc '["r-ASCII"] () T.Text)
+-- tst3 = encodeFAll . toEncoding () $ "\194\160" :: Either EncodeEx (Enc '["r-ASCII"] () B.ByteString)

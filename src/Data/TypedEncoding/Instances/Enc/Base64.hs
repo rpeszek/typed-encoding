@@ -10,7 +10,6 @@ module Data.TypedEncoding.Instances.Enc.Base64 where
 import           Data.TypedEncoding
 import           Data.TypedEncoding.Instances.Support
 
-import           Data.Proxy
 import           Data.Functor.Identity
 import           GHC.TypeLits
 
@@ -80,17 +79,16 @@ acceptLenientL = withUnsafeCoerce (BL64.encode . BL64.decodeLenient)
 -- 
 --
 -- >>> let tstB64 = encodeAll . toEncoding () $ "Hello World" :: Enc '["enc-B64"] () B.ByteString
--- >>> displ (flattenAs (Proxy :: Proxy "r-ASCII") tstB64 :: Enc '["r-ASCII"] () B.ByteString)
+-- >>> displ (flattenAs tstB64 :: Enc '["r-ASCII"] () B.ByteString)
 -- "MkEnc '[r-ASCII] () (ByteString SGVsbG8gV29ybGQ=)"
-instance FlattenAs "enc-B64-nontext" "r-ASCII" where
-instance FlattenAs "enc-B64" "r-ASCII" where
+instance FlattenAs "r-ASCII" "enc-B64-nontext" where
+instance FlattenAs "r-ASCII" "enc-B64" where
 
 
 -----------------
 -- Encodings   --
 -----------------
 
--- prxyB64 = Proxy :: Proxy "enc-B64"
 
 instance Applicative f => EncodeF f (Enc xs c B.ByteString) (Enc ("enc-B64" ': xs) c B.ByteString) where
     encodeF = implEncodeP B64.encode 

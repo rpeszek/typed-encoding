@@ -39,7 +39,7 @@ import           Data.Text.Encoding.Error (UnicodeException)
 import           Data.Either
 
 -- $setup
--- >>> :set -XScopedTypeVariables -XKindSignatures -XMultiParamTypeClasses -XDataKinds -XPolyKinds -XPartialTypeSignatures -XFlexibleInstances 
+-- >>> :set -XScopedTypeVariables -XKindSignatures -XMultiParamTypeClasses -XDataKinds -XPolyKinds -XPartialTypeSignatures -XFlexibleInstances -XTypeApplications
 -- >>> import Test.QuickCheck
 -- >>> import Test.QuickCheck.Instances.Text()
 -- >>> import Test.QuickCheck.Instances.ByteString()

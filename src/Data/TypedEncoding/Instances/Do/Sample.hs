@@ -20,7 +20,6 @@ import qualified Data.ByteString as B
 
 import           Data.TypedEncoding.Instances.Support
 
-import           Data.Proxy
 import           GHC.TypeLits
 import           Data.Char
 
@@ -53,8 +52,8 @@ instance Applicative f => EncodeF f (Enc xs c TL.Text) (Enc ("do-reverse" ': xs)
     encodeF = implEncodeP TL.reverse    
 
 newtype SizeLimit = SizeLimit {unSizeLimit :: Int} deriving (Eq, Show)
-instance (HasA c SizeLimit, Applicative f) => EncodeF f (Enc xs c T.Text) (Enc ("do-size-limit" ': xs) c T.Text) where
-    encodeF =  implEncodeP' (T.take . unSizeLimit . has (Proxy :: Proxy SizeLimit)) 
-instance (HasA c SizeLimit, Applicative f) => EncodeF f (Enc xs c B.ByteString) (Enc ("do-size-limit" ': xs) c B.ByteString) where
-    encodeF =  implEncodeP' (B.take . unSizeLimit . has (Proxy :: Proxy SizeLimit)) 
+instance (HasA SizeLimit c, Applicative f) => EncodeF f (Enc xs c T.Text) (Enc ("do-size-limit" ': xs) c T.Text) where
+    encodeF =  implEncodeP' (T.take . unSizeLimit . has @ SizeLimit) 
+instance (HasA SizeLimit c, Applicative f) => EncodeF f (Enc xs c B.ByteString) (Enc ("do-size-limit" ': xs) c B.ByteString) where
+    encodeF =  implEncodeP' (B.take . unSizeLimit .  has @ SizeLimit) 
 

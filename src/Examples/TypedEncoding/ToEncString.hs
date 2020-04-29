@@ -106,7 +106,10 @@ data SimplifiedEmailF a = SimplifiedEmailF {
 
 type SimplifiedEmail = SimplifiedEmailF (PartHeader, B.ByteString)
 
-type SimplifiedEmailEnc = SimplifiedEmailF (SomeEnc () B.ByteString)
+type SimplifiedEmailEncB = SimplifiedEmailF (SomeEnc () B.ByteString)
+
+-- TODO
+type SimplifiedEmailEncT = SimplifiedEmailF (SomeEnc () T.Text)
 
 tstEmail :: SimplifiedEmail
 tstEmail = SimplifiedEmailF {
@@ -123,8 +126,8 @@ tstEmail = SimplifiedEmailF {
 -- Encodes 'simple email' 
 -- 
 -- This uses 'unsafeSomeEnc' for simplicity 
-encodeEmail :: SimplifiedEmail -> Either RecreateEx SimplifiedEmailEnc
-encodeEmail = extractEither . fmap encodefn
+recreateEncoding :: SimplifiedEmail -> Either RecreateEx SimplifiedEmailEncB
+recreateEncoding = extractEither . fmap encodefn
   where -- | simplified parse header assumes email has the same layout as encodings
         parseHeader :: PartHeader -> SomeAnn
         parseHeader = id
@@ -137,17 +140,15 @@ encodeEmail = extractEither . fmap encodefn
             _                 -> Right $ unsafeSomeEnc (parseHeader parth) () body 
 
 
-
-
 extractEither :: Traversable t => t (Either err a) -> Either err (t a)
 extractEither tx = mapM id tx
 
 -- | Decode email base 64 encoded text entries but not image entries
 -- this provides a type safety over not decoding certain parts of email
 --
--- decodeB64ForTextOnly <$> encodeEmail tstEmail
+-- decodeB64ForTextOnly <$> recreateEncoding tstEmail
 --
-decodeB64ForTextOnly :: SimplifiedEmailEnc -> SimplifiedEmailEnc
+decodeB64ForTextOnly :: SimplifiedEmailEncB -> SimplifiedEmailEncB
 decodeB64ForTextOnly = fmap (EnT.maybeTranformations [tryUtf8, tryAscii]) 
   where
     tryUtf8, tryAscii :: SomeEnc c B.ByteString -> Maybe (SomeEnc c B.ByteString)
