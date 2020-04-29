@@ -115,14 +115,14 @@ prxyUtf8 = Proxy :: Proxy "r-UTF8"
 -- prop> \(b :: B.ByteString) -> verEncoding b (fmap (fromEncoding . decodeAll . proxiedId (Proxy :: Proxy (Enc '["r-UTF8"] _ _))) . (encodeFAll :: _ -> Either EncodeEx _). toEncoding () $ b)
 
 instance EncodeF (Either EncodeEx) (Enc xs c B.ByteString) (Enc ("r-UTF8" ': xs) c B.ByteString) where
-    encodeF = implEncodeF prxyUtf8 (fmap TE.encodeUtf8 . TE.decodeUtf8')
+    encodeF = implEncodeF_ prxyUtf8 (fmap TE.encodeUtf8 . TE.decodeUtf8')
 instance (RecreateErr f, Applicative f) => RecreateF f (Enc xs c B.ByteString) (Enc ("r-UTF8" ': xs) c B.ByteString) where
     checkPrevF = implCheckPrevF (asRecreateErr_ @"r-UTF8" . fmap TE.encodeUtf8 . TE.decodeUtf8')
 instance Applicative f => DecodeF f (Enc ("r-UTF8" ': xs) c B.ByteString) (Enc xs c B.ByteString) where
     decodeF = implTranP id 
 
 instance EncodeF (Either EncodeEx) (Enc xs c BL.ByteString) (Enc ("r-UTF8" ': xs) c BL.ByteString) where
-    encodeF = implEncodeF prxyUtf8 (fmap TEL.encodeUtf8 . TEL.decodeUtf8')
+    encodeF = implEncodeF_ prxyUtf8 (fmap TEL.encodeUtf8 . TEL.decodeUtf8')
 instance (RecreateErr f, Applicative f) => RecreateF f (Enc xs c BL.ByteString) (Enc ("r-UTF8" ': xs) c BL.ByteString) where
     checkPrevF = implCheckPrevF (asRecreateErr_ @"r-UTF8" . fmap TEL.encodeUtf8 . TEL.decodeUtf8')
 instance Applicative f => DecodeF f (Enc ("r-UTF8" ': xs) c BL.ByteString) (Enc xs c BL.ByteString) where

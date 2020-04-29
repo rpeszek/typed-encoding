@@ -29,11 +29,8 @@ import           Data.TypedEncoding.Instances.Support
 -- >>> import qualified Data.Text as T
 
 
-prxyWord8Decimal =  Proxy :: Proxy "r-Word8-decimal"
-
 instance (IsStringR str, IsString str) =>  EncodeF (Either EncodeEx) (Enc xs c str) (Enc ("r-Word8-decimal" ': xs) c str) where
-    encodeF = implEncodeF prxyWord8Decimal (verifyWithRead @Word8 "Word8-decimal")
-    -- encodeF = implEncodeF (Proxy :: Proxy "r-Word8-decimal") (verifyWithRead (Proxy :: Proxy Word8) "Word8-decimal")
+    encodeF = implEncodeF @"r-Word8-decimal" (verifyWithRead @Word8 "Word8-decimal")
 instance (IsStringR str, IsString str, RecreateErr f, Applicative f) => RecreateF f (Enc xs c str) (Enc ("r-Word8-decimal" ': xs) c str) where
     checkPrevF = implCheckPrevF (asRecreateErr_ @"r-Word8-decimal" . verifyWithRead @Word8 "Word8-decimal")
 instance (IsStringR str, IsString str, Applicative f) => DecodeF f (Enc ("r-Word8-decimal" ': xs) c str) (Enc xs c str) where

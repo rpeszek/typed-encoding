@@ -57,11 +57,13 @@ implTranF :: Functor f => (str -> f str) -> Enc enc1 conf str -> f (Enc enc2 con
 implTranF f  = implTranF' (\c -> f)
 
 -- TODO could this type be more precise?
-implEncodeF :: (Show err, KnownSymbol x) => Proxy x -> (str -> Either err str) ->  Enc enc1 conf str -> Either EncodeEx (Enc enc2 conf str) 
-implEncodeF p f = implTranF (either (Left . EncodeEx p) Right . f) 
+implEncodeF_ :: (Show err, KnownSymbol x) => Proxy x -> (str -> Either err str) ->  Enc enc1 conf str -> Either EncodeEx (Enc enc2 conf str) 
+implEncodeF_ p f = implTranF (either (Left . EncodeEx p) Right . f) 
 
--- implEncodeF_ :: forall err x str conf enc1 enc2. (Show err, KnownSymbol x) => (str -> Either err str) ->  Enc enc1 conf str -> Either EncodeEx (Enc enc2 conf str) 
--- implEncodeF_ f = implTranF (either (Left . EncodeEx (Proxy :: Proxy x)) Right . f) 
+implEncodeF :: forall x enc1 enc2 err conf str . 
+              (Show err, KnownSymbol x) 
+              => (str -> Either err str) ->  Enc enc1 conf str -> Either EncodeEx (Enc enc2 conf str) 
+implEncodeF = implEncodeF_ (Proxy :: Proxy x)
 
 implDecodeF :: Functor f => (str -> f str) -> Enc enc1 conf str -> f (Enc enc2 conf str)
 implDecodeF = implTranF
@@ -73,8 +75,8 @@ implCheckPrevF = implTranF
 implTranF' :: Functor f =>  (conf -> str -> f str) -> Enc enc1 conf str -> f (Enc enc2 conf str)
 implTranF' f (MkEnc _ conf str) = (MkEnc Proxy conf) <$> f conf str
 
-implEncodeF' :: (Show err, KnownSymbol x) => Proxy x -> (conf -> str -> Either err str) ->  Enc enc1 conf str -> Either EncodeEx (Enc enc2 conf str) 
-implEncodeF' p f = implTranF' (\c -> either (Left . EncodeEx p) Right . f c) 
+implEncodeF_' :: (Show err, KnownSymbol x) => Proxy x -> (conf -> str -> Either err str) ->  Enc enc1 conf str -> Either EncodeEx (Enc enc2 conf str) 
+implEncodeF_' p f = implTranF' (\c -> either (Left . EncodeEx p) Right . f c) 
 
 implDecodeF' :: Functor f =>  (conf -> str -> f str) -> Enc enc1 conf str -> f (Enc enc2 conf str)
 implDecodeF' = implTranF'
