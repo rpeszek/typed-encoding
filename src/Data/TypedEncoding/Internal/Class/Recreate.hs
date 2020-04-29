@@ -32,7 +32,7 @@ import           Data.Semigroup ((<>))
 class RecreateF f instr outstr where    
     checkPrevF :: outstr -> f instr
 
-class (Functor f) => RecreateFAll f (xs :: [k]) c str where
+class (Functor f) => RecreateFAll f (xs :: [Symbol]) c str where
     checkFAll :: (Enc xs c str) -> f (Enc '[] c str)
     recreateFAll :: (Enc '[] c str) -> f (Enc xs c str)
     recreateFAll str@(MkEnc _ _ pay) = 
@@ -49,7 +49,7 @@ instance (Monad f, RecreateFAll f xs c str, RecreateF f (Enc xs c str) (Enc (x '
         in re >>= checkFAll
 
 
-recreateAll :: RecreateFAll Identity (xs :: [k]) c str => 
+recreateAll :: forall xs c str . RecreateFAll Identity xs c str => 
               (Enc '[] c str) 
               -> (Enc xs c str)
 recreateAll = runIdentity . recreateFAll 

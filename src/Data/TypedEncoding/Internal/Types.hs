@@ -8,11 +8,15 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE AllowAmbiguousTypes #-}
+{-# LANGUAGE RankNTypes #-}
 
 -- |
 -- Internal definition of types
 
-module Data.TypedEncoding.Internal.Types where
+module Data.TypedEncoding.Internal.Types (
+        module Data.TypedEncoding.Internal.Types
+        , type SomeAnn
+    ) where
 
 import           Data.Proxy
 import           Data.Functor.Identity
@@ -34,9 +38,9 @@ data Enc enc conf str where
 -- >>> let disptest = unsafeSetPayload () "hello" :: Enc '["TEST"] () T.Text
 -- >>> displ disptest
 -- "MkEnc '[TEST] () (Text hello)"
-instance (Displ (Proxy xs), Show c, Displ str) => Displ ( Enc xs c str) where
+instance (SomeAnnotation xs, Show c, Displ str) => Displ ( Enc xs c str) where
     displ (MkEnc p c s) = 
-        "MkEnc '[" ++ displ p ++ "] " ++ show c ++ " " ++ displ s
+        "MkEnc '[" ++ someAnn @ xs ++ "] " ++ show c ++ " " ++ displ s
 
 
 toEncoding :: conf -> str -> Enc '[] conf str
@@ -102,13 +106,14 @@ unsafeChangePayload f (MkEnc p conf str)  = (MkEnc p conf (f str))
 
 -- * Untyped Enc
 
-type SomeAnn = String
-
 data SomeEnc conf str where
     -- | constructor is to be treated as Unsafe to Encode and Decode instance implementations
     -- particular encoding instances may expose smart constructors for limited data types
     MkSomeEnc :: SomeAnn -> conf -> str -> SomeEnc conf str
     deriving (Show, Eq) 
+
+unsafeSomeEnc:: SomeAnn -> c -> s -> SomeEnc c s
+unsafeSomeEnc = MkSomeEnc
 
 getSomePayload :: SomeEnc conf str -> str
 getSomePayload = snd . getSomeEncPayload
@@ -116,17 +121,30 @@ getSomePayload = snd . getSomeEncPayload
 getSomeEncPayload :: SomeEnc conf str -> (SomeAnn, str) 
 getSomeEncPayload (MkSomeEnc t _ s) = (t,s)
 
-toSomeEnc :: forall xs c str . (Displ (Proxy xs)) => Enc xs c str -> SomeEnc c str 
+toSomeEnc :: forall xs c str . (SomeAnnotation xs) => Enc xs c str -> SomeEnc c str 
 toSomeEnc (MkEnc p c s) = 
-        MkSomeEnc ("[" ++ displ p ++ "]") c s   
+        MkSomeEnc ("[" ++ someAnn @ xs ++ "]") c s   
 
 
-fromSomeEnc :: forall xs c str . (Displ (Proxy xs)) => SomeEnc c str -> Maybe (Enc xs c str)
+fromSomeEnc :: forall xs c str . SomeAnnotation xs => SomeEnc c str -> Maybe (Enc xs c str)
 fromSomeEnc (MkSomeEnc xs c s) = 
     let p = Proxy :: Proxy xs
-    in if "[" ++ displ p ++ "]" == xs
+    in if "[" ++ someAnn @ xs ++ "]" == xs
        then Just $ MkEnc p c s
        else Nothing
+
+
+-- TODO this does
+-- data SomeEnc' conf str where
+--     -- | constructor is to be treated as Unsafe to Encode and Decode instance implementations
+--     -- particular encoding instances may expose smart constructors for limited data types
+--     MkSomeEnc' :: Enc xs conf str -> SomeEnc' conf str
+    
+
+
+-- withSomeEnc' :: SomeEnc' conf str -> (forall xs . Enc xs conf str -> r) -> r
+-- withSomeEnc' (MkSomeEnc' enc) f = f enc
+
 
 -- |
 -- >>> let encsometest = MkSomeEnc "[TEST]" () $ T.pack "hello"
@@ -134,14 +152,14 @@ fromSomeEnc (MkSomeEnc xs c s) =
 -- True
 -- >>> proc_toSomeEncFromSomeEnc @'["TEST1"] encsometest
 -- False
-proc_toSomeEncFromSomeEnc :: forall xs c str . (Displ (Proxy xs), Eq c, Eq str) => SomeEnc c str -> Bool
+proc_toSomeEncFromSomeEnc :: forall xs c str . (SomeAnnotation xs, Eq c, Eq str) => SomeEnc c str -> Bool
 proc_toSomeEncFromSomeEnc x = (== Just x) . fmap (toSomeEnc @ xs) . fromSomeEnc $ x
 
 -- |
 -- >>> let enctest = unsafeSetPayload () "hello" :: Enc '["TEST"] () T.Text
 -- >>> proc_fromSomeEncToSomeEnc enctest
 -- True
-proc_fromSomeEncToSomeEnc :: forall xs c str . (Displ (Proxy xs), Eq c, Eq str) => Enc xs c str -> Bool
+proc_fromSomeEncToSomeEnc :: forall xs c str . (SomeAnnotation xs, Eq c, Eq str) => Enc xs c str -> Bool
 proc_fromSomeEncToSomeEnc x = (== Just x) . fromSomeEnc . toSomeEnc $ x
 
 instance (Show c, Displ str) => Displ (SomeEnc c str) where

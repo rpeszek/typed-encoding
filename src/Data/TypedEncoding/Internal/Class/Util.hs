@@ -8,6 +8,8 @@
 {-# LANGUAGE UndecidableInstances #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE AllowAmbiguousTypes #-}
 
 module Data.TypedEncoding.Internal.Class.Util where
 
@@ -20,6 +22,8 @@ import           Data.Proxy
 import qualified Data.List as L
 import           GHC.TypeLits
 
+-- $setup
+-- >>> :set -XScopedTypeVariables -XTypeApplications -XAllowAmbiguousTypes
 
 -- | TODO use singletons definition instead?
 type family Append (xs :: [k]) (ys :: [k]) :: [k] where
@@ -33,6 +37,23 @@ class HasA c a where
 
 instance HasA a () where
     has _ = const ()
+
+-- * Some Annotation
+
+-- TODO move out to central place
+type SomeAnn = String
+
+class SomeAnnotation (xs::[Symbol]) where 
+    someAnn :: SomeAnn
+
+instance SomeAnnotation '[] where
+    someAnn = ""
+
+-- |
+-- >>> someAnn @ '["FIRST", "SECOND"]
+-- "FIRST,SECOND"
+instance (SomeAnnotation xs, KnownSymbol x) => SomeAnnotation (x ': xs) where
+    someAnn =  L.dropWhileEnd (',' ==) $  symbolVal (Proxy :: Proxy x) ++ "," ++ someAnn @xs
 
 
 -- * Display 
@@ -53,14 +74,12 @@ instance Displ BL.ByteString where
     displ x = "(ByteString " ++ BL.unpack x ++ ")" 
 
 
-instance Displ (Proxy '[]) where
-    displ _ = ""
 
 -- |
 -- >>> displ (Proxy :: Proxy ["FIRST", "SECOND"])
 -- "FIRST,SECOND"
-instance (pxs ~ Proxy xs, Displ pxs, KnownSymbol x) => Displ (Proxy (x ': xs)) where
-    displ _ =  L.dropWhileEnd (',' ==) $  symbolVal (Proxy :: Proxy x) ++ "," ++ displ (Proxy :: Proxy xs)
+instance (SomeAnnotation xs) => Displ (Proxy xs) where
+    displ _ = someAnn @ xs
 
 
 

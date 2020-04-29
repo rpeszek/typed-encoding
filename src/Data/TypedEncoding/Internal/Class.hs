@@ -35,7 +35,7 @@ import           Data.Semigroup ((<>))
 -- TODO would be nice to have EncodeFAll1 and DecodeFAll1 that starts
 -- end stops at frist encoding.           
 
--- | Generalized Java toString, it encodes @a@ as @Enc@
+-- | Generalized Java toString/ type safe version of Haskell's Show, it encodes @a@ as @Enc@
 -- It is here to generate data that can be then partially encoded
 -- using encoding combinators.
 -- It is not part of encodeFAll, so it instances do not need to use polymorphic @f@ effect.

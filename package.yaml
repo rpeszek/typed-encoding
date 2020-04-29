@@ -35,7 +35,10 @@ dependencies:
 
 library:
   source-dirs: src
-
+  ghc-options:
+    # - -fwarn-unused-imports
+    - -fwarn-incomplete-patterns
+    - -fprint-explicit-kinds
 
 tests:
   typed-encoding-test:

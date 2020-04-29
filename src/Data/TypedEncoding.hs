@@ -94,23 +94,32 @@ module Data.TypedEncoding (
     , module Data.TypedEncoding.Internal.Class
     -- * Types
     , Enc
+    , SomeEnc
     , EncodeEx(..)
     , RecreateEx(..)
     , UnexpectedDecodeEx(..)
-    -- * Combinators
+    -- * Basic Enc Combinators
     , getPayload 
     , unsafeSetPayload
     , fromEncoding
     , toEncoding
+    -- * Basic SomeEnc Combinators  
+    , unsafeSomeEnc
+    , getSomePayload
+    , getSomeEncPayload
+    , toSomeEnc
+    , fromSomeEnc
  ) where
 
-import           Data.TypedEncoding.Internal.Types (Enc
-                                              , RecreateEx(..)
-                                              , UnexpectedDecodeEx(..)
-                                              , EncodeEx(..)
-                                              , getPayload
-                                              , unsafeSetPayload
-                                              , toEncoding
-                                              , fromEncoding
-                                               )
+-- import           Data.TypedEncoding.Internal.Types (Enc
+--                                               , RecreateEx(..)
+--                                               , UnexpectedDecodeEx(..)
+--                                               , EncodeEx(..)
+--                                               , getPayload
+--                                               , unsafeSetPayload
+--                                               , toEncoding
+--                                               , fromEncoding
+--                                               , SomeEnc
+--                                                )
+import           Data.TypedEncoding.Internal.Types
 import           Data.TypedEncoding.Internal.Class
