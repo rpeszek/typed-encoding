@@ -6,6 +6,7 @@
     - Data.TypedEncoding.Internal.Class modules reorganized
     - Data.TypedEncoding.Internal.Utils module renamed
     - Several TypeAnnotations friendly changes:
+       * Removed polymorphic kinds in most places
        * Changed name of Subset to Superset
        * flipped type parameters on FlattenAs, HasA typeclasses
        * Removed Proxy parameters from several methods (few methods have '_' version which still has them)
