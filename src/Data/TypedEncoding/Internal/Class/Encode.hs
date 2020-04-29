@@ -31,7 +31,7 @@ import           Data.Semigroup ((<>))
 class EncodeF f instr outstr where    
     encodeF :: instr -> f outstr
 
-class EncodeFAll f (xs :: [k]) c str where
+class EncodeFAll f (xs :: [Symbol]) c str where
     encodeFAll :: (Enc '[] c str) -> f (Enc xs c str)
 
 instance Applicative f => EncodeFAll f '[] c str where
@@ -43,7 +43,7 @@ instance (Monad f, EncodeFAll f xs c str, EncodeF f (Enc xs c str) (Enc (x ': xs
         in re >>= encodeF
 
 
-encodeAll :: EncodeFAll Identity (xs :: [k]) c str => 
+encodeAll :: EncodeFAll Identity (xs :: [Symbol]) c str => 
               (Enc '[] c str) 
               -> (Enc xs c str)
 encodeAll = runIdentity . encodeFAll             
@@ -60,14 +60,14 @@ encodeFPart :: forall (xs :: [Symbol]) xsf f c str . (Functor f, EncodeFAll f xs
 encodeFPart = encodeFPart_ (Proxy :: Proxy xs) 
 
 
-encodePart_ :: EncodeFAll Identity (xs :: [k]) c str => 
+encodePart_ :: EncodeFAll Identity (xs :: [Symbol]) c str => 
               Proxy xs 
               -> (Enc xsf c str)
               -> (Enc (Append xs xsf) c str) 
 encodePart_ p = runIdentity . encodeFPart_ p
 
 -- | for some reason ApplyTypes syntax does not want to work if xs is specified with 
--- polymorphic [k]
+-- polymorphic [Symbol]
 encodePart :: forall (xs :: [Symbol]) xsf c str . EncodeFAll Identity xs c str => 
                (Enc xsf c str)
               -> (Enc (Append xs xsf) c str) 

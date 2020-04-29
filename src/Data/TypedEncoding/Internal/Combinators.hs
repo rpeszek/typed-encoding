@@ -24,26 +24,26 @@ import           Data.Maybe
 -- * Composite encodings from 'Foldable' 'Functor' types
 
 -- | allows to fold payload in Enc to create another Enc, assumes homogenious input encodings.
-foldEnc :: forall (xs2 :: [k]) (xs1 :: [k]) f c s1 s2 
+foldEnc :: forall (xs2 :: [Symbol]) (xs1 :: [Symbol]) f c s1 s2 
            . (Foldable f, Functor f) 
            => c -> (s1 -> s2 -> s2) -> s2 -> f (Enc xs1 c s1) -> Enc xs2 c s2
 foldEnc c f sinit ts = unsafeSetPayload c . foldr f sinit . fmap getPayload $ ts
 
 -- | Similar to 'foldEnc', assumes that destination payload has @IsString@ instance and uses @""@ as base case. 
-foldEncStr :: forall (xs2 :: [k]) (xs1 :: [k]) f c s1 s2 
+foldEncStr :: forall (xs2 :: [Symbol]) (xs1 :: [Symbol]) f c s1 s2 
              . (Foldable f, Functor f, IsString s2) 
              => c -> (s1 -> s2 -> s2) -> f (Enc xs1 c s1) -> Enc xs2 c s2
 foldEncStr c f = foldEnc c f ""
 
 -- TODO pass SomeAnn to fold
 -- | Similar to 'foldEnc', works with untyped 'SomeEnc'
-foldSomeEnc :: forall (xs2 :: [k]) f c s1 s2 
+foldSomeEnc :: forall (xs2 :: [Symbol]) f c s1 s2 
              . (Foldable f, Functor f) 
              => c -> (SomeAnn -> s1 -> s2 -> s2) -> s2 -> f (SomeEnc c s1) -> Enc xs2 c s2
 foldSomeEnc c f sinit ts = unsafeSetPayload c . foldr (uncurry f) sinit . fmap getSomeEncPayload $ ts
 
 -- | Similar to 'foldEncStr', works with untyped 'SomeEnc'
-foldSomeEncStr :: forall (xs2 :: [k]) f c s1 s2 . (Foldable f, Functor f, IsString s2) => c -> (SomeAnn -> s1 -> s2 -> s2) -> f (SomeEnc c s1) -> Enc xs2 c s2
+foldSomeEncStr :: forall (xs2 :: [Symbol]) f c s1 s2 . (Foldable f, Functor f, IsString s2) => c -> (SomeAnn -> s1 -> s2 -> s2) -> f (SomeEnc c s1) -> Enc xs2 c s2
 foldSomeEncStr c f  = foldSomeEnc c f ""
 
 

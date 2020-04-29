@@ -30,7 +30,7 @@ import           Data.Semigroup ((<>))
 class DecodeF f instr outstr where    
     decodeF :: instr -> f outstr
 
-class DecodeFAll f (xs :: [k]) c str where
+class DecodeFAll f (xs :: [Symbol]) c str where
     decodeFAll :: (Enc xs c str) ->  f (Enc '[] c str)
 
 instance Applicative f => DecodeFAll f '[] c str where
@@ -41,7 +41,7 @@ instance (Monad f, DecodeFAll f xs c str, DecodeF f (Enc (x ': xs) c str) (Enc (
         let re :: f (Enc xs c str) = decodeF str
         in re >>= decodeFAll
 
-decodeAll :: DecodeFAll Identity (xs :: [k]) c str => 
+decodeAll :: DecodeFAll Identity (xs :: [Symbol]) c str => 
               (Enc xs c str)
               -> (Enc '[] c str) 
 decodeAll = runIdentity . decodeFAll 
@@ -55,7 +55,7 @@ decodeFPart_ p (MkEnc _ conf str) =
 decodeFPart :: forall (xs :: [Symbol]) xsf f c str . (Functor f, DecodeFAll f xs c str) =>  (Enc (Append xs xsf) c str) -> f (Enc xsf c str)
 decodeFPart = decodeFPart_ (Proxy :: Proxy xs) 
 
-decodePart_ :: DecodeFAll Identity (xs :: [k]) c str => 
+decodePart_ :: DecodeFAll Identity (xs :: [Symbol]) c str => 
               Proxy xs 
               -> (Enc (Append xs xsf) c str) 
               -> (Enc xsf c str) 
