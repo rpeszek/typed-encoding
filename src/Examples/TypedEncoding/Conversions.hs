@@ -80,10 +80,10 @@ helloUtf8B = inject helloAsciiB
 -- * More complex rules
 
 helloUtf8B64B :: Enc '["enc-B64", "r-UTF8"] () B.ByteString
-helloUtf8B64B = encodePart_ @'["enc-B64"] helloUtf8B 
+helloUtf8B64B = encodePart @'["enc-B64"] helloUtf8B 
 -- ^ We put Base64 on the UFT8 ByteString
 --
--- >>> displ $ encodePart (Proxy :: Proxy '["enc-B64"]) helloUtf8B
+-- >>> displ $ encodePart_ (Proxy :: Proxy '["enc-B64"]) helloUtf8B
 -- "MkEnc '[enc-B64,r-UTF8] () (ByteString SGVMbG8gd29ybGQ=)"
 
 helloUtf8B64T :: Enc '["enc-B64"] () T.Text

@@ -156,10 +156,10 @@ decodeB64ForTextOnly = fmap (EnT.maybeTranformations [tryUtf8, tryAscii])
     tryAscii = fmap (toSomeEnc . decodeToAscii) . fromSomeEnc @ '["enc-B64", "r-ASCII"] 
  
     decodeToUtf8 :: Enc '["enc-B64", "r-UTF8"] c B.ByteString -> _
-    decodeToUtf8 = decodePart_ @'["enc-B64"]
+    decodeToUtf8 = decodePart @'["enc-B64"]
 
     decodeToAscii :: Enc '["enc-B64", "r-ASCII"] c B.ByteString -> _
-    decodeToAscii = decodePart_ @'["enc-B64"]
+    decodeToAscii = decodePart @'["enc-B64"]
 
 
 

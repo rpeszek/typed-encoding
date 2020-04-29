@@ -47,24 +47,24 @@ decodeAll :: DecodeFAll Identity (xs :: [k]) c str =>
 decodeAll = runIdentity . decodeFAll 
 
 
-decodeFPart :: forall f xs xsf c str . (Functor f, DecodeFAll f xs c str) => Proxy xs -> (Enc (Append xs xsf) c str) -> f (Enc xsf c str)
-decodeFPart p (MkEnc _ conf str) = 
+decodeFPart_ :: forall f xs xsf c str . (Functor f, DecodeFAll f xs c str) => Proxy xs -> (Enc (Append xs xsf) c str) -> f (Enc xsf c str)
+decodeFPart_ p (MkEnc _ conf str) = 
     let re :: f (Enc '[] c str) = decodeFAll $ MkEnc (Proxy :: Proxy xs) conf str
     in  (MkEnc Proxy conf . getPayload) <$> re 
 
-decodeFPart_ :: forall (xs :: [Symbol]) xsf f c str . (Functor f, DecodeFAll f xs c str) =>  (Enc (Append xs xsf) c str) -> f (Enc xsf c str)
-decodeFPart_ = decodeFPart (Proxy :: Proxy xs) 
+decodeFPart :: forall (xs :: [Symbol]) xsf f c str . (Functor f, DecodeFAll f xs c str) =>  (Enc (Append xs xsf) c str) -> f (Enc xsf c str)
+decodeFPart = decodeFPart_ (Proxy :: Proxy xs) 
 
-decodePart :: DecodeFAll Identity (xs :: [k]) c str => 
+decodePart_ :: DecodeFAll Identity (xs :: [k]) c str => 
               Proxy xs 
               -> (Enc (Append xs xsf) c str) 
               -> (Enc xsf c str) 
-decodePart p = runIdentity . decodeFPart p
+decodePart_ p = runIdentity . decodeFPart_ p
 
-decodePart_ :: forall (xs :: [Symbol]) xsf c str .  DecodeFAll Identity xs c str => 
+decodePart :: forall (xs :: [Symbol]) xsf c str .  DecodeFAll Identity xs c str => 
               (Enc (Append xs xsf) c str) 
               -> (Enc xsf c str)
-decodePart_ = decodePart (Proxy :: Proxy xs)              
+decodePart = decodePart_ (Proxy :: Proxy xs)              
 
 -- | With type safety in pace decoding errors should be unexpected
 -- this class can be used to provide extra info if decoding could fail

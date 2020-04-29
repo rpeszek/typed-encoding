@@ -85,13 +85,13 @@ helloB64B64 = encodeAll . toEncoding () $ "Hello World"
 
 -- | Double Base64 encoded "Hello World" with one layer of encoding removed
 --
--- >>> decodePart_ @'["enc-B64"] $ helloB64B64 :: Enc '["enc-B64"] () B.ByteString
+-- >>> decodePart @'["enc-B64"] $ helloB64B64 :: Enc '["enc-B64"] () B.ByteString
 -- MkEnc Proxy () "SGVsbG8gV29ybGQ="
 --
 -- >>> helloB64B64PartDecode == helloB64
 -- True
 helloB64B64PartDecode :: Enc '["enc-B64"] () B.ByteString
-helloB64B64PartDecode = decodePart_ @'["enc-B64"] $ helloB64B64
+helloB64B64PartDecode = decodePart @'["enc-B64"] $ helloB64B64
 
 -- | 'helloB64B64' all the way to 'B.ByteString'
 --
@@ -102,7 +102,7 @@ helloB64B64PartDecode = decodePart_ @'["enc-B64"] $ helloB64B64
 -- 
 -- We can also decode all the parts: 
 --
--- >>> fromEncoding . decodePart_ @'["enc-B64","enc-B64"] $ helloB64B64
+-- >>> fromEncoding . decodePart @'["enc-B64","enc-B64"] $ helloB64B64
 -- "Hello World"
 helloB64B64Decoded :: B.ByteString
 helloB64B64Decoded = fromEncoding . decodeAll $ helloB64B64
@@ -172,10 +172,10 @@ helloTitle = encodeAll . toEncoding exampleConf $ "hello wOrld"
 --
 -- Instead, encode previously defined 'helloTitle' by reversing it and adding size limit
 --
--- >>> encodePart_ @'["do-size-limit", "do-reverse"] helloTitle :: Enc '["do-size-limit", "do-reverse", "do-Title"] Config T.Text
+-- >>> encodePart @'["do-size-limit", "do-reverse"] helloTitle :: Enc '["do-size-limit", "do-reverse", "do-Title"] Config T.Text
 -- MkEnc Proxy (Config {sizeLimit = SizeLimit {unSizeLimit = 8}}) "dlroW ol"
 helloRevLimit :: Enc '["do-size-limit", "do-reverse", "do-Title"] Config T.Text
-helloRevLimit = encodePart_ @'["do-size-limit", "do-reverse"] helloTitle
+helloRevLimit = encodePart @'["do-size-limit", "do-reverse"] helloTitle
 
 -- >>> encodeAll . toEncoding exampleConf $ "HeLlo world" :: Enc '["enc-B64", "do-size-limit"] Config B.ByteString
 -- MkEnc Proxy (Config {sizeLimit = SizeLimit {unSizeLimit = 8}}) "SGVMbG8gd28="
@@ -184,10 +184,10 @@ helloLimitB64 = encodeAll . toEncoding exampleConf $ "HeLlo world"
 
 -- | ... and we unwrap the B64 part only
 -- 
--- >>> decodePart_ @'["enc-B64"] $ helloLimitB64
+-- >>> decodePart @'["enc-B64"] $ helloLimitB64
 -- MkEnc Proxy (Config {sizeLimit = SizeLimit {unSizeLimit = 8}}) "HeLlo wo"
 helloRevLimitParDec :: Enc '["do-size-limit"] Config B.ByteString
-helloRevLimitParDec =  decodePart_ @'["enc-B64"] $ helloLimitB64
+helloRevLimitParDec =  decodePart @'["enc-B64"] $ helloLimitB64
 
 
 
@@ -218,7 +218,7 @@ helloAsciiB64 :: Either EncodeEx (Enc '["enc-B64", "r-ASCII"] () B.ByteString)
 helloAsciiB64 = encodeFAll . toEncoding () $ "Hello World"
 
 -- |
--- >>> decodePart_ @'["enc-B64"] <$> helloAsciiB64
+-- >>> decodePart @'["enc-B64"] <$> helloAsciiB64
 -- Right (MkEnc Proxy () "Hello World")
 helloAsciiB64PartDec :: Either EncodeEx (Enc '["r-ASCII"] () B.ByteString)
-helloAsciiB64PartDec = decodePart_ @'["enc-B64"] <$> helloAsciiB64 
+helloAsciiB64PartDec = decodePart @'["enc-B64"] <$> helloAsciiB64 

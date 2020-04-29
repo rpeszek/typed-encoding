@@ -50,26 +50,26 @@ encodeAll = runIdentity . encodeFAll
 
 
 
-encodeFPart :: forall f xs xsf c str . (Functor f, EncodeFAll f xs c str) => Proxy xs -> (Enc xsf c str) -> f (Enc (Append xs xsf) c str)
-encodeFPart p (MkEnc _ conf str) = 
+encodeFPart_ :: forall f xs xsf c str . (Functor f, EncodeFAll f xs c str) => Proxy xs -> (Enc xsf c str) -> f (Enc (Append xs xsf) c str)
+encodeFPart_ p (MkEnc _ conf str) = 
     let re :: f (Enc xs c str) = encodeFAll $ MkEnc Proxy conf str
     in  (MkEnc Proxy conf . getPayload) <$> re 
 
 
-encodeFPart_ :: forall (xs :: [Symbol]) xsf f c str . (Functor f, EncodeFAll f xs c str) => (Enc xsf c str) -> f (Enc (Append xs xsf) c str)
-encodeFPart_ = encodeFPart (Proxy :: Proxy xs) 
+encodeFPart :: forall (xs :: [Symbol]) xsf f c str . (Functor f, EncodeFAll f xs c str) => (Enc xsf c str) -> f (Enc (Append xs xsf) c str)
+encodeFPart = encodeFPart_ (Proxy :: Proxy xs) 
 
 
-encodePart :: EncodeFAll Identity (xs :: [k]) c str => 
+encodePart_ :: EncodeFAll Identity (xs :: [k]) c str => 
               Proxy xs 
               -> (Enc xsf c str)
               -> (Enc (Append xs xsf) c str) 
-encodePart p = runIdentity . encodeFPart p
+encodePart_ p = runIdentity . encodeFPart_ p
 
 -- | for some reason ApplyTypes syntax does not want to work if xs is specified with 
 -- polymorphic [k]
-encodePart_ :: forall (xs :: [Symbol]) xsf c str . EncodeFAll Identity xs c str => 
+encodePart :: forall (xs :: [Symbol]) xsf c str . EncodeFAll Identity xs c str => 
                (Enc xsf c str)
               -> (Enc (Append xs xsf) c str) 
-encodePart_ = encodePart (Proxy :: Proxy xs)              
+encodePart = encodePart_ (Proxy :: Proxy xs)              
 
