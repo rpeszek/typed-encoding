@@ -100,6 +100,7 @@ module Data.TypedEncoding (
     , RecreateEx(..)
     , recreateErrUnknown
     , UnexpectedDecodeEx(..)
+    , SomeAnn 
     -- * Basic Enc Combinators
     , getPayload 
     , unsafeSetPayload

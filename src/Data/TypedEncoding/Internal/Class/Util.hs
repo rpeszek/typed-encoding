@@ -13,6 +13,8 @@
 
 module Data.TypedEncoding.Internal.Class.Util where
 
+import           Data.TypedEncoding.Internal.Types.Common
+
 import qualified Data.ByteString.Char8 as B
 import qualified Data.ByteString.Lazy.Char8 as BL
 import qualified Data.Text as T
@@ -40,8 +42,7 @@ instance HasA () c where
 
 -- * Some Annotation
 
--- TODO move out to central place
-type SomeAnn = String
+
 
 class KnownAnnotation (xs::[Symbol]) where 
     knownAnn :: SomeAnn
