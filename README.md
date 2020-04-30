@@ -1,5 +1,5 @@
 # typed-encoding
-Type level annotations that make programming strings safer.
+Type level annotations, string transformations, and other goodies that make programming strings safer.
 
 ## Motivation
 I have recently spent a lot of time troubleshooting various `Base64`, `quoted-printable`, and `Utf8` encoding issues.  
@@ -35,13 +35,14 @@ Transformations can be
    - used with parameters.
    - applied or undone partially (if encoding is reversible)
  
+## Examples 
 
 Here are some code examples:
    - [Overview](src/Examples/TypedEncoding/Overview.hs)
    - [Conversions between encodings](src/Examples/TypedEncoding/Conversions.hs)
    - [Adding a new encoding, error handling](src/Examples/TypedEncoding/DiySignEncoding.hs)
    - [Unsafe - working inside encodings](src/Examples/TypedEncoding/Unsafe.hs)
-
+ 
 ## Dependencies on other encoding libs
 
 Currently it uses
@@ -53,4 +54,8 @@ Currently it uses
    - better implementation type safety
 
 ## Tested with
-   - stack lts-14.27
+   - stack (1.9.3) lts-14.27 (ghc-8.6.5)
+
+## Known issues
+   - running test suite: cabal has problems with doctest, use stack  
+   https://github.com/haskell/cabal/issues/6087   

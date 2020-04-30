@@ -4,16 +4,28 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE AllowAmbiguousTypes #-}
+-- {-# LANGUAGE RankNTypes #-}
 
 -- |
 -- Internal definition of types
 
-module Data.TypedEncoding.Internal.Types where
+module Data.TypedEncoding.Internal.Types (
+        module Data.TypedEncoding.Internal.Types
+        , type SomeAnn
+    ) where
 
 import           Data.Proxy
 import           Data.Functor.Identity
 import           GHC.TypeLits
+import           Data.TypedEncoding.Internal.Class.Util
+
+-- $setup
+-- >>> :set -XOverloadedStrings -XMultiParamTypeClasses -XDataKinds -XAllowAmbiguousTypes
+-- >>> import qualified Data.Text as T
 
 -- Not a Functor on purpose
 data Enc enc conf str where
@@ -21,7 +33,16 @@ data Enc enc conf str where
     -- particular encoding instances may expose smart constructors for limited data types
     MkEnc :: Proxy enc -> conf -> str -> Enc enc conf str
     deriving (Show, Eq) 
- 
+
+-- |
+-- >>> let disptest = unsafeSetPayload () "hello" :: Enc '["TEST"] () T.Text
+-- >>> displ disptest
+-- "MkEnc '[TEST] () (Text hello)"
+instance (KnownAnnotation xs, Show c, Displ str) => Displ ( Enc xs c str) where
+    displ (MkEnc p c s) = 
+        "MkEnc '[" ++ knownAnn @ xs ++ "] " ++ show c ++ " " ++ displ s
+
+
 toEncoding :: conf -> str -> Enc '[] conf str
 toEncoding conf str = MkEnc Proxy conf str
 
@@ -36,8 +57,13 @@ implTranF :: Functor f => (str -> f str) -> Enc enc1 conf str -> f (Enc enc2 con
 implTranF f  = implTranF' (\c -> f)
 
 -- TODO could this type be more precise?
-implEncodeF :: (Show err, KnownSymbol x) => Proxy x -> (str -> Either err str) ->  Enc enc1 conf str -> Either EncodeEx (Enc enc2 conf str) 
-implEncodeF p f = implTranF (either (Left . EncodeEx p) Right . f) 
+implEncodeF_ :: (Show err, KnownSymbol x) => Proxy x -> (str -> Either err str) ->  Enc enc1 conf str -> Either EncodeEx (Enc enc2 conf str) 
+implEncodeF_ p f = implTranF (either (Left . EncodeEx p) Right . f) 
+
+implEncodeF :: forall x enc1 enc2 err conf str . 
+              (Show err, KnownSymbol x) 
+              => (str -> Either err str) ->  Enc enc1 conf str -> Either EncodeEx (Enc enc2 conf str) 
+implEncodeF = implEncodeF_ (Proxy :: Proxy x)
 
 implDecodeF :: Functor f => (str -> f str) -> Enc enc1 conf str -> f (Enc enc2 conf str)
 implDecodeF = implTranF
@@ -49,8 +75,8 @@ implCheckPrevF = implTranF
 implTranF' :: Functor f =>  (conf -> str -> f str) -> Enc enc1 conf str -> f (Enc enc2 conf str)
 implTranF' f (MkEnc _ conf str) = (MkEnc Proxy conf) <$> f conf str
 
-implEncodeF' :: (Show err, KnownSymbol x) => Proxy x -> (conf -> str -> Either err str) ->  Enc enc1 conf str -> Either EncodeEx (Enc enc2 conf str) 
-implEncodeF' p f = implTranF' (\c -> either (Left . EncodeEx p) Right . f c) 
+implEncodeF_' :: (Show err, KnownSymbol x) => Proxy x -> (conf -> str -> Either err str) ->  Enc enc1 conf str -> Either EncodeEx (Enc enc2 conf str) 
+implEncodeF_' p f = implTranF' (\c -> either (Left . EncodeEx p) Right . f c) 
 
 implDecodeF' :: Functor f =>  (conf -> str -> f str) -> Enc enc1 conf str -> f (Enc enc2 conf str)
 implDecodeF' = implTranF'
@@ -80,14 +106,106 @@ withUnsafeCoerce f (MkEnc _ conf str)  = (MkEnc Proxy conf (f str))
 unsafeChangePayload ::  (s1 -> s2) -> Enc e c s1 -> Enc e c s2
 unsafeChangePayload f (MkEnc p conf str)  = (MkEnc p conf (f str)) 
 
+-- * Untyped Enc
+
+-- | Untyped version of Enc. SomeEnc contains some verfied encoding, encoding is visible
+-- at value level only.
+data SomeEnc conf str where
+    -- | constructor is to be treated as Unsafe to Encode and Decode instance implementations
+    -- particular encoding instances may expose smart constructors for limited data types
+    MkSomeEnc :: SomeAnn -> conf -> str -> SomeEnc conf str
+    deriving (Show, Eq) 
+
+unsafeSomeEnc:: SomeAnn -> c -> s -> SomeEnc c s
+unsafeSomeEnc = MkSomeEnc
+
+getSomePayload :: SomeEnc conf str -> str
+getSomePayload = snd . getSomeEncPayload
+
+getSomeEncPayload :: SomeEnc conf str -> (SomeAnn, str) 
+getSomeEncPayload (MkSomeEnc t _ s) = (t,s)
+
+toSomeEnc :: forall xs c str . (KnownAnnotation xs) => Enc xs c str -> SomeEnc c str 
+toSomeEnc (MkEnc p c s) = 
+        MkSomeEnc ("[" ++ knownAnn @ xs ++ "]") c s   
+
+
+fromSomeEnc :: forall xs c str . KnownAnnotation xs => SomeEnc c str -> Maybe (Enc xs c str)
+fromSomeEnc (MkSomeEnc xs c s) = 
+    let p = Proxy :: Proxy xs
+    in if "[" ++ knownAnn @ xs ++ "]" == xs
+       then Just $ MkEnc p c s
+       else Nothing
+
+
+-- TODO this does
+-- data SomeEnc' conf str where
+--     -- | constructor is to be treated as Unsafe to Encode and Decode instance implementations
+--     -- particular encoding instances may expose smart constructors for limited data types
+--     MkSomeEnc' :: Enc xs conf str -> SomeEnc' conf str
+    
+
+
+-- withSomeEnc' :: SomeEnc' conf str -> (forall xs . Enc xs conf str -> r) -> r
+-- withSomeEnc' (MkSomeEnc' enc) f = f enc
+
+
+-- |
+-- >>> let encsometest = MkSomeEnc "[TEST]" () $ T.pack "hello"
+-- >>> proc_toSomeEncFromSomeEnc @'["TEST"] encsometest
+-- True
+-- >>> proc_toSomeEncFromSomeEnc @'["TEST1"] encsometest
+-- False
+proc_toSomeEncFromSomeEnc :: forall xs c str . (KnownAnnotation xs, Eq c, Eq str) => SomeEnc c str -> Bool
+proc_toSomeEncFromSomeEnc x = (== Just x) . fmap (toSomeEnc @ xs) . fromSomeEnc $ x
+
+-- |
+-- >>> let enctest = unsafeSetPayload () "hello" :: Enc '["TEST"] () T.Text
+-- >>> proc_fromSomeEncToSomeEnc enctest
+-- True
+proc_fromSomeEncToSomeEnc :: forall xs c str . (KnownAnnotation xs, Eq c, Eq str) => Enc xs c str -> Bool
+proc_fromSomeEncToSomeEnc x = (== Just x) . fromSomeEnc . toSomeEnc $ x
+
+instance (Show c, Displ str) => Displ (SomeEnc c str) where
+    displ (MkSomeEnc xs c s) = 
+        "MkSomeEnc " ++ xs ++ show c ++ " " ++ displ s
+
+
+-- * Unchecked for recreate, similar to SomeEnc only not verified
+
+data Unchecked c str = MkUnchecked SomeAnn c str deriving (Show, Eq)
+
+toUnchecked :: SomeAnn -> c -> str -> Unchecked c str
+toUnchecked = MkUnchecked
+
+getUncheckedAnn :: Unchecked c str -> SomeAnn
+getUncheckedAnn (MkUnchecked ann _ _) = ann
+
+verifyAnn :: forall xs c str . KnownAnnotation xs => Unchecked c str -> Either String (Unchecked c str)
+verifyAnn x@(MkUnchecked xs _ _) = 
+    let p = Proxy :: Proxy xs
+    in if "[" ++ knownAnn @ xs ++ "]" == xs
+       then Right $ x
+       else Left $ "Unchecked has not matching annotation " ++ xs
+
+-- TODO verifyUnchecked in Recrete
 
 
 -- | Represents errors in recovery (recreation of encoded types).
 data RecreateEx where
-    RecreateEx:: (Show e, KnownSymbol x) => Proxy x -> e -> RecreateEx 
+    RecreateEx:: (Show e, KnownSymbol x) => Proxy x -> e -> RecreateEx
+    RecreateExUnkStep::   (Show e) => e -> RecreateEx
 
 instance Show RecreateEx where
     show (RecreateEx prxy a) = "(RecreateEx \"" ++ symbolVal prxy ++ "\" (" ++ show a ++ "))"
+    show (RecreateExUnkStep  a) = "(UnknownDecodeStep (" ++ show a ++ "))"
+
+
+recreateErrUnknown :: (Show e) => e -> RecreateEx
+recreateErrUnknown  = RecreateExUnkStep
+
+-- instance Eq RecreateEx where
+--     (RecreateEx prxy1 a1) == RecreateEx prxy2 a2 = (symbolVal prxy1) == (symbolVal prxy2)
 
 
 -- | Represents errors in encoding

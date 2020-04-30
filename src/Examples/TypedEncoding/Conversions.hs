@@ -4,6 +4,7 @@
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TypeApplications #-}
 
 -- | Examples or moving between type annotated encodings
 --
@@ -15,9 +16,9 @@
 module Examples.TypedEncoding.Conversions where
 
 import           Data.TypedEncoding
-import qualified Data.TypedEncoding.Instances.Base64 as EnB64
-import qualified Data.TypedEncoding.Instances.ASCII as EnASCII
-import qualified Data.TypedEncoding.Instances.UTF8  as EnUTF8
+import qualified Data.TypedEncoding.Instances.Enc.Base64 as EnB64
+import qualified Data.TypedEncoding.Instances.Restriction.ASCII as EnASCII
+import qualified Data.TypedEncoding.Instances.Restriction.UTF8  as EnUTF8
 
 import           Data.Proxy
 
@@ -25,7 +26,7 @@ import qualified Data.Text as T
 import qualified Data.ByteString as B
 
 -- $setup
--- >>> :set -XOverloadedStrings -XMultiParamTypeClasses -XDataKinds
+-- >>> :set -XOverloadedStrings -XMultiParamTypeClasses -XDataKinds -XTypeApplications
 --
 -- This module contains some ghci friendly values to play with.
 --
@@ -57,8 +58,9 @@ helloAsciiT = EnASCII.byteString2TextS helloAsciiB
 
 -- * Subsets
 
+
 helloUtf8B :: Enc '["r-UTF8"] () B.ByteString
-helloUtf8B = inject Proxy helloAsciiB
+helloUtf8B = inject helloAsciiB
 -- ^ To get UTF8 annotation, instead of doing this: 
 --
 -- >>> encodeFAll . toEncoding () $ "HeLlo world" :: Either EncodeEx (Enc '["r-UTF8"] () B.ByteString)
@@ -70,7 +72,7 @@ helloUtf8B = inject Proxy helloAsciiB
 --
 -- @inject@ method accepts proxy to specify superset to use.
 --
--- >>> displ $ inject (Proxy :: Proxy "r-UTF8") helloAsciiB
+-- >>> displ $ inject @ "r-UTF8" helloAsciiB
 -- "MkEnc '[r-UTF8] () (ByteString HeLlo world)"
 
 
@@ -78,10 +80,10 @@ helloUtf8B = inject Proxy helloAsciiB
 -- * More complex rules
 
 helloUtf8B64B :: Enc '["enc-B64", "r-UTF8"] () B.ByteString
-helloUtf8B64B = encodePart (Proxy :: Proxy '["enc-B64"]) helloUtf8B 
+helloUtf8B64B = encodePart @'["enc-B64"] helloUtf8B 
 -- ^ We put Base64 on the UFT8 ByteString
 --
--- >>> displ $ encodePart (Proxy :: Proxy '["enc-B64"]) helloUtf8B
+-- >>> displ $ encodePart_ (Proxy :: Proxy '["enc-B64"]) helloUtf8B
 -- "MkEnc '[enc-B64,r-UTF8] () (ByteString SGVMbG8gd29ybGQ=)"
 
 helloUtf8B64T :: Enc '["enc-B64"] () T.Text
@@ -152,11 +154,11 @@ lenientSomething = recreateAll . toEncoding () $ "abc==CB"
 -- * Flattening
 
 b64IsAscii :: Enc '["r-ASCII"] () B.ByteString
-b64IsAscii = flattenAs Proxy helloUtf8B64B
+b64IsAscii = flattenAs helloUtf8B64B
 -- ^ Base 64 encodes binary data as ASCII text. 
 -- thus, we should be able to treat "enc-B64" as "r-ASCII" losing some information.
 -- this is done using 'FlattenAs' type class
 --
--- >>> :t flattenAs (Proxy :: Proxy "r-ASCII") helloUtf8B64B
--- flattenAs (Proxy :: Proxy "r-ASCII") helloUtf8B64B
+-- >>> :t flattenAs @ "r-ASCII" helloUtf8B64B
+-- flattenAs @ "r-ASCII" helloUtf8B64B
 -- ... :: Enc '["r-ASCII"] () B.ByteString

@@ -71,10 +71,10 @@
 --
 -- Here is list of instance modules available in typed-encoding library itself
 --
--- * "Data.TypedEncoding.Instances.Base64"
--- * "Data.TypedEncoding.Instances.ASCII" 
--- * "Data.TypedEncoding.Instances.UTF8" 
--- * "Data.TypedEncoding.Instances.Encode.Sample" 
+-- * "Data.TypedEncoding.Instances.Enc.Base64"
+-- * "Data.TypedEncoding.Instances.Restriction.ASCII" 
+-- * "Data.TypedEncoding.Instances.Restriction.UTF8" 
+-- * "Data.TypedEncoding.Instances.Do.Sample" 
 -- 
 -- This list is not intended to be exhaustive, rather separate libraries
 -- can provide instances for other encodings and transformations.
@@ -94,23 +94,38 @@ module Data.TypedEncoding (
     , module Data.TypedEncoding.Internal.Class
     -- * Types
     , Enc
+    , SomeEnc
+    , Unchecked (..)
     , EncodeEx(..)
     , RecreateEx(..)
+    , recreateErrUnknown
     , UnexpectedDecodeEx(..)
-    -- * Combinators
+    -- * Basic Enc Combinators
     , getPayload 
     , unsafeSetPayload
     , fromEncoding
     , toEncoding
+    -- * Basic SomeEnc Combinators  
+    , unsafeSomeEnc
+    , getSomePayload
+    , getSomeEncPayload
+    , toSomeEnc
+    , fromSomeEnc
+    -- * Basic Unchecked Combinators
+    , toUnchecked
+    , getUncheckedAnn
+    , verifyAnn
  ) where
 
-import           Data.TypedEncoding.Internal.Types (Enc
-                                              , RecreateEx(..)
-                                              , UnexpectedDecodeEx(..)
-                                              , EncodeEx(..)
-                                              , getPayload
-                                              , unsafeSetPayload
-                                              , toEncoding
-                                              , fromEncoding
-                                               )
+-- import           Data.TypedEncoding.Internal.Types (Enc
+--                                               , RecreateEx(..)
+--                                               , UnexpectedDecodeEx(..)
+--                                               , EncodeEx(..)
+--                                               , getPayload
+--                                               , unsafeSetPayload
+--                                               , toEncoding
+--                                               , fromEncoding
+--                                               , SomeEnc
+--                                                )
+import           Data.TypedEncoding.Internal.Types
 import           Data.TypedEncoding.Internal.Class

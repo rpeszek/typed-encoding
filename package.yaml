@@ -1,5 +1,5 @@
 name:                typed-encoding
-version:             0.1.0.0
+version:             0.2.0.0
 github:              "rpeszek/typed-encoding"
 license:             BSD3
 author:              "Robert Peszek"
@@ -13,7 +13,7 @@ extra-source-files:
 
 # Metadata used when publishing your package
 synopsis:            Type safe string transformations
-category:            Web
+category:            Data, Text
 
 # To avoid duplicated efforts in documentation and dealing with the
 # complications of embedding Haddock markup inside cabal files, it is
@@ -30,12 +30,15 @@ dependencies:
 - bytestring
 - text
 - base64-bytestring
-# - aeson
-# - uri-encode
+# - symbols
+
 
 library:
   source-dirs: src
-
+  ghc-options:
+    # - -fwarn-unused-imports
+    - -fwarn-incomplete-patterns
+    - -fprint-explicit-kinds
 
 tests:
   typed-encoding-test:
