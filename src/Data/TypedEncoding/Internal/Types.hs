@@ -8,7 +8,7 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE AllowAmbiguousTypes #-}
-{-# LANGUAGE RankNTypes #-}
+-- {-# LANGUAGE RankNTypes #-}
 
 -- |
 -- Internal definition of types
@@ -38,9 +38,9 @@ data Enc enc conf str where
 -- >>> let disptest = unsafeSetPayload () "hello" :: Enc '["TEST"] () T.Text
 -- >>> displ disptest
 -- "MkEnc '[TEST] () (Text hello)"
-instance (SomeAnnotation xs, Show c, Displ str) => Displ ( Enc xs c str) where
+instance (KnownAnnotation xs, Show c, Displ str) => Displ ( Enc xs c str) where
     displ (MkEnc p c s) = 
-        "MkEnc '[" ++ someAnn @ xs ++ "] " ++ show c ++ " " ++ displ s
+        "MkEnc '[" ++ knownAnn @ xs ++ "] " ++ show c ++ " " ++ displ s
 
 
 toEncoding :: conf -> str -> Enc '[] conf str
@@ -108,6 +108,8 @@ unsafeChangePayload f (MkEnc p conf str)  = (MkEnc p conf (f str))
 
 -- * Untyped Enc
 
+-- | Untyped version of Enc. SomeEnc contains some verfied encoding, encoding is visible
+-- at value level only.
 data SomeEnc conf str where
     -- | constructor is to be treated as Unsafe to Encode and Decode instance implementations
     -- particular encoding instances may expose smart constructors for limited data types
@@ -123,15 +125,15 @@ getSomePayload = snd . getSomeEncPayload
 getSomeEncPayload :: SomeEnc conf str -> (SomeAnn, str) 
 getSomeEncPayload (MkSomeEnc t _ s) = (t,s)
 
-toSomeEnc :: forall xs c str . (SomeAnnotation xs) => Enc xs c str -> SomeEnc c str 
+toSomeEnc :: forall xs c str . (KnownAnnotation xs) => Enc xs c str -> SomeEnc c str 
 toSomeEnc (MkEnc p c s) = 
-        MkSomeEnc ("[" ++ someAnn @ xs ++ "]") c s   
+        MkSomeEnc ("[" ++ knownAnn @ xs ++ "]") c s   
 
 
-fromSomeEnc :: forall xs c str . SomeAnnotation xs => SomeEnc c str -> Maybe (Enc xs c str)
+fromSomeEnc :: forall xs c str . KnownAnnotation xs => SomeEnc c str -> Maybe (Enc xs c str)
 fromSomeEnc (MkSomeEnc xs c s) = 
     let p = Proxy :: Proxy xs
-    in if "[" ++ someAnn @ xs ++ "]" == xs
+    in if "[" ++ knownAnn @ xs ++ "]" == xs
        then Just $ MkEnc p c s
        else Nothing
 
@@ -154,26 +156,56 @@ fromSomeEnc (MkSomeEnc xs c s) =
 -- True
 -- >>> proc_toSomeEncFromSomeEnc @'["TEST1"] encsometest
 -- False
-proc_toSomeEncFromSomeEnc :: forall xs c str . (SomeAnnotation xs, Eq c, Eq str) => SomeEnc c str -> Bool
+proc_toSomeEncFromSomeEnc :: forall xs c str . (KnownAnnotation xs, Eq c, Eq str) => SomeEnc c str -> Bool
 proc_toSomeEncFromSomeEnc x = (== Just x) . fmap (toSomeEnc @ xs) . fromSomeEnc $ x
 
 -- |
 -- >>> let enctest = unsafeSetPayload () "hello" :: Enc '["TEST"] () T.Text
 -- >>> proc_fromSomeEncToSomeEnc enctest
 -- True
-proc_fromSomeEncToSomeEnc :: forall xs c str . (SomeAnnotation xs, Eq c, Eq str) => Enc xs c str -> Bool
+proc_fromSomeEncToSomeEnc :: forall xs c str . (KnownAnnotation xs, Eq c, Eq str) => Enc xs c str -> Bool
 proc_fromSomeEncToSomeEnc x = (== Just x) . fromSomeEnc . toSomeEnc $ x
 
 instance (Show c, Displ str) => Displ (SomeEnc c str) where
     displ (MkSomeEnc xs c s) = 
         "MkSomeEnc " ++ xs ++ show c ++ " " ++ displ s
 
+
+-- * Unchecked for recreate, similar to SomeEnc only not verified
+
+data Unchecked c str = MkUnchecked SomeAnn c str deriving (Show, Eq)
+
+toUnchecked :: SomeAnn -> c -> str -> Unchecked c str
+toUnchecked = MkUnchecked
+
+getUncheckedAnn :: Unchecked c str -> SomeAnn
+getUncheckedAnn (MkUnchecked ann _ _) = ann
+
+verifyAnn :: forall xs c str . KnownAnnotation xs => Unchecked c str -> Either String (Unchecked c str)
+verifyAnn x@(MkUnchecked xs _ _) = 
+    let p = Proxy :: Proxy xs
+    in if "[" ++ knownAnn @ xs ++ "]" == xs
+       then Right $ x
+       else Left $ "Unchecked has not matching annotation " ++ xs
+
+-- TODO verifyUnchecked in Recrete
+
+
 -- | Represents errors in recovery (recreation of encoded types).
 data RecreateEx where
-    RecreateEx:: (Show e, KnownSymbol x) => Proxy x -> e -> RecreateEx 
+    RecreateEx:: (Show e, KnownSymbol x) => Proxy x -> e -> RecreateEx
+    RecreateExUnkStep::   (Show e) => e -> RecreateEx
 
 instance Show RecreateEx where
     show (RecreateEx prxy a) = "(RecreateEx \"" ++ symbolVal prxy ++ "\" (" ++ show a ++ "))"
+    show (RecreateExUnkStep  a) = "(UnknownDecodeStep (" ++ show a ++ "))"
+
+
+recreateErrUnknown :: (Show e) => e -> RecreateEx
+recreateErrUnknown  = RecreateExUnkStep
+
+-- instance Eq RecreateEx where
+--     (RecreateEx prxy1 a1) == RecreateEx prxy2 a2 = (symbolVal prxy1) == (symbolVal prxy2)
 
 
 -- | Represents errors in encoding

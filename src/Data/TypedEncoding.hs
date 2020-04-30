@@ -95,8 +95,10 @@ module Data.TypedEncoding (
     -- * Types
     , Enc
     , SomeEnc
+    , Unchecked (..)
     , EncodeEx(..)
     , RecreateEx(..)
+    , recreateErrUnknown
     , UnexpectedDecodeEx(..)
     -- * Basic Enc Combinators
     , getPayload 
@@ -109,6 +111,10 @@ module Data.TypedEncoding (
     , getSomeEncPayload
     , toSomeEnc
     , fromSomeEnc
+    -- * Basic Unchecked Combinators
+    , toUnchecked
+    , getUncheckedAnn
+    , verifyAnn
  ) where
 
 -- import           Data.TypedEncoding.Internal.Types (Enc

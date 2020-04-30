@@ -11,11 +11,14 @@
        * flipped type parameters on FlattenAs, HasA typeclasses
        * Removed Proxy parameters from several methods (few methods have '_' version which still has them)
  - new functionality
-    - IsStringR - added reversed IsString class
-    - ToEncString - class allowing to convert types to `Enc` strings
-    - SomeAnnotation class
-    - SomeEnc
- - minor  
+    - ToEncString - class allowing to convert types to `Enc` encoded strings
+    - FromEncString - reverses ToEncString
+    - KnownAnnotation class
+    - SomeEnc for untyped (valid) encodings
+    - Unchecked type for untyped not validated encodings
+    - RecreateExUnkStep constructor in RecreateEx
+    - IsStringR - utility class, reversed IsString class
+  - minor  
     - ToEncString example
 
 

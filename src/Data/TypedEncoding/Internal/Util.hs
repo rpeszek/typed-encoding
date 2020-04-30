@@ -11,4 +11,6 @@ explainBool f (a, False) = Left $ f a
 proxiedId :: Proxy a -> a -> a
 proxiedId _ = id
 
-
+-- | explicit mapM
+extractEither :: Traversable t => t (Either err a) -> Either err (t a)
+extractEither tx = mapM id tx

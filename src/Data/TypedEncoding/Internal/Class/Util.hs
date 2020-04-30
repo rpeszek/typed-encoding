@@ -43,17 +43,17 @@ instance HasA () c where
 -- TODO move out to central place
 type SomeAnn = String
 
-class SomeAnnotation (xs::[Symbol]) where 
-    someAnn :: SomeAnn
+class KnownAnnotation (xs::[Symbol]) where 
+    knownAnn :: SomeAnn
 
-instance SomeAnnotation '[] where
-    someAnn = ""
+instance KnownAnnotation '[] where
+    knownAnn = ""
 
 -- |
--- >>> someAnn @ '["FIRST", "SECOND"]
+-- >>> knownAnn @ '["FIRST", "SECOND"]
 -- "FIRST,SECOND"
-instance (SomeAnnotation xs, KnownSymbol x) => SomeAnnotation (x ': xs) where
-    someAnn =  L.dropWhileEnd (',' ==) $  symbolVal (Proxy :: Proxy x) ++ "," ++ someAnn @xs
+instance (KnownAnnotation xs, KnownSymbol x) => KnownAnnotation (x ': xs) where
+    knownAnn =  L.dropWhileEnd (',' ==) $  symbolVal (Proxy :: Proxy x) ++ "," ++ knownAnn @xs
 
 
 -- * Display 
@@ -78,8 +78,8 @@ instance Displ BL.ByteString where
 -- |
 -- >>> displ (Proxy :: Proxy ["FIRST", "SECOND"])
 -- "FIRST,SECOND"
-instance (SomeAnnotation xs) => Displ (Proxy xs) where
-    displ _ = someAnn @ xs
+instance (KnownAnnotation xs) => Displ (Proxy xs) where
+    displ _ = knownAnn @ xs
 
 
 
