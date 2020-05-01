@@ -46,7 +46,7 @@ import           Data.Maybe
 
 
 -- $setup
--- >>> :set -XMultiParamTypeClasses -XDataKinds -XPolyKinds -XFlexibleInstances -XTypeApplications -XOverloadeStrings
+-- >>> :set -XMultiParamTypeClasses -XDataKinds -XPolyKinds -XFlexibleInstances -XTypeApplications -XOverloadedStrings
 -- >>> import qualified Data.List as L
 
 
@@ -165,9 +165,10 @@ tstEmail = SimplifiedEmailF {
   }
 
 -- | 
--- Encodes 'simple email' 
+-- This exmple encodes fields in 'SimplifiedEmailF' into existentially quantified
+-- @SomeEnc () B.ByteString@.
 -- 
--- This example uses existentially quantified 'Unchecked' that can easily represent
+-- This example uses existentially quantified 'Unchecked' type that can easily represent
 -- parts of the email
 --
 -- >>> let part = parts tstEmail L.!! 2
@@ -177,14 +178,16 @@ tstEmail = SimplifiedEmailF {
 -- >>> unchecked 
 -- MkUnchecked ["enc-B64","r-UTF8"] () "U29tZSBVVEY4IFRleHQ="
 --
--- This code uses Maybe as 'Alternative' @(<|>)@ with final option being a 'RecreateEx' error.
+-- We can play 'Alternative' ('<|>') game (we acually use @Maybe@) with final option being a 'RecreateEx' error:
+--
 -- >>> verifyUnchecked' @'["enc-B64","r-ASCII"] $ unchecked
 -- Nothing
 -- >>> verifyUnchecked' @'["enc-B64","r-UTF8"] $ unchecked
 -- Just (Right (MkEnc Proxy () "U29tZSBVVEY4IFRleHQ="))
 --
--- Since the data is heterogeneous, we wrap the result in another existential type: 'SomeEnc'.
--- 'SomeEnc' is similar to 'Unchecked' but the only safe way to get values of that type is
+-- Since the data is heterogeneous (each piece has a different encoding annotation), we need wrap the result in another existential type: 'SomeEnc'.
+-- 
+-- 'SomeEnc' is similar to 'Unchecked' with the difference that the only (safe) way to get values of this type is
 -- from properly encoded 'Enc' values. 
 --
 -- Using 'unsafeSomeEnc' would break type safety here. 
@@ -217,15 +220,15 @@ recreateEncoding = mapM encodefn
 -- Example decodes parts of email that are base 64 encoded text and nothing else.
 --
 -- This provides a type safety making sure that we do not decode certain parts of email
--- that would not decode correctly (like trying to decode ["r-ASCII"] part).
+-- that would not decode correctly (like trying to decode base 64 on a plain text part).
 --
 -- >>> decodeB64ForTextOnly <$> recreateEncoding tstEmail
 -- Right (SimplifiedEmailF {emailHeader = "Some Header", parts = [MkSomeEnc ["enc-B64"] () "U29tZSBBU0NJSSBUZXh0",MkSomeEnc ["r-ASCII"] () "Some ASCII Text",MkSomeEnc ["r-UTF8"] () "Some UTF8 Text",MkSomeEnc ["r-ASCII"] () "Some ASCII plain text"]})
 --
--- Combinator $fromSomeEnc @ '["enc-B64", "r-UTF8"]@ acts as a selector and pick only
--- ["enc-B64", "r-UTF8"] values from our 'Traversable' containing @SomeEnc c B.ByteString@.
+-- Combinator @fromSomeEnc @ '["enc-B64", "r-UTF8"]@ acts as a selector and pick only the
+-- @["enc-B64", "r-UTF8"]@ values from our 'Traversable' type. 
 --
--- We play the @(<|>) game on all the selectors we want picking and decoding right pieces only.
+-- We play the ('<|>') game on all the selectors we want picking and decoding right pieces only.
 --
 -- Imagine this is one of the pieces:
 --
@@ -239,6 +242,7 @@ recreateEncoding = mapM encodefn
 -- Nothing
 --
 -- But this one will:
+--
 -- >>> fromSomeEnc @ '["enc-B64", "r-ASCII"]  $ piece
 -- Just (MkEnc Proxy () "U29tZSBBU0NJSSBUZXh0")
 --
