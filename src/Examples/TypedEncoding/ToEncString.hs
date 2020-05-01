@@ -14,7 +14,9 @@
 
 {-# OPTIONS_GHC -Wno-partial-type-signatures #-}
 
-
+-- |
+-- This module shows use of 'ToEncString' and 'FromEncString'
+-- to achive string encoding of composite types.
 module Examples.TypedEncoding.ToEncString where
 
 import           Data.TypedEncoding
@@ -31,7 +33,7 @@ import qualified Data.Text as T
 import qualified Data.ByteString as B
 import           GHC.TypeLits
 import           Data.Proxy
-import           Control.Applicative ((<|>))
+import           Control.Applicative -- ((<|>))
 import           Data.Maybe
 
 
@@ -74,7 +76,7 @@ instance ToEncString "r-IPv4" T.Text Identity IpV4 where
 instance (UnexpectedDecodeErr f, Applicative f) => FromEncString IpV4 f T.Text "r-IPv4" where   
     fromEncStringF = fmap map . unreduce
       where unreduce :: Enc '["r-IPv4"] () T.Text -> f (IpV4F (Enc '["r-Word8-decimal"] () T.Text))
-            unreduce = asUnexpected_ @"r-IPv4" . recover . EnT.splitPayload @ '["r-Word8-decimal"] (T.splitOn ".")
+            unreduce = asUnexpected @"r-IPv4" . recover . EnT.splitPayload @ '["r-Word8-decimal"] (T.splitOn ".")
             
             map :: IpV4F (Enc '["r-Word8-decimal"] () T.Text) -> IpV4F Word8 
             map = fmap fromEncString
@@ -90,7 +92,7 @@ instance (UnexpectedDecodeErr f, Applicative f) => FromEncString IpV4 f T.Text "
 
 
 -- | Simplified Part header  
-type PartHeader = String
+type PartHeader = [String]
 
 -- | Simplified Email header  
 type EmailHeader = String
@@ -117,47 +119,48 @@ tstEmail :: SimplifiedEmail
 tstEmail = SimplifiedEmailF {
       emailHeader = "Some Header"
       , parts = [
-        ("enc-B64,image", "U29tZSBBU0NJSSBUZXh0") 
-        , ("enc-B64,r-ASCII", "U29tZSBBU0NJSSBUZXh0")
-        , ("enc-B64,r-UTF8", "U29tZSBVVEY4IFRleHQ=") 
-        , ("r-ASCII", "Some ASCII plain text") 
+        (["enc-B64","image"], "U29tZSBBU0NJSSBUZXh0") 
+        , (["enc-B64","r-ASCII"], "U29tZSBBU0NJSSBUZXh0")
+        , (["enc-B64","r-UTF8"], "U29tZSBVVEY4IFRleHQ=") 
+        , (["r-ASCII"], "Some ASCII plain text") 
          ]
   }
 
 -- | 
 -- Encodes 'simple email' 
 -- 
--- This uses 'unsafeSomeEnc' for simplicity 
+-- Using 'unsafeSomeEnc' would break type safety here. 
+-- It is important to handle all cases during enconding so decoding errors become impossible.
 recreateEncoding :: SimplifiedEmail -> Either RecreateEx SimplifiedEmailEncB
 recreateEncoding = mapM encodefn
   where 
         -- | simplified parse header assumes email has the same layout as encodings
         -- image is ingored, since [enc-B64] annotation on ByteString permits base 64
         -- encoded bytes
-        parseHeader :: PartHeader -> SomeAnn
-        parseHeader "enc-B64,image" = "[enc-B64]" 
-        parseHeader x = "[" ++ x ++ "]"
+        parseHeader :: PartHeader -> [SomeAnn]
+        parseHeader ["enc-B64","image"] = ["enc-B64"] 
+        parseHeader x = x
 
         encodefn :: (PartHeader, B.ByteString) -> Either RecreateEx (SomeEnc () B.ByteString)
         encodefn (parth, body) = 
-          let unchecked = toUnchecked (parseHeader parth) () body
-              try1 = (fmap (fmap toSomeEnc)) . EnT.verifyUnchecked' @'["enc-B64","r-UTF8"] $ unchecked
-              try2 = (fmap (fmap toSomeEnc)) . EnT.verifyUnchecked' @'["enc-B64","r-ASCII"] $ unchecked
-              try3 = (fmap (fmap toSomeEnc)) . EnT.verifyUnchecked' @'["r-ASCII"] $ unchecked
-              try4 = (fmap (fmap toSomeEnc)) . EnT.verifyUnchecked' @'["r-UTF8"] $ unchecked
-              try5 = (fmap (fmap toSomeEnc)) . EnT.verifyUnchecked' @'["enc-B64"] $ unchecked
-              def =  Left $ recreateErrUnknown ("Invalid Header " ++ parth)
-          in def `fromMaybe` (try1 <|> try2 <|> try3 <|> try4 <|> try5)    
- 
+          runAlternatives' (fromMaybe def) [try1, try2, try3, try4, try5] $ body
+          where
+              unchecked = toUnchecked (parseHeader parth) () 
+              try1 = (fmap (fmap toSomeEnc)) . verifyUnchecked' @'["enc-B64","r-UTF8"] . unchecked
+              try2 = (fmap (fmap toSomeEnc)) . verifyUnchecked' @'["enc-B64","r-ASCII"] . unchecked
+              try3 = (fmap (fmap toSomeEnc)) . verifyUnchecked' @'["r-ASCII"] . unchecked
+              try4 = (fmap (fmap toSomeEnc)) . verifyUnchecked' @'["r-UTF8"] . unchecked
+              try5 = (fmap (fmap toSomeEnc)) . verifyUnchecked' @'["enc-B64"] . unchecked
+              def =  Left $ recreateErrUnknown ("Invalid Header " ++ show parth) 
 
 
 -- | Decode email base 64 encoded text entries but not image entries
 -- this provides a type safety over not decoding certain parts of email
 --
--- decodeB64ForTextOnly <$> recreateEncoding tstEmail
---
+-- >>> decodeB64ForTextOnly <$> recreateEncoding tstEmail
+-- Right (SimplifiedEmailF {emailHeader = "Some Header", parts = [MkSomeEnc ["enc-B64"] () "U29tZSBBU0NJSSBUZXh0",MkSomeEnc ["r-ASCII"] () "Some ASCII Text",MkSomeEnc ["r-UTF8"] () "Some UTF8 Text",MkSomeEnc ["r-ASCII"] () "Some ASCII plain text"]})
 decodeB64ForTextOnly :: SimplifiedEmailEncB -> SimplifiedEmailEncB
-decodeB64ForTextOnly = fmap (EnT.maybeTranformations [tryUtf8, tryAscii]) 
+decodeB64ForTextOnly = fmap (runAlternatives fromMaybe [tryUtf8, tryAscii]) 
   where
     tryUtf8, tryAscii :: SomeEnc c B.ByteString -> Maybe (SomeEnc c B.ByteString)
     tryUtf8 = fmap (toSomeEnc . decodeToUtf8) . fromSomeEnc @ '["enc-B64", "r-UTF8"] 
@@ -176,10 +179,21 @@ decodeB64ForTextOnly = fmap (EnT.maybeTranformations [tryUtf8, tryAscii])
 
 
 
--- * Helper instances
+-- * Helper instances and utils
 
 instance Displ a => Displ (IpV4F a) where
     displ = show . fmap displ
 
 instance Displ a => Displ (SimplifiedEmailF a) where
     displ = show . fmap displ    
+
+
+runAlternatives' :: Alternative f => (f b -> b) -> [a -> f b] -> a -> b
+runAlternatives' defF fns = defF . alternatives fns
+
+runAlternatives :: Alternative f => (a -> f b -> b) -> [a -> f b] -> a -> b
+runAlternatives defF fns a = defF a . alternatives fns $ a
+
+alternatives :: Alternative f => [a -> f b] -> a -> f b
+alternatives fns a = foldr (<|>) empty . map ($ a) $ fns
+

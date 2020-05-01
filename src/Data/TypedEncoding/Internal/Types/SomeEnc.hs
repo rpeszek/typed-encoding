@@ -35,27 +35,27 @@ import           Data.TypedEncoding.Internal.Types.Common
 data SomeEnc conf str where
     -- | constructor is to be treated as Unsafe to Encode and Decode instance implementations
     -- particular encoding instances may expose smart constructors for limited data types
-    MkSomeEnc :: SomeAnn -> conf -> str -> SomeEnc conf str
+    MkSomeEnc :: [SomeAnn] -> conf -> str -> SomeEnc conf str
     deriving (Show, Eq) 
 
-unsafeSomeEnc:: SomeAnn -> c -> s -> SomeEnc c s
+unsafeSomeEnc:: [SomeAnn] -> c -> s -> SomeEnc c s
 unsafeSomeEnc = MkSomeEnc
 
 getSomePayload :: SomeEnc conf str -> str
 getSomePayload = snd . getSomeEncPayload
 
-getSomeEncPayload :: SomeEnc conf str -> (SomeAnn, str) 
+getSomeEncPayload :: SomeEnc conf str -> ([SomeAnn], str) 
 getSomeEncPayload (MkSomeEnc t _ s) = (t,s)
 
 toSomeEnc :: forall xs c str . (KnownAnnotation xs) => Enc xs c str -> SomeEnc c str 
 toSomeEnc (MkEnc p c s) = 
-        MkSomeEnc ("[" ++ knownAnn @ xs ++ "]") c s   
+        MkSomeEnc (knownAnn @ xs) c s   
 
 
 fromSomeEnc :: forall xs c str . KnownAnnotation xs => SomeEnc c str -> Maybe (Enc xs c str)
 fromSomeEnc (MkSomeEnc xs c s) = 
     let p = Proxy :: Proxy xs
-    in if "[" ++ knownAnn @ xs ++ "]" == xs
+    in if knownAnn @ xs == xs
        then Just $ MkEnc p c s
        else Nothing
 
@@ -73,7 +73,7 @@ fromSomeEnc (MkSomeEnc xs c s) =
 
 
 -- |
--- >>> let encsometest = MkSomeEnc "[TEST]" () $ T.pack "hello"
+-- >>> let encsometest = MkSomeEnc ["TEST"] () $ T.pack "hello"
 -- >>> proc_toSomeEncFromSomeEnc @'["TEST"] encsometest
 -- True
 -- >>> proc_toSomeEncFromSomeEnc @'["TEST1"] encsometest
@@ -88,8 +88,11 @@ proc_toSomeEncFromSomeEnc x = (== Just x) . fmap (toSomeEnc @ xs) . fromSomeEnc 
 proc_fromSomeEncToSomeEnc :: forall xs c str . (KnownAnnotation xs, Eq c, Eq str) => Enc xs c str -> Bool
 proc_fromSomeEncToSomeEnc x = (== Just x) . fromSomeEnc . toSomeEnc $ x
 
+-- |
+-- >>> displ $ MkSomeEnc ["TEST"] () ("hello" :: T.Text)
+-- "MkSomeEnc [TEST] () (Text hello)"
 instance (Show c, Displ str) => Displ (SomeEnc c str) where
     displ (MkSomeEnc xs c s) = 
-        "MkSomeEnc " ++ xs ++ show c ++ " " ++ displ s
+        "MkSomeEnc " ++ displ xs  ++ " " ++ show c ++ " " ++ displ s
 
 

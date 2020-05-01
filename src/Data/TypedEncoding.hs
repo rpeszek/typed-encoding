@@ -92,13 +92,14 @@ module Data.TypedEncoding (
     module Data.TypedEncoding
     -- * Classes
     , module Data.TypedEncoding.Internal.Class
+    -- * Common combinators
+    , module Data.TypedEncoding.Internal.Combinators
     -- * Types
     , Enc
     , SomeEnc
     , Unchecked (..)
     , EncodeEx(..)
     , RecreateEx(..)
-    , recreateErrUnknown
     , UnexpectedDecodeEx(..)
     , SomeAnn 
     -- * Basic Enc Combinators
@@ -116,6 +117,8 @@ module Data.TypedEncoding (
     , toUnchecked
     , getUncheckedAnn
     , verifyAnn
+     -- * Other Basic Combinators     
+    , recreateErrUnknown
  ) where
 
 -- import           Data.TypedEncoding.Internal.Types (Enc
@@ -130,3 +133,4 @@ module Data.TypedEncoding (
 --                                                )
 import           Data.TypedEncoding.Internal.Types
 import           Data.TypedEncoding.Internal.Class
+import           Data.TypedEncoding.Internal.Combinators

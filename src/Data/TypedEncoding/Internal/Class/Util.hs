@@ -25,7 +25,7 @@ import qualified Data.List as L
 import           GHC.TypeLits
 
 -- $setup
--- >>> :set -XScopedTypeVariables -XTypeApplications -XAllowAmbiguousTypes
+-- >>> :set -XScopedTypeVariables -XTypeApplications -XAllowAmbiguousTypes -XDataKinds
 
 -- | TODO use singletons definition instead?
 type family Append (xs :: [k]) (ys :: [k]) :: [k] where
@@ -45,16 +45,17 @@ instance HasA () c where
 
 
 class KnownAnnotation (xs::[Symbol]) where 
-    knownAnn :: SomeAnn
+    knownAnn :: [SomeAnn]
 
 instance KnownAnnotation '[] where
-    knownAnn = ""
+    knownAnn = []
 
 -- |
 -- >>> knownAnn @ '["FIRST", "SECOND"]
--- "FIRST,SECOND"
+-- ["FIRST","SECOND"]
 instance (KnownAnnotation xs, KnownSymbol x) => KnownAnnotation (x ': xs) where
-    knownAnn =  L.dropWhileEnd (',' ==) $  symbolVal (Proxy :: Proxy x) ++ "," ++ knownAnn @xs
+    knownAnn =  symbolVal (Proxy :: Proxy x) : knownAnn @xs
+    -- knownAnn =  L.dropWhileEnd (',' ==) $  symbolVal (Proxy :: Proxy x) ++ "," ++ knownAnn @xs
 
 
 -- * Display 
@@ -63,8 +64,10 @@ instance (KnownAnnotation xs, KnownSymbol x) => KnownAnnotation (x ': xs) where
 class Displ x where 
     displ :: x -> String
 
-instance Displ String where
-    displ = id    
+instance Displ SomeAnn where
+    displ = id 
+instance Displ [SomeAnn] where 
+    displ x = "[" ++ (L.intercalate "," $ map displ $ x) ++ "]"
 instance Displ T.Text where
     displ x = "(Text " ++ T.unpack x ++ ")"
 instance Displ TL.Text where
@@ -78,9 +81,10 @@ instance Displ BL.ByteString where
 
 -- |
 -- >>> displ (Proxy :: Proxy ["FIRST", "SECOND"])
--- "FIRST,SECOND"
+-- "[FIRST,SECOND]"
 instance (KnownAnnotation xs) => Displ (Proxy xs) where
-    displ _ = knownAnn @ xs
+    displ _ = displ $  knownAnn @ xs
+        -- "[" ++ (L.intercalate "," $ map displ $ knownAnn @ xs) ++ "]"
 
 
 

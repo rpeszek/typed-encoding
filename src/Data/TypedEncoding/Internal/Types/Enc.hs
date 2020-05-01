@@ -38,7 +38,7 @@ data Enc enc conf str where
 -- "MkEnc '[TEST] () (Text hello)"
 instance (KnownAnnotation xs, Show c, Displ str) => Displ ( Enc xs c str) where
     displ (MkEnc p c s) = 
-        "MkEnc '[" ++ knownAnn @ xs ++ "] " ++ show c ++ " " ++ displ s
+        "MkEnc '" ++ displ (Proxy :: Proxy xs) ++ " " ++ show c ++ " " ++ displ s
 
 
 toEncoding :: conf -> str -> Enc '[] conf str
@@ -49,7 +49,7 @@ fromEncoding = getPayload
 
 -- TODO make all implTran functions module-private
 -- TODO disambiguate implEncode from implDecode, from implCheckPrevF for type safety
--- especially since these are always used in combo with asRecreateErr or asUnexpected 
+-- especially since these are always used in combo with asRecreateErr_ or asUnexpected 
 
 implTranF :: Functor f => (str -> f str) -> Enc enc1 conf str -> f (Enc enc2 conf str)
 implTranF f  = implTranF' (\c -> f)

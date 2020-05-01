@@ -77,13 +77,9 @@ instance UnexpectedDecodeErr Identity where
 instance UnexpectedDecodeErr (Either UnexpectedDecodeEx) where
     unexpectedDecodeErr = Left 
 
-asUnexpected :: (KnownSymbol x, UnexpectedDecodeErr f, Applicative f, Show err) => Proxy x -> Either err a -> f a
-asUnexpected p (Left err) = unexpectedDecodeErr $ UnexpectedDecodeEx p err
-asUnexpected _ (Right r) = pure r
+asUnexpected_ :: (KnownSymbol x, UnexpectedDecodeErr f, Applicative f, Show err) => Proxy x -> Either err a -> f a
+asUnexpected_ p (Left err) = unexpectedDecodeErr $ UnexpectedDecodeEx p err
+asUnexpected_ _ (Right r) = pure r
 
-asUnexpected__ :: (KnownSymbol x, UnexpectedDecodeErr f, Applicative f, Show err) => Proxy x -> Proxy f -> Either err a -> f a
-asUnexpected__ p _ (Left err) = unexpectedDecodeErr $ UnexpectedDecodeEx p err
-asUnexpected__ _ _ (Right r) = pure r
-
-asUnexpected_ :: forall x f err a . (KnownSymbol x, UnexpectedDecodeErr f, Applicative f, Show err) => Either err a -> f a
-asUnexpected_ = asUnexpected (Proxy :: Proxy x)
+asUnexpected :: forall x f err a . (KnownSymbol x, UnexpectedDecodeErr f, Applicative f, Show err) => Either err a -> f a
+asUnexpected = asUnexpected_ (Proxy :: Proxy x)

@@ -118,9 +118,9 @@ instance Applicative f => EncodeF f (Enc xs c T.Text) (Enc ("my-sign" ': xs) c T
 -- 'UnexpectedDecodeErr' has Identity instance allowing for decoding that assumes errors are not possible.
 -- For debugging purposes or when unsafe changes to "my-sign" @Error UnexpectedDecodeEx@ instance can be used.
 instance (UnexpectedDecodeErr f, Applicative f) => DecodeF f (Enc ("my-sign" ': xs) c T.Text) (Enc xs c T.Text) where
-    decodeF = EnT.implDecodeF (asUnexpected_ @"my-sign" . decodeSign) 
+    decodeF = EnT.implDecodeF (asUnexpected @"my-sign" . decodeSign) 
 
 -- | Recreation allows effectful @f@ to check for tampering with data.
 -- Implementation simply uses 'EnT.implCheckPrevF' combinator on the recovery function.
 instance (RecreateErr f, Applicative f) => RecreateF f (Enc xs c T.Text) (Enc ("my-sign" ': xs) c T.Text) where   
-    checkPrevF = EnT.implCheckPrevF (asRecreateErr_ @"my-sign" . decodeSign) 
+    checkPrevF = EnT.implCheckPrevF (asRecreateErr @"my-sign" . decodeSign) 

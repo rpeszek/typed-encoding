@@ -22,7 +22,7 @@ import           Data.Proxy
 -- import qualified Data.Text.Lazy as TL
 
 import           Data.TypedEncoding.Internal.Class.IsStringR
-import           Data.TypedEncoding.Internal.Combinators
+import           Data.TypedEncoding.Internal.Instances.Combinators
 import           Data.TypedEncoding.Instances.Support
 
 -- $setup
@@ -32,7 +32,7 @@ import           Data.TypedEncoding.Instances.Support
 instance (IsStringR str, IsString str) =>  EncodeF (Either EncodeEx) (Enc xs c str) (Enc ("r-Word8-decimal" ': xs) c str) where
     encodeF = implEncodeF @"r-Word8-decimal" (verifyWithRead @Word8 "Word8-decimal")
 instance (IsStringR str, IsString str, RecreateErr f, Applicative f) => RecreateF f (Enc xs c str) (Enc ("r-Word8-decimal" ': xs) c str) where
-    checkPrevF = implCheckPrevF (asRecreateErr_ @"r-Word8-decimal" . verifyWithRead @Word8 "Word8-decimal")
+    checkPrevF = implCheckPrevF (asRecreateErr @"r-Word8-decimal" . verifyWithRead @Word8 "Word8-decimal")
 instance (IsStringR str, IsString str, Applicative f) => DecodeF f (Enc ("r-Word8-decimal" ': xs) c str) (Enc xs c str) where
     decodeF = implTranP id 
 

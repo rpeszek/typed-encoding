@@ -30,18 +30,24 @@ import           Data.TypedEncoding.Internal.Types.Common
 
 -- * Unchecked for recreate, similar to SomeEnc only not verified
 
-data Unchecked c str = MkUnchecked SomeAnn c str deriving (Show, Eq)
+data Unchecked c str = MkUnchecked [SomeAnn] c str deriving (Show, Eq)
 
-toUnchecked :: SomeAnn -> c -> str -> Unchecked c str
+toUnchecked :: [SomeAnn] -> c -> str -> Unchecked c str
 toUnchecked = MkUnchecked
 
-getUncheckedAnn :: Unchecked c str -> SomeAnn
+getUncheckedAnn :: Unchecked c str -> [SomeAnn]
 getUncheckedAnn (MkUnchecked ann _ _) = ann
 
 verifyAnn :: forall xs c str . KnownAnnotation xs => Unchecked c str -> Either String (Unchecked c str)
 verifyAnn x@(MkUnchecked xs _ _) = 
     let p = Proxy :: Proxy xs
-    in if "[" ++ knownAnn @ xs ++ "]" == xs
+    in if knownAnn @ xs == xs
        then Right $ x
-       else Left $ "Unchecked has not matching annotation " ++ xs
+       else Left $ "Unchecked has not matching annotation " ++ displ xs
 
+-- |
+-- >>> displ $ MkUnchecked ["TEST"] () ("hello" :: T.Text)
+-- "MkUnchecked [TEST] () (Text hello)"
+instance (Show c, Displ str) => Displ (Unchecked c str) where
+    displ (MkUnchecked xs c s) = 
+        "MkUnchecked " ++ displ xs ++ " " ++ show c ++ " " ++ displ s

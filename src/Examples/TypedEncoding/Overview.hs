@@ -69,6 +69,16 @@ helloB64Decoded = fromEncoding . decodeAll $ helloB64
 --
 -- >>> recreateFAll . toEncoding () $ "SGVsbG8gV29ybGQ" :: Either RecreateEx (Enc '["enc-B64"] () B.ByteString)
 -- Left (RecreateEx "enc-B64" ("invalid padding"))
+--
+-- The above example start by placing payload in zero-encoded @Enc '[] ()@ type and then apply 'recreateFAll'
+-- this is a good way to recreate encoded type if encoding is known. 
+--
+-- It is it not, existentially quantified 'Unchecked' type can be used. 
+-- (See 'Examples.TypedEncoding.ToEncString' for better example)
+--
+-- >>> let unchecked = toUnchecked ["enc-B64"] () ("SGVsbG8gV29ybGQ=" :: T.Text)
+-- >>> verifyUnchecked' @'["enc-B64"] unchecked
+-- Just (Right (MkEnc Proxy () "SGVsbG8gV29ybGQ="))
 helloB64Recovered :: Either RecreateEx (Enc '["enc-B64"] () B.ByteString)
 helloB64Recovered = recreateFAll . toEncoding () $ "SGVsbG8gV29ybGQ="
 
@@ -109,7 +119,8 @@ helloB64B64Decoded = fromEncoding . decodeAll $ helloB64B64
 
 -- | what happens when we try to recover encoded once text to @Enc '["enc-B64", "enc-B64"]@. 
 --
--- Again, notice the same expression is used as in previous recovery.
+-- Again, notice the same expression is used as in previous recovery. 
+-- (Alternativelly, 'Unchecked' type could have been used.)
 --
 -- >>> recreateFAll . toEncoding () $ "SGVsbG8gV29ybGQ=" :: Either RecreateEx (Enc '["enc-B64", "enc-B64"] () B.ByteString)
 -- Left (RecreateEx "enc-B64" ("invalid padding"))

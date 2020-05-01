@@ -48,6 +48,8 @@ Right exAsciiT = exAsciiTE
 -- >>> recreateFAll . toEncoding () $ newPayload :: Either RecreateEx (Enc '["r-ASCII"] () T.Text)
 -- Right (MkEnc Proxy () "HELLO some extra stuff")
 --
+-- Alternatively, 'Unchecked' type can be used in recreation, see 'Examples.TypedEncoding.Overview'
+-- 
 modifiedAsciiT :: Either RecreateEx (Enc '["r-ASCII"] () T.Text)
 modifiedAsciiT =  recreateFAll . toEncoding () . ( <> " some extra stuff") . getPayload $ exAsciiT
   

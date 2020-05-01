@@ -42,4 +42,4 @@ instance IsString str => ToEncString "r-Word8-decimal" str Identity Word8 where
     toEncStringF i = Identity $ MkEnc Proxy () (fromString . show $ i)
 
 instance (IsStringR str, UnexpectedDecodeErr f, Applicative f) => FromEncString Word8 f str "r-Word8-decimal" where
-    fromEncStringF  = asUnexpected_ @ "r-Word8-decimal" . readEither . toString . getPayload
+    fromEncStringF  = asUnexpected @ "r-Word8-decimal" . readEither . toString . getPayload

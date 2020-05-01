@@ -63,10 +63,10 @@ class RecreateErr f where
 instance RecreateErr (Either RecreateEx) where
     recoveryErr = Left  
 
-asRecreateErr :: (RecreateErr f, Applicative f, Show err, KnownSymbol x) => Proxy x -> Either err a -> f a
-asRecreateErr p (Left err) = recoveryErr $ RecreateEx p err
-asRecreateErr _ (Right r) = pure r
+asRecreateErr_ :: (RecreateErr f, Applicative f, Show err, KnownSymbol x) => Proxy x -> Either err a -> f a
+asRecreateErr_ p (Left err) = recoveryErr $ RecreateEx p err
+asRecreateErr_ _ (Right r) = pure r
 
 
-asRecreateErr_ :: forall x f err a . (RecreateErr f, Applicative f, Show err, KnownSymbol x) => Either err a -> f a
-asRecreateErr_ = asRecreateErr (Proxy :: Proxy x)
+asRecreateErr :: forall x f err a . (RecreateErr f, Applicative f, Show err, KnownSymbol x) => Either err a -> f a
+asRecreateErr = asRecreateErr_ (Proxy :: Proxy x)
