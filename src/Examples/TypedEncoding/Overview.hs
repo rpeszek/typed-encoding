@@ -74,7 +74,10 @@ helloB64Decoded = fromEncoding . decodeAll $ helloB64
 -- this is a good way to recreate encoded type if encoding is known. 
 --
 -- It is it not, existentially quantified 'Unchecked' type can be used. 
--- (See 'Examples.TypedEncoding.ToEncString' for better example)
+--
+-- (See 'Examples.TypedEncoding.ToEncString' for better example).
+-- 
+-- This module is concerned only with the first approach. 
 --
 -- >>> let unchecked = toUnchecked ["enc-B64"] () ("SGVsbG8gV29ybGQ=" :: T.Text)
 -- >>> verifyUnchecked' @'["enc-B64"] unchecked
@@ -120,7 +123,6 @@ helloB64B64Decoded = fromEncoding . decodeAll $ helloB64B64
 -- | what happens when we try to recover encoded once text to @Enc '["enc-B64", "enc-B64"]@. 
 --
 -- Again, notice the same expression is used as in previous recovery. 
--- (Alternativelly, 'Unchecked' type could have been used.)
 --
 -- >>> recreateFAll . toEncoding () $ "SGVsbG8gV29ybGQ=" :: Either RecreateEx (Enc '["enc-B64", "enc-B64"] () B.ByteString)
 -- Left (RecreateEx "enc-B64" ("invalid padding"))

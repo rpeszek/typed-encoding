@@ -16,7 +16,14 @@
 
 -- |
 -- This module shows use of 'ToEncString' and 'FromEncString'
--- to achive string encoding of composite types.
+-- and demostrates composite string encoding.
+--
+-- Classing @Show@ and @Read@ use a very permissive String causing 
+-- error on read. This approach provide safety in decoding the string.
+--
+-- Even more intersting is the non-homogenious case where consituent 
+-- data elements do not have the same encoding. This is discussed
+-- in the simplified email example.
 module Examples.TypedEncoding.ToEncString where
 
 import           Data.TypedEncoding
@@ -39,12 +46,17 @@ import           Data.Maybe
 
 
 -- $setup
--- >>> :set -XMultiParamTypeClasses -XDataKinds -XPolyKinds -XFlexibleInstances -XTypeApplications
+-- >>> :set -XMultiParamTypeClasses -XDataKinds -XPolyKinds -XFlexibleInstances -XTypeApplications -XOverloadeStrings
+-- >>> import qualified Data.List as L
+
 
 -- * IpV4 example
 
 type IpV4 = IpV4F Word8
 
+-- | 
+-- In this example all data fields have the same type. 
+-- This simplifies encoding work as all fields will be encoded the same way.
 data IpV4F a = IpV4F {
      oct1 :: a
      , oct2 :: a
@@ -58,8 +70,21 @@ tstIp = IpV4F 128 1 1 10
 
 
 -- |
+-- In this example @toEncString@ converts 'IpV4' to @Enc @"r-IPv4" Text@.
+--  
+-- This is done with help of existing @"r-Word8-decimal"@ annotation defined
+-- in 'Data.TypedEncoding.Instances.Restriction.Common'
+--
 -- >>> toEncString @"r-IPv4" @T.Text tstIp
 -- MkEnc Proxy () "128.1.1.10"
+--
+-- Implementation is a classic map reduce where reduce is done with help of
+-- 'EnT.foldEncStr'
+--
+-- >>> let fn a b = if b == "" then a else a <> "." <> b
+-- >>> let reduce = EnT.foldEncStr @'["r-IPv4"] @'["r-Word8-decimal"] () fn
+-- >>>  displ . reduce . fmap toEncString $ tstIp
+-- "MkEnc '[r-IPv4] () 128.1.1.10" 
 instance ToEncString "r-IPv4" T.Text Identity IpV4 where
     toEncStringF = Identity . reduce . map
       where map :: IpV4F Word8 -> IpV4F (Enc '["r-Word8-decimal"] () T.Text) 
@@ -69,10 +94,19 @@ instance ToEncString "r-IPv4" T.Text Identity IpV4 where
             reduce = EnT.foldEncStr () (\a b-> if b == "" then a else a <> "." <> b) 
 
 -- |
+--
 -- >>> let enc = toEncString @"r-IPv4" @T.Text tstIp
 -- >>> fromEncString @IpV4 enc
 -- IpV4F {oct1 = 128, oct2 = 1, oct3 = 1, oct4 = 10}
-
+--
+-- To get 'IpV4' out of the string we need to reverse previous @reduce@.
+-- This is currently done using helper 'EnT.splitPayload' combinator. 
+--
+-- >>> EnT.splitPayload @ '["r-Word8-decimal"] (T.splitOn $ T.pack ".") $ enc 
+-- [MkEnc Proxy () "128",MkEnc Proxy () "1",MkEnc Proxy () "1",MkEnc Proxy () "10"]
+-- 
+-- The conversion of a list to IpV4F needs handle errors but these errors 
+-- are considered unexpected.
 instance (UnexpectedDecodeErr f, Applicative f) => FromEncString IpV4 f T.Text "r-IPv4" where   
     fromEncStringF = fmap map . unreduce
       where unreduce :: Enc '["r-IPv4"] () T.Text -> f (IpV4F (Enc '["r-Word8-decimal"] () T.Text))
@@ -99,10 +133,14 @@ type EmailHeader = String
 
 -- | This section shows a type safe processing of emails.
 --
--- This over-simplified email type has parts that can binary and have to be Base 64 encoded or 
--- are text that have UTF8 or ASCII character set and can be optionally can be Base 64 encoded.
+-- This over-simplified email type has parts that can be either 
+-- 
+-- * binary and have to be Base 64 encoded or 
+-- * are text that have either UTF8 or ASCII character set 
 --
--- The layout of simplified headers is assumed the same as encoding annotations in this library.
+-- The text parts can be optionally can be Base 64 encoded.
+--
+-- For simplicity, the layout of simplified headers is assumed the same as encoding annotations in this library.
 data SimplifiedEmailF a = SimplifiedEmailF {
           emailHeader :: EmailHeader
           , parts :: [a]
@@ -113,7 +151,7 @@ type SimplifiedEmail = SimplifiedEmailF (PartHeader, B.ByteString)
 type SimplifiedEmailEncB = SimplifiedEmailF (SomeEnc () B.ByteString)
 
 -- TODO
-type SimplifiedEmailEncT = SimplifiedEmailF (SomeEnc () T.Text)
+-- type SimplifiedEmailEncT = SimplifiedEmailF (SomeEnc () T.Text)
 
 tstEmail :: SimplifiedEmail
 tstEmail = SimplifiedEmailF {
@@ -129,7 +167,28 @@ tstEmail = SimplifiedEmailF {
 -- | 
 -- Encodes 'simple email' 
 -- 
+-- This example uses existentially quantified 'Unchecked' that can easily represent
+-- parts of the email
+--
+-- >>> let part = parts tstEmail L.!! 2
+-- >>> part
+-- (["enc-B64","r-UTF8"],"U29tZSBVVEY4IFRleHQ=")
+-- >>> let unchecked = toUnchecked (fst part) () (snd part)
+-- >>> unchecked 
+-- MkUnchecked ["enc-B64","r-UTF8"] () "U29tZSBVVEY4IFRleHQ="
+--
+-- This code uses Maybe as 'Alternative' @(<|>)@ with final option being a 'RecreateEx' error.
+-- >>> verifyUnchecked' @'["enc-B64","r-ASCII"] $ unchecked
+-- Nothing
+-- >>> verifyUnchecked' @'["enc-B64","r-UTF8"] $ unchecked
+-- Just (Right (MkEnc Proxy () "U29tZSBVVEY4IFRleHQ="))
+--
+-- Since the data is heterogeneous, we wrap the result in another existential type: 'SomeEnc'.
+-- 'SomeEnc' is similar to 'Unchecked' but the only safe way to get values of that type is
+-- from properly encoded 'Enc' values. 
+--
 -- Using 'unsafeSomeEnc' would break type safety here. 
+-- 
 -- It is important to handle all cases during enconding so decoding errors become impossible.
 recreateEncoding :: SimplifiedEmail -> Either RecreateEx SimplifiedEmailEncB
 recreateEncoding = mapM encodefn
@@ -154,11 +213,40 @@ recreateEncoding = mapM encodefn
               def =  Left $ recreateErrUnknown ("Invalid Header " ++ show parth) 
 
 
--- | Decode email base 64 encoded text entries but not image entries
--- this provides a type safety over not decoding certain parts of email
+-- | 
+-- Example decodes parts of email that are base 64 encoded text and nothing else.
+--
+-- This provides a type safety making sure that we do not decode certain parts of email
+-- that would not decode correctly (like trying to decode ["r-ASCII"] part).
 --
 -- >>> decodeB64ForTextOnly <$> recreateEncoding tstEmail
 -- Right (SimplifiedEmailF {emailHeader = "Some Header", parts = [MkSomeEnc ["enc-B64"] () "U29tZSBBU0NJSSBUZXh0",MkSomeEnc ["r-ASCII"] () "Some ASCII Text",MkSomeEnc ["r-UTF8"] () "Some UTF8 Text",MkSomeEnc ["r-ASCII"] () "Some ASCII plain text"]})
+--
+-- Combinator $fromSomeEnc @ '["enc-B64", "r-UTF8"]@ acts as a selector and pick only
+-- ["enc-B64", "r-UTF8"] values from our 'Traversable' containing @SomeEnc c B.ByteString@.
+--
+-- We play the @(<|>) game on all the selectors we want picking and decoding right pieces only.
+--
+-- Imagine this is one of the pieces:
+--
+-- >>> let piece = unsafeSomeEnc ["enc-B64","r-ASCII"] () ("U29tZSBBU0NJSSBUZXh0" :: B.ByteString)
+-- >>> displ piece
+-- "MkSomeEnc [enc-B64,r-ASCII] () (ByteString U29tZSBBU0NJSSBUZXh0)"
+--
+-- This code will not pick it up:
+--
+-- >>> fromSomeEnc @ '["enc-B64", "r-UTF8"] $ piece
+-- Nothing
+--
+-- But this one will:
+-- >>> fromSomeEnc @ '["enc-B64", "r-ASCII"]  $ piece
+-- Just (MkEnc Proxy () "U29tZSBBU0NJSSBUZXh0")
+--
+-- so we can apply the decoding on selected piece correctly
+--
+-- >>> fmap (toSomeEnc . decodePart @'["enc-B64"]) . fromSomeEnc @ '["enc-B64", "r-ASCII"] $ piece
+-- Just (MkSomeEnc ["r-ASCII"] () "Some ASCII Text")
+
 decodeB64ForTextOnly :: SimplifiedEmailEncB -> SimplifiedEmailEncB
 decodeB64ForTextOnly = fmap (runAlternatives fromMaybe [tryUtf8, tryAscii]) 
   where
