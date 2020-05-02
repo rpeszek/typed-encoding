@@ -40,15 +40,15 @@ foldEncStr :: forall (xs2 :: [Symbol]) (xs1 :: [Symbol]) f c s1 s2
              => c -> (s1 -> s2 -> s2) -> f (Enc xs1 c s1) -> Enc xs2 c s2
 foldEncStr c f = foldEnc c f ""
 
--- | Similar to 'foldEnc', works with untyped 'SomeEnc'
-foldSomeEnc :: forall (xs2 :: [Symbol]) f c s1 s2 
+-- | Similar to 'foldEnc', works with untyped 'CheckedEnc'
+foldCheckedEnc :: forall (xs2 :: [Symbol]) f c s1 s2 
              . (Foldable f, Functor f) 
-             => c -> ([SomeAnn] -> s1 -> s2 -> s2) -> s2 -> f (SomeEnc c s1) -> Enc xs2 c s2
-foldSomeEnc c f sinit = unsafeSetPayload c . foldr (uncurry f) sinit . fmap getSomeEncPayload
+             => c -> ([EncAnn] -> s1 -> s2 -> s2) -> s2 -> f (CheckedEnc c s1) -> Enc xs2 c s2
+foldCheckedEnc c f sinit = unsafeSetPayload c . foldr (uncurry f) sinit . fmap getCheckedEncPayload
 
--- | Similar to 'foldEncStr', works with untyped 'SomeEnc'
-foldSomeEncStr :: forall (xs2 :: [Symbol]) f c s1 s2 . (Foldable f, Functor f, IsString s2) => c -> ([SomeAnn] -> s1 -> s2 -> s2) -> f (SomeEnc c s1) -> Enc xs2 c s2
-foldSomeEncStr c f  = foldSomeEnc c f ""
+-- | Similar to 'foldEncStr', works with untyped 'CheckedEnc'
+foldCheckedEncStr :: forall (xs2 :: [Symbol]) f c s1 s2 . (Foldable f, Functor f, IsString s2) => c -> ([EncAnn] -> s1 -> s2 -> s2) -> f (CheckedEnc c s1) -> Enc xs2 c s2
+foldCheckedEncStr c f  = foldCheckedEnc c f ""
 
 
 -- * Composite encoding: Recreate and Encode helpers
@@ -62,10 +62,10 @@ splitPayload f (MkEnc _ c s1) = map (MkEnc Proxy c) (f s1)
    
 -- | Untyped version of 'splitPayload'
 splitSomePayload :: forall c s1 s2 . 
-             ([SomeAnn] -> s1 -> [([SomeAnn], s2)]) 
-             -> SomeEnc c s1 
-             -> [SomeEnc c s2]
-splitSomePayload f (MkSomeEnc ann1 c s1) = map (\(ann2, s2) -> MkSomeEnc ann2 c s2) (f ann1 s1)
+             ([EncAnn] -> s1 -> [([EncAnn], s2)]) 
+             -> CheckedEnc c s1 
+             -> [CheckedEnc c s2]
+splitSomePayload f (MkCheckedEnc ann1 c s1) = map (\(ann2, s2) -> MkCheckedEnc ann2 c s2) (f ann1 s1)
 
 
 -- * Utility combinators 

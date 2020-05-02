@@ -15,17 +15,17 @@ module Data.TypedEncoding.Internal.Types (
         module Data.TypedEncoding.Internal.Types
         -- * Main encoding type and basic combinators.
         , module Data.TypedEncoding.Internal.Types.Enc
-        -- * Existentially quantified version of Enc
-        , module Data.TypedEncoding.Internal.Types.SomeEnc
+        -- * Untyped version and existentially quantified versions of Enc
+        , module Data.TypedEncoding.Internal.Types.CheckedEnc
         -- * Not verified encoded data
-        , module Data.TypedEncoding.Internal.Types.Unchecked
+        , module Data.TypedEncoding.Internal.Types.UncheckedEnc
         -- * Commmon types
         , module Data.TypedEncoding.Internal.Types.Common
     ) where
 
 import           Data.TypedEncoding.Internal.Types.Enc
-import           Data.TypedEncoding.Internal.Types.SomeEnc
-import           Data.TypedEncoding.Internal.Types.Unchecked
+import           Data.TypedEncoding.Internal.Types.CheckedEnc
+import           Data.TypedEncoding.Internal.Types.UncheckedEnc
 import           Data.TypedEncoding.Internal.Types.Common
 
 

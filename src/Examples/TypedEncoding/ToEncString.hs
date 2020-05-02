@@ -169,10 +169,10 @@ data SimplifiedEmailF a = SimplifiedEmailF {
 
 type SimplifiedEmail = SimplifiedEmailF (PartHeader, B.ByteString)
 
-type SimplifiedEmailEncB = SimplifiedEmailF (SomeEnc () B.ByteString)
+type SimplifiedEmailEncB = SimplifiedEmailF (CheckedEnc () B.ByteString)
 
 -- TODO
--- type SimplifiedEmailEncT = SimplifiedEmailF (SomeEnc () T.Text)
+-- type SimplifiedEmailEncT = SimplifiedEmailF (CheckedEnc () T.Text)
 
 tstEmail :: SimplifiedEmail
 tstEmail = SimplifiedEmailF {
@@ -186,32 +186,33 @@ tstEmail = SimplifiedEmailF {
   }
 
 -- | 
--- This example encodes fields in 'SimplifiedEmailF' into existentially quantified over encoding
--- @SomeEnc () B.ByteString@.
+-- This example encodes fields in 'SimplifiedEmailF' into an untyped version of @Enc@ which 
+-- stores encoding at the value level: 
+-- @CheckedEnc () B.ByteString@.
 -- 
--- This example uses 'Unchecked' (also existentially quantified over encoding) that can easily represent
--- parts of the email
+-- This example uses 'UncheckedEnc' type (that stores encoding information at the value level as well).
+-- 'UncheckedEnc'  that can easily represent parts of the email
 --
 -- >>> let part = parts tstEmail L.!! 2
 -- >>> part
 -- (["enc-B64","r-UTF8"],"U29tZSBVVEY4IFRleHQ=")
--- >>> let unchecked = toUnchecked (fst part) () (snd part)
+-- >>> let unchecked = toUncheckedEnc (fst part) () (snd part)
 -- >>> unchecked 
--- MkUnchecked ["enc-B64","r-UTF8"] () "U29tZSBVVEY4IFRleHQ="
+-- MkUncheckedEnc ["enc-B64","r-UTF8"] () "U29tZSBVVEY4IFRleHQ="
 --
 -- We can play 'Alternative' ('<|>') game (we acually use @Maybe@) with final option being a 'RecreateEx' error:
 --
--- >>> verifyUnchecked' @'["enc-B64","r-ASCII"] $ unchecked
+-- >>> verifyUncheckedEnc' @'["enc-B64","r-ASCII"] $ unchecked
 -- Nothing
--- >>> verifyUnchecked' @'["enc-B64","r-UTF8"] $ unchecked
+-- >>> verifyUncheckedEnc' @'["enc-B64","r-UTF8"] $ unchecked
 -- Just (Right (MkEnc Proxy () "U29tZSBVVEY4IFRleHQ="))
 --
--- Since the data is heterogeneous (each piece has a different encoding annotation), we need wrap the result in another existential type: 'SomeEnc'.
+-- Since the data is heterogeneous (each piece has a different encoding annotation), we need wrap the result in another plain ADT: 'CheckedEnc'.
 -- 
--- 'SomeEnc' is similar to 'Unchecked' with the difference that the only (safe) way to get values of this type is
+-- 'CheckedEnc' is similar to 'UncheckedEnc' with the difference that the only (safe) way to get values of this type is
 -- from properly encoded 'Enc' values. 
 --
--- Using 'unsafeSomeEnc' would break type safety here. 
+-- Using 'unsafeCheckedEnc' would break type safety here. 
 -- 
 -- It is important to handle all cases during encoding so decoding errors become impossible.
 --
@@ -223,20 +224,20 @@ recreateEncoding = mapM encodefn
         -- | simplified parse header assumes email has the same layout as encodings
         -- image is ingored, since [enc-B64] annotation on ByteString permits base 64
         -- encoded bytes
-        parseHeader :: PartHeader -> [SomeAnn]
+        parseHeader :: PartHeader -> [EncAnn]
         parseHeader ["enc-B64","image"] = ["enc-B64"] 
         parseHeader x = x
 
-        encodefn :: (PartHeader, B.ByteString) -> Either RecreateEx (SomeEnc () B.ByteString)
+        encodefn :: (PartHeader, B.ByteString) -> Either RecreateEx (CheckedEnc () B.ByteString)
         encodefn (parth, body) = 
           runAlternatives' (fromMaybe def) [try1, try2, try3, try4, try5] body
           where
-              unchecked = toUnchecked (parseHeader parth) () 
-              try1 = fmap (fmap toSomeEnc) . verifyUnchecked' @'["enc-B64","r-UTF8"] . unchecked
-              try2 = fmap (fmap toSomeEnc) . verifyUnchecked' @'["enc-B64","r-ASCII"] . unchecked
-              try3 = fmap (fmap toSomeEnc) . verifyUnchecked' @'["r-ASCII"] . unchecked
-              try4 = fmap (fmap toSomeEnc) . verifyUnchecked' @'["r-UTF8"] . unchecked
-              try5 = fmap (fmap toSomeEnc) . verifyUnchecked' @'["enc-B64"] . unchecked
+              unchecked = toUncheckedEnc (parseHeader parth) () 
+              try1 = fmap (fmap toCheckedEnc) . verifyUncheckedEnc' @'["enc-B64","r-UTF8"] . unchecked
+              try2 = fmap (fmap toCheckedEnc) . verifyUncheckedEnc' @'["enc-B64","r-ASCII"] . unchecked
+              try3 = fmap (fmap toCheckedEnc) . verifyUncheckedEnc' @'["r-ASCII"] . unchecked
+              try4 = fmap (fmap toCheckedEnc) . verifyUncheckedEnc' @'["r-UTF8"] . unchecked
+              try5 = fmap (fmap toCheckedEnc) . verifyUncheckedEnc' @'["enc-B64"] . unchecked
               def =  Left $ recreateErrUnknown ("Invalid Header " ++ show parth) 
 
 
@@ -247,40 +248,40 @@ recreateEncoding = mapM encodefn
 -- (like trying to decode base 64 on a plain text part).
 --
 -- >>> decodeB64ForTextOnly <$> recreateEncoding tstEmail
--- Right (SimplifiedEmailF {emailHeader = "Some Header", parts = [MkSomeEnc ["enc-B64"] () "U29tZSBBU0NJSSBUZXh0",MkSomeEnc ["r-ASCII"] () "Some ASCII Text",MkSomeEnc ["r-UTF8"] () "Some UTF8 Text",MkSomeEnc ["r-ASCII"] () "Some ASCII plain text"]})
+-- Right (SimplifiedEmailF {emailHeader = "Some Header", parts = [MkCheckedEnc ["enc-B64"] () "U29tZSBBU0NJSSBUZXh0",MkCheckedEnc ["r-ASCII"] () "Some ASCII Text",MkCheckedEnc ["r-UTF8"] () "Some UTF8 Text",MkCheckedEnc ["r-ASCII"] () "Some ASCII plain text"]})
 --
--- Combinator @fromSomeEnc \@'["enc-B64", "r-UTF8"]@ acts as a selector and picks only the
+-- Combinator @fromCheckedEnc \@'["enc-B64", "r-UTF8"]@ acts as a selector and picks only the
 -- @["enc-B64", "r-UTF8"]@ values from our 'Traversable' type. 
 --
 -- We play the ('<|>') game on all the selectors we want picking and decoding right pieces only.
 --
 -- Imagine this is one of the pieces:
 --
--- >>> let piece = unsafeSomeEnc ["enc-B64","r-ASCII"] () ("U29tZSBBU0NJSSBUZXh0" :: B.ByteString)
+-- >>> let piece = unsafeCheckedEnc ["enc-B64","r-ASCII"] () ("U29tZSBBU0NJSSBUZXh0" :: B.ByteString)
 -- >>> displ piece
--- "MkSomeEnc [enc-B64,r-ASCII] () (ByteString U29tZSBBU0NJSSBUZXh0)"
+-- "MkCheckedEnc [enc-B64,r-ASCII] () (ByteString U29tZSBBU0NJSSBUZXh0)"
 --
 -- This code will not pick it up:
 --
--- >>> fromSomeEnc @ '["enc-B64", "r-UTF8"] $ piece
+-- >>> fromCheckedEnc @ '["enc-B64", "r-UTF8"] $ piece
 -- Nothing
 --
 -- But this one will:
 --
--- >>> fromSomeEnc @ '["enc-B64", "r-ASCII"]  $ piece
+-- >>> fromCheckedEnc @ '["enc-B64", "r-ASCII"]  $ piece
 -- Just (MkEnc Proxy () "U29tZSBBU0NJSSBUZXh0")
 --
 -- so we can apply the decoding on the selected piece 
 --
--- >>> fmap (toSomeEnc . decodePart @'["enc-B64"]) . fromSomeEnc @ '["enc-B64", "r-ASCII"] $ piece
--- Just (MkSomeEnc ["r-ASCII"] () "Some ASCII Text")
+-- >>> fmap (toCheckedEnc . decodePart @'["enc-B64"]) . fromCheckedEnc @ '["enc-B64", "r-ASCII"] $ piece
+-- Just (MkCheckedEnc ["r-ASCII"] () "Some ASCII Text")
 
 decodeB64ForTextOnly :: SimplifiedEmailEncB -> SimplifiedEmailEncB
 decodeB64ForTextOnly = fmap (runAlternatives fromMaybe [tryUtf8, tryAscii]) 
   where
-    tryUtf8, tryAscii :: SomeEnc c B.ByteString -> Maybe (SomeEnc c B.ByteString)
-    tryUtf8 = fmap (toSomeEnc . decodeToUtf8) . fromSomeEnc @ '["enc-B64", "r-UTF8"] 
-    tryAscii = fmap (toSomeEnc . decodeToAscii) . fromSomeEnc @ '["enc-B64", "r-ASCII"] 
+    tryUtf8, tryAscii :: CheckedEnc c B.ByteString -> Maybe (CheckedEnc c B.ByteString)
+    tryUtf8 = fmap (toCheckedEnc . decodeToUtf8) . fromCheckedEnc @ '["enc-B64", "r-UTF8"] 
+    tryAscii = fmap (toCheckedEnc . decodeToAscii) . fromCheckedEnc @ '["enc-B64", "r-ASCII"] 
  
     decodeToUtf8 :: Enc '["enc-B64", "r-UTF8"] c B.ByteString -> _
     decodeToUtf8 = decodePart @'["enc-B64"]

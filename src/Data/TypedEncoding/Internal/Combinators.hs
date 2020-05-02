@@ -20,32 +20,32 @@ import           GHC.TypeLits
 -- >>> import qualified Data.Text as T
 -- >>> import           Data.Word
 
--- * Converting 'Unchecked' to 'Enc'
+-- * Converting 'UncheckedEnc' to 'Enc'
 
 -- | Maybe signals annotation mismatch, effect @f@ is not evaluated unless there is match
-verifyUnchecked :: forall (xs :: [Symbol]) f c str . (
+verifyUncheckedEnc :: forall (xs :: [Symbol]) f c str . (
                      RecreateFAll f xs c str
                      , RecreateErr f
                      , Applicative f
                      , KnownAnnotation xs
                    ) 
                    =>
-                   Unchecked c str
+                   UncheckedEnc c str
                    ->  Maybe (f (Enc xs c str))
 
-verifyUnchecked x = 
+verifyUncheckedEnc x = 
     -- let perr = Proxy :: Proxy "e-mismatch"
     --in  
       case verifyAnn @xs x of
             Left err -> Nothing -- asRecreateErr_ perr $ Left err
-            Right (MkUnchecked _ c str) -> Just $ recreateFAll . toEncoding c $ str
+            Right (MkUncheckedEnc _ c str) -> Just $ recreateFAll . toEncoding c $ str
 
 
-verifyUnchecked' :: forall (xs :: [Symbol]) c str . (
+verifyUncheckedEnc' :: forall (xs :: [Symbol]) c str . (
                      RecreateFAll (Either RecreateEx) xs c str
                      , KnownAnnotation xs
                    ) 
                    =>
-                   Unchecked c str
+                   UncheckedEnc c str
                    ->  Maybe (Either RecreateEx (Enc xs c str))
-verifyUnchecked' = verifyUnchecked
+verifyUncheckedEnc' = verifyUncheckedEnc

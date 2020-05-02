@@ -45,7 +45,7 @@ instance HasA () c where
 
 
 class KnownAnnotation (xs::[Symbol]) where 
-    knownAnn :: [SomeAnn]
+    knownAnn :: [EncAnn]
 
 instance KnownAnnotation '[] where
     knownAnn = []
@@ -64,9 +64,9 @@ instance (KnownAnnotation xs, KnownSymbol x) => KnownAnnotation (x ': xs) where
 class Displ x where 
     displ :: x -> String
 
-instance Displ SomeAnn where
+instance Displ EncAnn where
     displ = id 
-instance Displ [SomeAnn] where 
+instance Displ [EncAnn] where 
     displ x = "[" ++ L.intercalate "," (map displ x) ++ "]"
 instance Displ T.Text where
     displ x = "(Text " ++ T.unpack x ++ ")"

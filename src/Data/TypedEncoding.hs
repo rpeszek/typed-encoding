@@ -109,26 +109,29 @@ module Data.TypedEncoding (
     , module Data.TypedEncoding.Internal.Combinators
     -- * Types
     , Enc
-    , SomeEnc
-    , Unchecked (..)
+    , CheckedEnc
+    , SomeEnc (..)
+    , UncheckedEnc (..)
     , EncodeEx(..)
     , RecreateEx(..)
     , UnexpectedDecodeEx(..)
-    , SomeAnn 
+    , EncAnn 
     -- * Basic @Enc@ Combinators
     , getPayload 
     , unsafeSetPayload
     , fromEncoding
     , toEncoding
+    -- * Basic @CheckedEnc@ Combinators  
+    , unsafeCheckedEnc
+    , getCheckedPayload
+    , getCheckedEncPayload
+    , toCheckedEnc
+    , fromCheckedEnc
     -- * Basic @SomeEnc@ Combinators  
-    , unsafeSomeEnc
-    , getSomePayload
-    , getSomeEncPayload
-    , toSomeEnc
-    , fromSomeEnc
-    -- * Basic @Unchecked@ Combinators
-    , toUnchecked
-    , getUncheckedAnn
+    , withSomeEnc
+    -- * Basic @UncheckedEnc@ Combinators
+    , toUncheckedEnc
+    , getUncheckedEncAnn
     , verifyAnn
      -- * Other Basic Combinators     
     , recreateErrUnknown
@@ -142,7 +145,7 @@ module Data.TypedEncoding (
 --                                               , unsafeSetPayload
 --                                               , toEncoding
 --                                               , fromEncoding
---                                               , SomeEnc
+--                                               , CheckedEnc
 --                                                )
 import           Data.TypedEncoding.Internal.Types
 import           Data.TypedEncoding.Internal.Class

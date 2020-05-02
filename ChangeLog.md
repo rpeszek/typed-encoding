@@ -10,12 +10,13 @@
        * Changed typeclass name from 'Subset' to 'Superset'
        * flipped type parameters on FlattenAs, HasA typeclass functions
        * Removed Proxy parameters from several methods (few methods have a '_' backward compatible version which still has them)
- - new functionality
+  - new functionality
     - 'ToEncString' - class allowing to convert types to `Enc` encoded strings
     - 'FromEncString' - class reverses ToEncString
     - 'KnownAnnotation' class
-    - 'SomeEnc' existential type for (valid) encodings
-    - 'Unchecked' existential type for not validated encodings
+    - 'CheckedEnc' untyped version of `Enc` containing valid encoding
+    - 'SomeEnc' existentially quantified version of `Enc` 
+    - 'UncheckedEnc' contains not validated encoding
     - 'RecreateExUnkStep' constructor in RecreateEx
     -  utility 'IsStringR' - utility class, reversing 'IsString' class
   - minor  
