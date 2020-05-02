@@ -1,25 +1,19 @@
 
 {-# LANGUAGE PolyKinds #-}
 {-# LANGUAGE DataKinds #-}
-{-# LANGUAGE OverloadedStrings #-}
+-- {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE AllowAmbiguousTypes #-}
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE AllowAmbiguousTypes #-}
 {-# LANGUAGE FlexibleContexts #-}
 
 module Data.TypedEncoding.Internal.Combinators where
 
-import           Data.String
-import           Data.Proxy
-import           Text.Read
 import           Data.TypedEncoding.Internal.Types
-import           Data.TypedEncoding.Internal.Class.IsStringR
+import           Data.TypedEncoding.Internal.Class.IsStringR ()
 import           Data.TypedEncoding.Internal.Class.Recreate
 import           Data.TypedEncoding.Internal.Class.Util (KnownAnnotation)
-import qualified Data.List as L
 import           GHC.TypeLits
-import           Data.Maybe
 
 -- $setup
 -- >>> :set -XTypeApplications

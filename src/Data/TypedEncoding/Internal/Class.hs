@@ -28,7 +28,6 @@ import           Data.TypedEncoding.Internal.Types (Enc(..)
                                                    , withUnsafeCoerce)
 import           Data.Functor.Identity
 import           GHC.TypeLits
-import           Data.Semigroup ((<>))
 
 
 -- TODO would be nice to have EncodeFAll1 and DecodeFAll1 that starts

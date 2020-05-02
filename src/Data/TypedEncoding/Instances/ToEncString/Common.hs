@@ -24,9 +24,6 @@ import           Data.TypedEncoding.Internal.Class.IsStringR
 
 import           Data.String
 import           Data.Proxy
-import           GHC.TypeLits
-import           Data.Char
-import           Data.String
 import           Data.Word
 import           Text.Read
 import           Data.Functor.Identity

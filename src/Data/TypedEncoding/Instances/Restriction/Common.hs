@@ -7,14 +7,12 @@
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE AllowAmbiguousTypes #-}
 {-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE TypeApplications #-}
 
 -- | Common restrictions "r-" instances
 module Data.TypedEncoding.Instances.Restriction.Common where
 
 import           Data.Word
 import           Data.String
-import           Data.Proxy
 
 -- import qualified Data.ByteString as B
 -- import qualified Data.ByteString.Lazy as BL

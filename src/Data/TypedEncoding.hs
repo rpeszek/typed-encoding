@@ -1,10 +1,7 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
-{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE DataKinds #-}
 
 -- |
--- Main Module in typed-encoding. 
---
 -- = Overview
 --
 -- This library allows to specify and work with types like
@@ -27,6 +24,13 @@
 -- upper = ...
 -- @
 --
+-- or define precise types to use with 'toEncString' and 'fromEncString'
+-- 
+-- @
+-- ipAdd :: Enc '["r-IpV4"] Text
+-- ipAdd = toEncString ...
+-- @
+--
 -- Primary focus of type-encodings is to provide type safe
 --
 -- * /encoding/
@@ -36,6 +40,13 @@
 --
 -- of string-like data (@ByteString@, @Text@) that is subject of some
 -- encoding or formatting restrictions.
+--
+-- as well as
+--
+-- * /toEncString/ 
+-- * /fromEncString/ 
+--
+-- conversions.
 --
 -- = Groups of annotations
 --
@@ -67,14 +78,16 @@
 -- 
 -- = Usage
 --
--- To use this library import this module and one or more "instance" modules.
+-- To use this library import this module and one or more /instance/ module.
 --
 -- Here is list of instance modules available in typed-encoding library itself
 --
 -- * "Data.TypedEncoding.Instances.Enc.Base64"
+-- * "Data.TypedEncoding.Instances.Restriction.Common" 
 -- * "Data.TypedEncoding.Instances.Restriction.ASCII" 
 -- * "Data.TypedEncoding.Instances.Restriction.UTF8" 
 -- * "Data.TypedEncoding.Instances.Do.Sample" 
+-- * "Data.TypedEncoding.Instances.ToEncString.Common" 
 -- 
 -- This list is not intended to be exhaustive, rather separate libraries
 -- can provide instances for other encodings and transformations.
@@ -92,7 +105,7 @@ module Data.TypedEncoding (
     module Data.TypedEncoding
     -- * Classes
     , module Data.TypedEncoding.Internal.Class
-    -- * Common combinators
+    -- * Combinators
     , module Data.TypedEncoding.Internal.Combinators
     -- * Types
     , Enc
@@ -102,18 +115,18 @@ module Data.TypedEncoding (
     , RecreateEx(..)
     , UnexpectedDecodeEx(..)
     , SomeAnn 
-    -- * Basic Enc Combinators
+    -- * Basic @Enc@ Combinators
     , getPayload 
     , unsafeSetPayload
     , fromEncoding
     , toEncoding
-    -- * Basic SomeEnc Combinators  
+    -- * Basic @SomeEnc@ Combinators  
     , unsafeSomeEnc
     , getSomePayload
     , getSomeEncPayload
     , toSomeEnc
     , fromSomeEnc
-    -- * Basic Unchecked Combinators
+    -- * Basic @Unchecked@ Combinators
     , toUnchecked
     , getUncheckedAnn
     , verifyAnn

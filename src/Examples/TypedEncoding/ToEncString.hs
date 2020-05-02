@@ -16,30 +16,33 @@
 
 -- |
 -- This module shows use of 'ToEncString' and 'FromEncString'
--- and demostrates composite string encoding.
+-- and demostrates /composite/ encoding.
 --
--- Classing @Show@ and @Read@ use a very permissive String causing 
--- error on read. This approach provide safety in decoding the string.
+-- Classing @Show@ and @Read@ use a very permissive String type likely resulting in 
+-- read errors. This approach provides type safety over decoding process.
 --
--- Even more intersting is the non-homogenious case where consituent 
+-- This module includes an interesting, non-homogenious case where consituent 
 -- data elements do not have the same encoding. This is discussed
 -- in the simplified email example.
+--
+-- Examples here could be made more type safe with use of dependently typed
+-- concepts like @Vect@, @HList@ or variant equivalents of these types.
+--
+-- Current version of typed-encoding does not have dependecies on such types. 
 module Examples.TypedEncoding.ToEncString where
 
 import           Data.TypedEncoding
 import qualified Data.TypedEncoding.Instances.Support as EnT
-import           Data.TypedEncoding.Instances.Restriction.Common
-import           Data.TypedEncoding.Instances.ToEncString.Common
-import           Data.TypedEncoding.Instances.Enc.Base64
-import           Data.TypedEncoding.Instances.Restriction.ASCII
-import           Data.TypedEncoding.Instances.Restriction.UTF8
+import           Data.TypedEncoding.Instances.Restriction.Common ()
+import           Data.TypedEncoding.Instances.ToEncString.Common ()
+import           Data.TypedEncoding.Instances.Enc.Base64 ()
+import           Data.TypedEncoding.Instances.Restriction.ASCII ()
+import           Data.TypedEncoding.Instances.Restriction.UTF8 ()
 
 import           Data.Word
 import           Data.Functor.Identity
 import qualified Data.Text as T
 import qualified Data.ByteString as B
-import           GHC.TypeLits
-import           Data.Proxy
 import           Control.Applicative -- ((<|>))
 import           Data.Maybe
 
@@ -57,6 +60,7 @@ type IpV4 = IpV4F Word8
 -- | 
 -- In this example all data fields have the same type. 
 -- This simplifies encoding work as all fields will be encoded the same way.
+-- We use IP address since all fields are single byte size.
 data IpV4F a = IpV4F {
      oct1 :: a
      , oct2 :: a
@@ -70,10 +74,10 @@ tstIp = IpV4F 128 1 1 10
 
 
 -- |
--- In this example @toEncString@ converts 'IpV4' to @Enc @"r-IPv4" Text@.
+-- In this example @toEncString@ converts 'IpV4' to @Enc '["r-IPv4"] Text@.
 --  
 -- This is done with help of existing @"r-Word8-decimal"@ annotation defined
--- in 'Data.TypedEncoding.Instances.Restriction.Common'
+-- in "Data.TypedEncoding.Instances.Restriction.Common"
 --
 -- >>> toEncString @"r-IPv4" @T.Text tstIp
 -- MkEnc Proxy () "128.1.1.10"
@@ -85,12 +89,26 @@ tstIp = IpV4F 128 1 1 10
 -- >>> let reduce = EnT.foldEncStr @'["r-IPv4"] @'["r-Word8-decimal"] () fn
 -- >>>  displ . reduce . fmap toEncString $ tstIp
 -- "MkEnc '[r-IPv4] () 128.1.1.10" 
+--
+-- Note lack of type safety here, the same code would work just fine if we added
+-- 5th field to 'IpV4F' constructor.  
+--
+-- Using something like a dependently typed
+--
+-- @
+-- Vect 4 (Enc '["r-Word8-decimal"] () T.Text)
+-- @ 
+-- 
+-- would have improved this situation.
+-- @HList@ could be used for record types with heterogeneous fields.
+--
+-- Currently, 'type-encoding' library does not have these types in scope.  
 instance ToEncString "r-IPv4" T.Text Identity IpV4 where
     toEncStringF = Identity . reduce . map
       where map :: IpV4F Word8 -> IpV4F (Enc '["r-Word8-decimal"] () T.Text) 
             map = fmap toEncString
 
-            reduce :: IpV4F (Enc '["r-Word8-decimal"] () T.Text) -> (Enc '["r-IPv4"] () T.Text) 
+            reduce :: IpV4F (Enc '["r-Word8-decimal"] () T.Text) -> Enc '["r-IPv4"] () T.Text 
             reduce = EnT.foldEncStr () (\a b-> if b == "" then a else a <> "." <> b) 
 
 -- |
@@ -107,6 +125,9 @@ instance ToEncString "r-IPv4" T.Text Identity IpV4 where
 -- 
 -- The conversion of a list to IpV4F needs handle errors but these errors 
 -- are considered unexpected.
+--
+-- Note, again, the error condition exposed by this implemementation could have been avoided
+-- if 'EnT.splitPayload' returned fixed size @Vect 4@.
 instance (UnexpectedDecodeErr f, Applicative f) => FromEncString IpV4 f T.Text "r-IPv4" where   
     fromEncStringF = fmap map . unreduce
       where unreduce :: Enc '["r-IPv4"] () T.Text -> f (IpV4F (Enc '["r-Word8-decimal"] () T.Text))
@@ -165,10 +186,10 @@ tstEmail = SimplifiedEmailF {
   }
 
 -- | 
--- This exmple encodes fields in 'SimplifiedEmailF' into existentially quantified
+-- This example encodes fields in 'SimplifiedEmailF' into existentially quantified over encoding
 -- @SomeEnc () B.ByteString@.
 -- 
--- This example uses existentially quantified 'Unchecked' type that can easily represent
+-- This example uses 'Unchecked' (also existentially quantified over encoding) that can easily represent
 -- parts of the email
 --
 -- >>> let part = parts tstEmail L.!! 2
@@ -193,6 +214,9 @@ tstEmail = SimplifiedEmailF {
 -- Using 'unsafeSomeEnc' would break type safety here. 
 -- 
 -- It is important to handle all cases during enconding so decoding errors become impossible.
+--
+-- Again, use of dependently typed variant types that could enumerate all possible encodings
+-- would made this code nicer.
 recreateEncoding :: SimplifiedEmail -> Either RecreateEx SimplifiedEmailEncB
 recreateEncoding = mapM encodefn
   where 
@@ -205,27 +229,27 @@ recreateEncoding = mapM encodefn
 
         encodefn :: (PartHeader, B.ByteString) -> Either RecreateEx (SomeEnc () B.ByteString)
         encodefn (parth, body) = 
-          runAlternatives' (fromMaybe def) [try1, try2, try3, try4, try5] $ body
+          runAlternatives' (fromMaybe def) [try1, try2, try3, try4, try5] body
           where
               unchecked = toUnchecked (parseHeader parth) () 
-              try1 = (fmap (fmap toSomeEnc)) . verifyUnchecked' @'["enc-B64","r-UTF8"] . unchecked
-              try2 = (fmap (fmap toSomeEnc)) . verifyUnchecked' @'["enc-B64","r-ASCII"] . unchecked
-              try3 = (fmap (fmap toSomeEnc)) . verifyUnchecked' @'["r-ASCII"] . unchecked
-              try4 = (fmap (fmap toSomeEnc)) . verifyUnchecked' @'["r-UTF8"] . unchecked
-              try5 = (fmap (fmap toSomeEnc)) . verifyUnchecked' @'["enc-B64"] . unchecked
+              try1 = fmap (fmap toSomeEnc) . verifyUnchecked' @'["enc-B64","r-UTF8"] . unchecked
+              try2 = fmap (fmap toSomeEnc) . verifyUnchecked' @'["enc-B64","r-ASCII"] . unchecked
+              try3 = fmap (fmap toSomeEnc) . verifyUnchecked' @'["r-ASCII"] . unchecked
+              try4 = fmap (fmap toSomeEnc) . verifyUnchecked' @'["r-UTF8"] . unchecked
+              try5 = fmap (fmap toSomeEnc) . verifyUnchecked' @'["enc-B64"] . unchecked
               def =  Left $ recreateErrUnknown ("Invalid Header " ++ show parth) 
 
 
 -- | 
 -- Example decodes parts of email that are base 64 encoded text and nothing else.
 --
--- This provides a type safety making sure that we do not decode certain parts of email
--- that would not decode correctly (like trying to decode base 64 on a plain text part).
+-- This provides a type safety assurance that we do not decode certain parts of email
+-- (like trying to decode base 64 on a plain text part).
 --
 -- >>> decodeB64ForTextOnly <$> recreateEncoding tstEmail
 -- Right (SimplifiedEmailF {emailHeader = "Some Header", parts = [MkSomeEnc ["enc-B64"] () "U29tZSBBU0NJSSBUZXh0",MkSomeEnc ["r-ASCII"] () "Some ASCII Text",MkSomeEnc ["r-UTF8"] () "Some UTF8 Text",MkSomeEnc ["r-ASCII"] () "Some ASCII plain text"]})
 --
--- Combinator @fromSomeEnc @ '["enc-B64", "r-UTF8"]@ acts as a selector and pick only the
+-- Combinator @fromSomeEnc \@'["enc-B64", "r-UTF8"]@ acts as a selector and picks only the
 -- @["enc-B64", "r-UTF8"]@ values from our 'Traversable' type. 
 --
 -- We play the ('<|>') game on all the selectors we want picking and decoding right pieces only.
@@ -246,7 +270,7 @@ recreateEncoding = mapM encodefn
 -- >>> fromSomeEnc @ '["enc-B64", "r-ASCII"]  $ piece
 -- Just (MkEnc Proxy () "U29tZSBBU0NJSSBUZXh0")
 --
--- so we can apply the decoding on selected piece correctly
+-- so we can apply the decoding on the selected piece 
 --
 -- >>> fmap (toSomeEnc . decodePart @'["enc-B64"]) . fromSomeEnc @ '["enc-B64", "r-ASCII"] $ piece
 -- Just (MkSomeEnc ["r-ASCII"] () "Some ASCII Text")
@@ -265,20 +289,15 @@ decodeB64ForTextOnly = fmap (runAlternatives fromMaybe [tryUtf8, tryAscii])
     decodeToAscii = decodePart @'["enc-B64"]
 
 
+-- * Helpers
 
-
-
-
-
-
--- * Helper instances and utils
-
+-- | Provides easy to read encoding information
 instance Displ a => Displ (IpV4F a) where
     displ = show . fmap displ
 
+-- | Provides easy to read encoding information
 instance Displ a => Displ (SimplifiedEmailF a) where
     displ = show . fmap displ    
-
 
 runAlternatives' :: Alternative f => (f b -> b) -> [a -> f b] -> a -> b
 runAlternatives' defF fns = defF . alternatives fns
@@ -287,5 +306,5 @@ runAlternatives :: Alternative f => (a -> f b -> b) -> [a -> f b] -> a -> b
 runAlternatives defF fns a = defF a . alternatives fns $ a
 
 alternatives :: Alternative f => [a -> f b] -> a -> f b
-alternatives fns a = foldr (<|>) empty . map ($ a) $ fns
+alternatives fns a = foldr ((<|>) . ($ a)) empty fns
 

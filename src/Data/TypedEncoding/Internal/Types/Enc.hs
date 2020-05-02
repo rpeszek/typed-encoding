@@ -1,12 +1,11 @@
 {-# LANGUAGE GADTs #-}
 {-# LANGUAGE PolyKinds #-}
-{-# LANGUAGE DeriveFunctor #-}
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE TypeApplications #-}
+-- {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE AllowAmbiguousTypes #-}
 -- {-# LANGUAGE RankNTypes #-}
 
@@ -16,8 +15,6 @@
 module Data.TypedEncoding.Internal.Types.Enc where
 
 import           Data.Proxy
-import           Data.Functor.Identity
-import           GHC.TypeLits
 
 import           Data.TypedEncoding.Internal.Class.Util
 
@@ -42,7 +39,7 @@ instance (KnownAnnotation xs, Show c, Displ str) => Displ ( Enc xs c str) where
 
 
 toEncoding :: conf -> str -> Enc '[] conf str
-toEncoding conf str = MkEnc Proxy conf str
+toEncoding = MkEnc Proxy 
 
 fromEncoding :: Enc '[] conf str -> str
 fromEncoding = getPayload
@@ -52,7 +49,7 @@ fromEncoding = getPayload
 -- especially since these are always used in combo with asRecreateErr_ or asUnexpected 
 
 implTranF :: Functor f => (str -> f str) -> Enc enc1 conf str -> f (Enc enc2 conf str)
-implTranF f  = implTranF' (\c -> f)
+implTranF f  = implTranF' (const f)
 
 
 implDecodeF :: Functor f => (str -> f str) -> Enc enc1 conf str -> f (Enc enc2 conf str)
@@ -63,7 +60,7 @@ implCheckPrevF = implTranF
 
 
 implTranF' :: Functor f =>  (conf -> str -> f str) -> Enc enc1 conf str -> f (Enc enc2 conf str)
-implTranF' f (MkEnc _ conf str) = (MkEnc Proxy conf) <$> f conf str
+implTranF' f (MkEnc _ conf str) = MkEnc Proxy conf <$> f conf str
 
 
 implDecodeF' :: Functor f =>  (conf -> str -> f str) -> Enc enc1 conf str -> f (Enc enc2 conf str)
@@ -86,11 +83,11 @@ getPayload :: Enc enc conf str -> str
 getPayload (MkEnc _ _ str) = str
 
 unsafeSetPayload :: conf -> str -> Enc enc conf str 
-unsafeSetPayload c str = MkEnc Proxy c str
+unsafeSetPayload  = MkEnc Proxy 
 
 withUnsafeCoerce ::  (s1 -> s2) -> Enc e1 c s1 -> Enc e2 c s2
-withUnsafeCoerce f (MkEnc _ conf str)  = (MkEnc Proxy conf (f str)) 
+withUnsafeCoerce f (MkEnc _ conf str)  = MkEnc Proxy conf (f str)
 
 unsafeChangePayload ::  (s1 -> s2) -> Enc e c s1 -> Enc e c s2
-unsafeChangePayload f (MkEnc p conf str)  = (MkEnc p conf (f str)) 
+unsafeChangePayload f (MkEnc p conf str)  = MkEnc p conf (f str) 
 

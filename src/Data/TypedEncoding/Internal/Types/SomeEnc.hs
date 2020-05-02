@@ -1,6 +1,5 @@
 {-# LANGUAGE GADTs #-}
 {-# LANGUAGE PolyKinds #-}
-{-# LANGUAGE DeriveFunctor #-}
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE FlexibleInstances #-}
@@ -18,8 +17,6 @@ module Data.TypedEncoding.Internal.Types.SomeEnc where
 import           Data.TypedEncoding.Internal.Types.Enc
 
 import           Data.Proxy
-import           Data.Functor.Identity
-import           GHC.TypeLits
 import           Data.TypedEncoding.Internal.Class.Util
 import           Data.TypedEncoding.Internal.Types.Common
 

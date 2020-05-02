@@ -14,11 +14,8 @@
 module Data.TypedEncoding.Instances.Restriction.UTF8 where
 
 import           Data.TypedEncoding.Instances.Support
--- import           Data.TypedEncoding.Internal.Util (proxiedId)
-import           Data.TypedEncoding.Unsafe (withUnsafe)
 
 import           Data.Proxy
-import           Data.Functor.Identity
 import           GHC.TypeLits
 
 import qualified Data.ByteString as B
@@ -28,13 +25,8 @@ import qualified Data.Text.Lazy as TL
 import qualified Data.Text.Encoding as TE 
 import qualified Data.Text.Lazy.Encoding as TEL 
 
-import qualified Data.ByteString.Char8 as B8
-import qualified Data.ByteString.Lazy.Char8 as BL8
-
-import           GHC.TypeLits
-import           Data.Char
-import           Control.Arrow
-import           Data.Text.Encoding.Error (UnicodeException)
+-- import qualified Data.ByteString.Char8 as B8
+-- import qualified Data.ByteString.Lazy.Char8 as BL8
 
 import           Data.Either
 

@@ -18,15 +18,15 @@ module Examples.TypedEncoding.Conversions where
 import           Data.TypedEncoding
 import qualified Data.TypedEncoding.Instances.Enc.Base64 as EnB64
 import qualified Data.TypedEncoding.Instances.Restriction.ASCII as EnASCII
-import qualified Data.TypedEncoding.Instances.Restriction.UTF8  as EnUTF8
-
-import           Data.Proxy
+-- import qualified Data.TypedEncoding.Instances.Restriction.UTF8  as EnUTF8
 
 import qualified Data.Text as T
 import qualified Data.ByteString as B
 
 -- $setup
 -- >>> :set -XOverloadedStrings -XMultiParamTypeClasses -XDataKinds -XTypeApplications
+-- >>> import           Data.TypedEncoding.Instances.Restriction.UTF8 ()
+-- >>> import           Data.Proxy
 --
 -- This module contains some ghci friendly values to play with.
 --
@@ -68,7 +68,7 @@ helloUtf8B = inject helloAsciiB
 -- 
 -- We should be able to convert the ASCII version.
 --
--- This is done using 'Subset' typeclass.
+-- This is done using 'Superset' typeclass.
 --
 -- @inject@ method accepts proxy to specify superset to use.
 --

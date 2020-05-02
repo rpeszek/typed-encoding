@@ -15,11 +15,19 @@ mydata :: Enc '["enc-B64"] ByteString
 myData :: Enc '["enc-B64", "r-UTF8"] ByteString
 ```
 
+It allows to define precise string content annotations like:
+
+```Haskell
+mydata :: Enc '["r-IpV4"] Text
+```
+
 and provides ways for 
    - encoding
    - decoding
    - recreation (encoding validation)
    - type conversions
+   - converting types to encoded strings
+   - typesafe conversion of encoded strings to types
 
 ... but this approach seems to be a bit more...
 
@@ -43,6 +51,11 @@ Here are some code examples:
    - [Adding a new encoding, error handling](src/Examples/TypedEncoding/DiySignEncoding.hs)
    - [Unsafe - working inside encodings](src/Examples/TypedEncoding/Unsafe.hs)
  
+
+## Hackage
+
+https://hackage.haskell.org/package/typed-encoding
+
 ## Dependencies on other encoding libs
 
 Currently it uses

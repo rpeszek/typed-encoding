@@ -29,14 +29,9 @@ module Examples.TypedEncoding.DiySignEncoding where
 import           Data.TypedEncoding
 import qualified Data.TypedEncoding.Instances.Support as EnT
 
-import           Data.Proxy
-import           Data.Functor.Identity
-import           GHC.TypeLits
-
 import qualified Data.Text as T
 import           Data.Char
 import           Data.Semigroup ((<>))
-import           Control.Arrow
 import           Text.Read (readMaybe)
 
 -- $setup

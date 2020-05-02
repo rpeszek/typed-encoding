@@ -19,16 +19,12 @@
 module Examples.TypedEncoding.Overview where
 
 import           Data.TypedEncoding
-import           Data.TypedEncoding.Instances.Enc.Base64
-import           Data.TypedEncoding.Instances.Restriction.ASCII
+import           Data.TypedEncoding.Instances.Enc.Base64 ()
+import           Data.TypedEncoding.Instances.Restriction.ASCII ()
 import           Data.TypedEncoding.Instances.Do.Sample
  
-import           GHC.TypeLits
 import qualified Data.ByteString as B
-import qualified Data.ByteString.Lazy as BL
 import qualified Data.Text as T
-import           Data.Proxy
-import           Data.Functor.Identity
 
 
 -- $setup
@@ -104,7 +100,7 @@ helloB64B64 = encodeAll . toEncoding () $ "Hello World"
 -- >>> helloB64B64PartDecode == helloB64
 -- True
 helloB64B64PartDecode :: Enc '["enc-B64"] () B.ByteString
-helloB64B64PartDecode = decodePart @'["enc-B64"] $ helloB64B64
+helloB64B64PartDecode = decodePart @'["enc-B64"] helloB64B64
 
 -- | 'helloB64B64' all the way to 'B.ByteString'
 --
@@ -158,7 +154,7 @@ helloTitleRev = encodeAll . toEncoding () $ "HeLLo world"
 -- * Configuration
 
 -- | Example configuration
-data Config = Config {
+newtype Config = Config {
     sizeLimit :: SizeLimit
   } deriving (Show)
 exampleConf = Config (SizeLimit 8) 
@@ -200,7 +196,7 @@ helloLimitB64 = encodeAll . toEncoding exampleConf $ "HeLlo world"
 -- >>> decodePart @'["enc-B64"] $ helloLimitB64
 -- MkEnc Proxy (Config {sizeLimit = SizeLimit {unSizeLimit = 8}}) "HeLlo wo"
 helloRevLimitParDec :: Enc '["do-size-limit"] Config B.ByteString
-helloRevLimitParDec =  decodePart @'["enc-B64"] $ helloLimitB64
+helloRevLimitParDec =  decodePart @'["enc-B64"] helloLimitB64
 
 
 

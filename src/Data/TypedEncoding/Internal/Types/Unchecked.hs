@@ -1,6 +1,5 @@
 {-# LANGUAGE GADTs #-}
 {-# LANGUAGE PolyKinds #-}
-{-# LANGUAGE DeriveFunctor #-}
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE FlexibleInstances #-}
@@ -15,11 +14,7 @@
 
 module Data.TypedEncoding.Internal.Types.Unchecked where
 
-import           Data.TypedEncoding.Internal.Types.Enc
-
 import           Data.Proxy
-import           Data.Functor.Identity
-import           GHC.TypeLits
 import           Data.TypedEncoding.Internal.Class.Util
 import           Data.TypedEncoding.Internal.Types.Common
 
@@ -42,7 +37,7 @@ verifyAnn :: forall xs c str . KnownAnnotation xs => Unchecked c str -> Either S
 verifyAnn x@(MkUnchecked xs _ _) = 
     let p = Proxy :: Proxy xs
     in if knownAnn @ xs == xs
-       then Right $ x
+       then Right x
        else Left $ "Unchecked has not matching annotation " ++ displ xs
 
 -- |

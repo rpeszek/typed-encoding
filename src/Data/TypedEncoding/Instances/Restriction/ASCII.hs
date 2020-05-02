@@ -3,7 +3,6 @@
 {-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TypeApplications #-}
 
 -- | Strings can move to 'Enc "r-ASCII' only if they contain only ascii characters.
@@ -19,8 +18,6 @@ module Data.TypedEncoding.Instances.Restriction.ASCII where
 import           Data.TypedEncoding.Instances.Support
 
 import           Data.Proxy
-import           Data.Functor.Identity
-import           GHC.TypeLits
 
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Lazy as BL
@@ -68,7 +65,7 @@ instance Superset "r-UTF8" "r-ASCII" where
 -- Encondings  --
 -----------------
 
-data NonAsciiChar = NonAsciiChar Char deriving (Eq, Show)
+newtype NonAsciiChar = NonAsciiChar Char deriving (Eq, Show)
 
 prxyAscii = Proxy :: Proxy "r-ASCII"
 

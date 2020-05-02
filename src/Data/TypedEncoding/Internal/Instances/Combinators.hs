@@ -3,8 +3,8 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE AllowAmbiguousTypes #-}
-{-# LANGUAGE TypeApplications #-}
+-- {-# LANGUAGE AllowAmbiguousTypes #-}
+-- {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE AllowAmbiguousTypes #-}
 {-# LANGUAGE FlexibleContexts #-}
 
@@ -14,12 +14,8 @@ import           Data.String
 import           Data.Proxy
 import           Text.Read
 import           Data.TypedEncoding.Internal.Types
-import           Data.TypedEncoding.Internal.Class.IsStringR
-import           Data.TypedEncoding.Internal.Class.Recreate
-import           Data.TypedEncoding.Internal.Class.Util (KnownAnnotation)
-import qualified Data.List as L
+import           Data.TypedEncoding.Internal.Class.IsStringR 
 import           GHC.TypeLits
-import           Data.Maybe
 
 -- $setup
 -- >>> :set -XTypeApplications
@@ -33,7 +29,7 @@ import           Data.Maybe
 foldEnc :: forall (xs2 :: [Symbol]) (xs1 :: [Symbol]) f c s1 s2 
            . (Foldable f, Functor f) 
            => c -> (s1 -> s2 -> s2) -> s2 -> f (Enc xs1 c s1) -> Enc xs2 c s2
-foldEnc c f sinit ts = unsafeSetPayload c . foldr f sinit . fmap getPayload $ ts
+foldEnc c f sinit = unsafeSetPayload c . foldr f sinit . fmap getPayload 
 
 -- | Similar to 'foldEnc', assumes that destination payload has @IsString@ instance and uses @""@ as base case. 
 foldEncStr :: forall (xs2 :: [Symbol]) (xs1 :: [Symbol]) f c s1 s2 
@@ -46,7 +42,7 @@ foldEncStr c f = foldEnc c f ""
 foldSomeEnc :: forall (xs2 :: [Symbol]) f c s1 s2 
              . (Foldable f, Functor f) 
              => c -> ([SomeAnn] -> s1 -> s2 -> s2) -> s2 -> f (SomeEnc c s1) -> Enc xs2 c s2
-foldSomeEnc c f sinit ts = unsafeSetPayload c . foldr (uncurry f) sinit . fmap getSomeEncPayload $ ts
+foldSomeEnc c f sinit = unsafeSetPayload c . foldr (uncurry f) sinit . fmap getSomeEncPayload
 
 -- | Similar to 'foldEncStr', works with untyped 'SomeEnc'
 foldSomeEncStr :: forall (xs2 :: [Symbol]) f c s1 s2 . (Foldable f, Functor f, IsString s2) => c -> ([SomeAnn] -> s1 -> s2 -> s2) -> f (SomeEnc c s1) -> Enc xs2 c s2
@@ -83,7 +79,7 @@ splitSomePayload f (MkSomeEnc ann1 c s1) = map (\(ann2, s2) -> MkSomeEnc ann2 c 
 -- Right "123"
 verifyWithRead :: forall a str . (IsStringR str, IsString str, Read a, Show a) => String -> str -> Either String str
 verifyWithRead msg x = 
-    let s = toString $ x
+    let s = toString x
         a :: Maybe a = readMaybe s
         check = (show <$> a) == Just s 
     in if check

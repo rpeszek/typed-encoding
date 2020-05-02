@@ -30,7 +30,7 @@ import           GHC.TypeLits
 -- | TODO use singletons definition instead?
 type family Append (xs :: [k]) (ys :: [k]) :: [k] where
     Append '[] xs = xs
-    Append (y ': ys) xs = y ': (Append ys xs)
+    Append (y ': ys) xs = y ': Append ys xs
 
 
 -- | Polymorphic data payloads used to encode/decode
@@ -67,7 +67,7 @@ class Displ x where
 instance Displ SomeAnn where
     displ = id 
 instance Displ [SomeAnn] where 
-    displ x = "[" ++ (L.intercalate "," $ map displ $ x) ++ "]"
+    displ x = "[" ++ L.intercalate "," (map displ x) ++ "]"
 instance Displ T.Text where
     displ x = "(Text " ++ T.unpack x ++ ")"
 instance Displ TL.Text where
