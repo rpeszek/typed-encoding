@@ -28,7 +28,7 @@ import           Data.TypedEncoding.Internal.Types.Common
 -- | Represents some encoded string where encoding was not validated.
 --
 -- Similar to 'Data.TypedEncoding.Internal.Types.SomeEnc' but unlike
--- 'SomeEnc' it can contain payloads that have invalid encoding.
+-- @SomeEnc@ it can contain payloads that have invalid encoding.
 -- 
 data Unchecked c str = MkUnchecked [SomeAnn] c str deriving (Show, Eq)
 

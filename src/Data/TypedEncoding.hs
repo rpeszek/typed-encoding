@@ -27,8 +27,8 @@
 -- or define precise types to use with 'toEncString' and 'fromEncString'
 -- 
 -- @
--- ipAdd :: Enc '["r-IpV4"] Text
--- ipAdd = toEncString ...
+-- date :: Enc '["r-date-%d/%b/%Y:%X %Z"] Text
+-- date = toEncString ...
 -- @
 --
 -- Primary focus of type-encodings is to provide type safe
