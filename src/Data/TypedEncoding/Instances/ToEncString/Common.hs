@@ -11,6 +11,7 @@
 {-# LANGUAGE AllowAmbiguousTypes #-}
 {-# LANGUAGE OverloadedStrings #-}
 
+-- | Common 'ToEncString' and 'FromEncString' instances.
 module Data.TypedEncoding.Instances.ToEncString.Common where
 
 

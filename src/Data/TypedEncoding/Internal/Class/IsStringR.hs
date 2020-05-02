@@ -21,14 +21,17 @@ import qualified Data.Text.Lazy as TL
 -- >>> import Test.QuickCheck.Instances.Text()
 -- >>> import Test.QuickCheck.Instances.ByteString()
 
--- | reverses 'Data.String.IsString'
+-- | Reverses 'Data.String.IsString'
+--
 -- laws:
+--
 -- @
 --  toString . fromString == id
 --  fromString . toString == id
 -- @
 --
--- Note: ByteString is not a valid instance, need ByteString "r-ASCII", or "r-UTF8"
+-- Note: ByteString is not a valid instance, ByteString "r-ASCII", or "r-UTF8" would
+-- be needed.
 -- @B.unpack $ B.pack "\160688" == "\176"@
 class IsStringR a where
     toString :: a -> String

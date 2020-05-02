@@ -8,6 +8,7 @@
 {-# LANGUAGE AllowAmbiguousTypes #-}
 {-# LANGUAGE FlexibleContexts #-}
 
+-- | Combinators that can be helpful in instance creation.
 module Data.TypedEncoding.Internal.Instances.Combinators where
 
 import           Data.String
@@ -25,7 +26,9 @@ import           GHC.TypeLits
 
 -- * Composite encodings from 'Foldable' 'Functor' types
 
--- | allows to fold payload in Enc to create another Enc, assumes homogenious input encodings.
+-- | allows to fold payload in Enc to create another Enc, assumes homogeneous input encodings.
+-- This yields not a type safe code, better implementation code should use fixed size
+-- dependently typed @Vect n@ or some @HList@ like foldable.
 foldEnc :: forall (xs2 :: [Symbol]) (xs1 :: [Symbol]) f c s1 s2 
            . (Foldable f, Functor f) 
            => c -> (s1 -> s2 -> s2) -> s2 -> f (Enc xs1 c s1) -> Enc xs2 c s2
@@ -37,7 +40,6 @@ foldEncStr :: forall (xs2 :: [Symbol]) (xs1 :: [Symbol]) f c s1 s2
              => c -> (s1 -> s2 -> s2) -> f (Enc xs1 c s1) -> Enc xs2 c s2
 foldEncStr c f = foldEnc c f ""
 
--- TODO pass SomeAnn to fold
 -- | Similar to 'foldEnc', works with untyped 'SomeEnc'
 foldSomeEnc :: forall (xs2 :: [Symbol]) f c s1 s2 
              . (Foldable f, Functor f) 

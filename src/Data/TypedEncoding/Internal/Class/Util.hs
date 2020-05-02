@@ -27,7 +27,7 @@ import           GHC.TypeLits
 -- $setup
 -- >>> :set -XScopedTypeVariables -XTypeApplications -XAllowAmbiguousTypes -XDataKinds
 
--- | TODO use singletons definition instead?
+-- | TODO should this be imported from somewhere?
 type family Append (xs :: [k]) (ys :: [k]) :: [k] where
     Append '[] xs = xs
     Append (y ': ys) xs = y ': Append ys xs
@@ -85,6 +85,3 @@ instance Displ BL.ByteString where
 instance (KnownAnnotation xs) => Displ (Proxy xs) where
     displ _ = displ $  knownAnn @ xs
         -- "[" ++ (L.intercalate "," $ map displ $ knownAnn @ xs) ++ "]"
-
-
-

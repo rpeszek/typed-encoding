@@ -27,8 +27,11 @@ import           Data.TypedEncoding.Internal.Types.Common
 
 -- * Untyped Enc
 
--- | Untyped version of Enc. SomeEnc contains some verfied encoding, encoding is visible
--- at value level only.
+-- | Represents some validated encoded string. 
+--
+-- @SomeEnc@ is untyped version of 'Data.TypedEncoding.Internal.Types.Enc.Enc'. 
+-- @SomeEnc@ contains verified encoded data, encoding is visible
+-- at the value level only.
 data SomeEnc conf str where
     -- | constructor is to be treated as Unsafe to Encode and Decode instance implementations
     -- particular encoding instances may expose smart constructors for limited data types
@@ -91,5 +94,3 @@ proc_fromSomeEncToSomeEnc x = (== Just x) . fromSomeEnc . toSomeEnc $ x
 instance (Show c, Displ str) => Displ (SomeEnc c str) where
     displ (MkSomeEnc xs c s) = 
         "MkSomeEnc " ++ displ xs  ++ " " ++ show c ++ " " ++ displ s
-
-

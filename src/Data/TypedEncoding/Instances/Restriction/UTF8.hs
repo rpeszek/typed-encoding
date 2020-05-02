@@ -10,7 +10,7 @@
 {-# LANGUAGE PartialTypeSignatures #-}
 {-# LANGUAGE TypeApplications #-}
 
--- | 
+-- | 'UTF-8' encoding
 module Data.TypedEncoding.Instances.Restriction.UTF8 where
 
 import           Data.TypedEncoding.Instances.Support

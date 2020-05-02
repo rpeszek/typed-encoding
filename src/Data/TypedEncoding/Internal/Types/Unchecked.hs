@@ -25,6 +25,11 @@ import           Data.TypedEncoding.Internal.Types.Common
 
 -- * Unchecked for recreate, similar to SomeEnc only not verified
 
+-- | Represents some encoded string where encoding was not validated.
+--
+-- Similar to 'Data.TypedEncoding.Internal.Types.SomeEnc' but unlike
+-- 'SomeEnc' it can contain payloads that have invalid encoding.
+-- 
 data Unchecked c str = MkUnchecked [SomeAnn] c str deriving (Show, Eq)
 
 toUnchecked :: [SomeAnn] -> c -> str -> Unchecked c str

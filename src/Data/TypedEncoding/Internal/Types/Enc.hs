@@ -22,7 +22,8 @@ import           Data.TypedEncoding.Internal.Class.Util
 -- >>> :set -XOverloadedStrings -XMultiParamTypeClasses -XDataKinds -XAllowAmbiguousTypes
 -- >>> import qualified Data.Text as T
 
--- Not a Functor on purpose
+-- This type contains type level encoding information as well as
+-- configuration and payload.
 data Enc enc conf str where
     -- | constructor is to be treated as Unsafe to Encode and Decode instance implementations
     -- particular encoding instances may expose smart constructors for limited data types
@@ -90,4 +91,3 @@ withUnsafeCoerce f (MkEnc _ conf str)  = MkEnc Proxy conf (f str)
 
 unsafeChangePayload ::  (s1 -> s2) -> Enc e c s1 -> Enc e c s2
 unsafeChangePayload f (MkEnc p conf str)  = MkEnc p conf (f str) 
-

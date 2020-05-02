@@ -2,7 +2,7 @@
 Type level annotations, string transformations, and other goodies that make programming strings safer.
 
 ## Motivation
-I have recently spent a lot of time troubleshooting various `Base64`, `quoted-printable`, and `Utf8` encoding issues.  
+I have recently spent a lot of time troubleshooting various `Base64`, `quoted-printable`, and `UTF-8` encoding issues.  
 I decided to write a library that will help avoiding issues like these.
 
 This library allows to specify and work with types like

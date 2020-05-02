@@ -20,9 +20,7 @@ import           GHC.TypeLits
 -- >>> import qualified Data.Text as T
 -- >>> import           Data.Word
 
-
-
--- * unchecked to encoding
+-- * Converting 'Unchecked' to 'Enc'
 
 -- | Maybe signals annotation mismatch, effect @f@ is not evaluated unless there is match
 verifyUnchecked :: forall (xs :: [Symbol]) f c str . (
@@ -51,4 +49,3 @@ verifyUnchecked' :: forall (xs :: [Symbol]) c str . (
                    Unchecked c str
                    ->  Maybe (Either RecreateEx (Enc xs c str))
 verifyUnchecked' = verifyUnchecked
-

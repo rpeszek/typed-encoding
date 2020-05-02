@@ -13,9 +13,13 @@
 
 module Data.TypedEncoding.Internal.Types (
         module Data.TypedEncoding.Internal.Types
+        -- * Main encoding type and basic combinators.
         , module Data.TypedEncoding.Internal.Types.Enc
+        -- * Existentially quantified version of Enc
         , module Data.TypedEncoding.Internal.Types.SomeEnc
+        -- * Not verified encoded data
         , module Data.TypedEncoding.Internal.Types.Unchecked
+        -- * Commmon types
         , module Data.TypedEncoding.Internal.Types.Common
     ) where
 
@@ -33,7 +37,6 @@ import           GHC.TypeLits
 -- $setup
 -- >>> :set -XOverloadedStrings -XMultiParamTypeClasses -XDataKinds -XAllowAmbiguousTypes
 -- >>> import qualified Data.Text as T
-
 
 
 -- | Represents errors in recovery (recreation of encoded types).
@@ -59,7 +62,6 @@ data EncodeEx where
 
 instance Show EncodeEx where
     show (EncodeEx prxy a) = "(EncodeEx \"" ++ symbolVal prxy ++ "\" (" ++ show a ++ "))"
-
 
 
 -- | Type safety over encodings makes decoding process safe.

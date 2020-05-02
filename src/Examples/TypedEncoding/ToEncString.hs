@@ -16,19 +16,19 @@
 
 -- |
 -- This module shows use of 'ToEncString' and 'FromEncString'
--- and demostrates /composite/ encoding.
+-- and demonstrates /composite/ encoding.
 --
 -- Classing @Show@ and @Read@ use a very permissive String type likely resulting in 
 -- read errors. This approach provides type safety over decoding process.
 --
--- This module includes an interesting, non-homogenious case where consituent 
+-- This module includes an interesting, non-homogenious case where constituent 
 -- data elements do not have the same encoding. This is discussed
 -- in the simplified email example.
 --
 -- Examples here could be made more type safe with use of dependently typed
 -- concepts like @Vect@, @HList@ or variant equivalents of these types.
 --
--- Current version of typed-encoding does not have dependecies on such types. 
+-- Current version of typed-encoding does not have dependencies on such types. 
 module Examples.TypedEncoding.ToEncString where
 
 import           Data.TypedEncoding
@@ -126,7 +126,7 @@ instance ToEncString "r-IPv4" T.Text Identity IpV4 where
 -- The conversion of a list to IpV4F needs handle errors but these errors 
 -- are considered unexpected.
 --
--- Note, again, the error condition exposed by this implemementation could have been avoided
+-- Note, again, the error condition exposed by this implementation could have been avoided
 -- if 'EnT.splitPayload' returned fixed size @Vect 4@.
 instance (UnexpectedDecodeErr f, Applicative f) => FromEncString IpV4 f T.Text "r-IPv4" where   
     fromEncStringF = fmap map . unreduce
@@ -213,7 +213,7 @@ tstEmail = SimplifiedEmailF {
 --
 -- Using 'unsafeSomeEnc' would break type safety here. 
 -- 
--- It is important to handle all cases during enconding so decoding errors become impossible.
+-- It is important to handle all cases during encoding so decoding errors become impossible.
 --
 -- Again, use of dependently typed variant types that could enumerate all possible encodings
 -- would made this code nicer.
@@ -307,4 +307,3 @@ runAlternatives defF fns a = defF a . alternatives fns $ a
 
 alternatives :: Alternative f => [a -> f b] -> a -> f b
 alternatives fns a = foldr ((<|>) . ($ a)) empty fns
-

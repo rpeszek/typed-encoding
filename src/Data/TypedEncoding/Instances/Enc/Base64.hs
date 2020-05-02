@@ -5,6 +5,7 @@
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE TypeApplications #-}
 
+-- | Defines /Base64/ encoding
 module Data.TypedEncoding.Instances.Enc.Base64 where
 
 import           Data.TypedEncoding

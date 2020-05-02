@@ -62,8 +62,8 @@ decodePart :: forall (xs :: [Symbol]) xsf c str .  DecodeFAll Identity xs c str 
               -> Enc xsf c str
 decodePart = decodePart_ (Proxy :: Proxy xs)              
 
--- | With type safety in pace decoding errors should be unexpected
--- this class can be used to provide extra info if decoding could fail
+-- | With type safety in place decoding errors should be unexpected.
+-- This class can be used to provide extra info if decoding could fail
 class UnexpectedDecodeErr f where 
     unexpectedDecodeErr :: UnexpectedDecodeEx -> f a
 

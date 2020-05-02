@@ -8,7 +8,7 @@
 {-# LANGUAGE AllowAmbiguousTypes #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 
--- | Common restrictions "r-" instances
+-- | Common /restriction/ "r-" instances
 module Data.TypedEncoding.Instances.Restriction.Common where
 
 import           Data.Word
