@@ -14,18 +14,13 @@
 
 module Examples.TypedEncoding.Unsafe where
 
-
-import           Data.Proxy
-
 import qualified Data.Text as T
-
-import           Data.Char
+import           Data.Semigroup ((<>))
 
 import           Data.TypedEncoding
-import qualified Data.TypedEncoding.Instances.ASCII as EnASCII
 import qualified Data.TypedEncoding.Unsafe as Unsafe
+import qualified Data.TypedEncoding.Instances.Restriction.ASCII()
 
-import           Data.Semigroup ((<>))
 
 -- $setup
 -- >>> :set -XOverloadedStrings -XMultiParamTypeClasses -XDataKinds
@@ -48,6 +43,8 @@ Right exAsciiT = exAsciiTE
 -- >>> recreateFAll . toEncoding () $ newPayload :: Either RecreateEx (Enc '["r-ASCII"] () T.Text)
 -- Right (MkEnc Proxy () "HELLO some extra stuff")
 --
+-- Alternatively, 'UncheckedEnc' type can be used in recreation, see 'Examples.TypedEncoding.Overview'
+-- 
 modifiedAsciiT :: Either RecreateEx (Enc '["r-ASCII"] () T.Text)
 modifiedAsciiT =  recreateFAll . toEncoding () . ( <> " some extra stuff") . getPayload $ exAsciiT
   
@@ -70,7 +67,7 @@ modifiedAsciiT =  recreateFAll . toEncoding () . ( <> " some extra stuff") . get
 -- but @Enc '["r-ASCII"] () T.Text@ does not expose it
 -- We use Functor instance of Unsafe wrapper type to accomplish this
 toLowerAscii :: Either EncodeEx (Enc '["r-ASCII"] () T.Text)
-toLowerAscii = exAsciiTE >>= pure . Unsafe.withUnsafe (fmap T.toLower)
+toLowerAscii = Unsafe.withUnsafe (fmap T.toLower) <$> exAsciiTE
 
 -- | 
 -- Similar example uses applicative instance of 'Unsafe.Unsafe'

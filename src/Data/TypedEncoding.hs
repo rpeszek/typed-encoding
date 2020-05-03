@@ -1,10 +1,7 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
-{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE DataKinds #-}
 
 -- |
--- Main Module in typed-encoding. 
---
 -- = Overview
 --
 -- This library allows to specify and work with types like
@@ -27,6 +24,13 @@
 -- upper = ...
 -- @
 --
+-- or define precise types to use with 'toEncString' and 'fromEncString'
+-- 
+-- @
+-- date :: Enc '["r-date-%d/%b/%Y:%X %Z"] Text
+-- date = toEncString ...
+-- @
+--
 -- Primary focus of type-encodings is to provide type safe
 --
 -- * /encoding/
@@ -36,6 +40,13 @@
 --
 -- of string-like data (@ByteString@, @Text@) that is subject of some
 -- encoding or formatting restrictions.
+--
+-- as well as
+--
+-- * /toEncString/ 
+-- * /fromEncString/ 
+--
+-- conversions.
 --
 -- = Groups of annotations
 --
@@ -67,14 +78,16 @@
 -- 
 -- = Usage
 --
--- To use this library import this module and one or more "instance" modules.
+-- To use this library import this module and one or more /instance/ module.
 --
 -- Here is list of instance modules available in typed-encoding library itself
 --
--- * "Data.TypedEncoding.Instances.Base64"
--- * "Data.TypedEncoding.Instances.ASCII" 
--- * "Data.TypedEncoding.Instances.UTF8" 
--- * "Data.TypedEncoding.Instances.Encode.Sample" 
+-- * "Data.TypedEncoding.Instances.Enc.Base64"
+-- * "Data.TypedEncoding.Instances.Restriction.Common" 
+-- * "Data.TypedEncoding.Instances.Restriction.ASCII" 
+-- * "Data.TypedEncoding.Instances.Restriction.UTF8" 
+-- * "Data.TypedEncoding.Instances.Do.Sample" 
+-- * "Data.TypedEncoding.Instances.ToEncString.Common" 
 -- 
 -- This list is not intended to be exhaustive, rather separate libraries
 -- can provide instances for other encodings and transformations.
@@ -92,25 +105,36 @@ module Data.TypedEncoding (
     module Data.TypedEncoding
     -- * Classes
     , module Data.TypedEncoding.Internal.Class
+    -- * Combinators
+    , module Data.TypedEncoding.Internal.Combinators
     -- * Types
     , Enc
+    , CheckedEnc
     , EncodeEx(..)
     , RecreateEx(..)
     , UnexpectedDecodeEx(..)
-    -- * Combinators
+    , EncAnn 
+    -- * Existentially quantified version of @Enc@ and basic combinators
+    , module Data.TypedEncoding.Internal.Types.SomeEnc
+    -- * Types and combinators for not verfied encoding 
+    , module Data.TypedEncoding.Internal.Types.UncheckedEnc
+    -- * Basic @Enc@ Combinators
     , getPayload 
     , unsafeSetPayload
     , fromEncoding
     , toEncoding
+    -- * Basic @CheckedEnc@ Combinators  
+    , unsafeCheckedEnc
+    , getCheckedPayload
+    , getCheckedEncPayload
+    , toCheckedEnc
+    , fromCheckedEnc
+    -- * Other Basic Combinators     
+    , recreateErrUnknown
  ) where
 
-import           Data.TypedEncoding.Internal.Types (Enc
-                                              , RecreateEx(..)
-                                              , UnexpectedDecodeEx(..)
-                                              , EncodeEx(..)
-                                              , getPayload
-                                              , unsafeSetPayload
-                                              , toEncoding
-                                              , fromEncoding
-                                               )
+import           Data.TypedEncoding.Internal.Types
+import           Data.TypedEncoding.Internal.Types.SomeEnc
+import           Data.TypedEncoding.Internal.Types.UncheckedEnc
 import           Data.TypedEncoding.Internal.Class
+import           Data.TypedEncoding.Internal.Combinators

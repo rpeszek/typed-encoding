@@ -1,5 +1,5 @@
 name:                typed-encoding
-version:             0.1.0.0
+version:             0.2.0.0
 github:              "rpeszek/typed-encoding"
 license:             BSD3
 author:              "Robert Peszek"
@@ -27,14 +27,18 @@ description:  See README.md in the project github repository.
 
 dependencies:
 - base >= 4.7 && < 5
-- bytestring >= 0.10 && < 0.11
-- text >= 1.2 && < 1.3
-- base64-bytestring >= 1.0 && < 1.1
+- bytestring
+- text
+- base64-bytestring
+# - symbols
 
 
 library:
   source-dirs: src
-
+  ghc-options:
+    - -fwarn-unused-imports
+    - -fwarn-incomplete-patterns
+    - -fprint-explicit-kinds
 
 tests:
   typed-encoding-test:
@@ -57,8 +61,8 @@ tests:
     - -with-rtsopts=-N
     dependencies:
     - typed-encoding
-    - QuickCheck  >= 2.13.1 && < 2.14
-    - quickcheck-instances >= 0.3.20 && < 0.4
-    - doctest >= 0.16 && < 0.17
-    - doctest-discover >= 0.2 && < 0.3
+    - QuickCheck
+    - quickcheck-instances
+    - doctest
+    - doctest-discover
   

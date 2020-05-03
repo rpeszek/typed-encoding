@@ -5,6 +5,8 @@
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TypeApplications #-}
+
 -- {-# LANGUAGE PartialTypeSignatures #-}
 
 -- | Simple DIY encoding example that "signs" Text with its length.
@@ -27,14 +29,9 @@ module Examples.TypedEncoding.DiySignEncoding where
 import           Data.TypedEncoding
 import qualified Data.TypedEncoding.Instances.Support as EnT
 
-import           Data.Proxy
-import           Data.Functor.Identity
-import           GHC.TypeLits
-
 import qualified Data.Text as T
 import           Data.Char
 import           Data.Semigroup ((<>))
-import           Control.Arrow
 import           Text.Read (readMaybe)
 
 -- $setup
@@ -104,7 +101,6 @@ hacker =
 -- >>> recreateFAll . toEncoding () $ payload :: Either RecreateEx (Enc '["my-sign"] () T.Text)
 -- Right (MkEnc Proxy () "11:Hello World")
 
-prxyMySign = Proxy :: Proxy "my-sign"
 
 -- | Because encoding function is pure we can create instance of EncodeF 
 -- that is polymorphic in effect @f@. This is done using 'EnT.implTranP' combinator.
@@ -117,9 +113,9 @@ instance Applicative f => EncodeF f (Enc xs c T.Text) (Enc ("my-sign" ': xs) c T
 -- 'UnexpectedDecodeErr' has Identity instance allowing for decoding that assumes errors are not possible.
 -- For debugging purposes or when unsafe changes to "my-sign" @Error UnexpectedDecodeEx@ instance can be used.
 instance (UnexpectedDecodeErr f, Applicative f) => DecodeF f (Enc ("my-sign" ': xs) c T.Text) (Enc xs c T.Text) where
-    decodeF = EnT.implDecodeF (asUnexpected prxyMySign . decodeSign) 
+    decodeF = EnT.implDecodeF (asUnexpected @"my-sign" . decodeSign) 
 
 -- | Recreation allows effectful @f@ to check for tampering with data.
 -- Implementation simply uses 'EnT.implCheckPrevF' combinator on the recovery function.
 instance (RecreateErr f, Applicative f) => RecreateF f (Enc xs c T.Text) (Enc ("my-sign" ': xs) c T.Text) where   
-    checkPrevF = EnT.implCheckPrevF (asRecreateErr prxyMySign . decodeSign) 
+    checkPrevF = EnT.implCheckPrevF (asRecreateErr @"my-sign" . decodeSign) 

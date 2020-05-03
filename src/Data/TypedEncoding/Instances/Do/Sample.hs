@@ -7,27 +7,26 @@
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE UndecidableInstances #-}
 {-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TypeApplications #-}
 
 -- | This module defines some sample "do-" encodings
 -- currently for example use only.
-module Data.TypedEncoding.Instances.Encode.Sample where
+module Data.TypedEncoding.Instances.Do.Sample where
 
 import qualified Data.Text as T
 import qualified Data.Text.Lazy as TL
 import qualified Data.ByteString as B
 -- import qualified Data.ByteString.Lazy as BL
+import           Data.Char
 
 import           Data.TypedEncoding.Instances.Support
 
-import           Data.Proxy
-import           GHC.TypeLits
-import           Data.Char
 
 
 instance Applicative f => EncodeF f (Enc xs c T.Text) (Enc ("do-UPPER" ': xs) c T.Text) where
     encodeF = implEncodeP T.toUpper
 instance (RecreateErr f, Applicative f) => RecreateF f (Enc xs c T.Text) (Enc ("do-UPPER" ': xs) c T.Text) where
-    checkPrevF = implCheckPrevF (asRecreateErr (Proxy :: Proxy "do-UPPER") . (\t -> 
+    checkPrevF = implCheckPrevF (asRecreateErr @"do-UPPER" . (\t -> 
                                  let (g,b) = T.partition isUpper t
                                  in if T.null b
                                     then Right t
@@ -52,8 +51,8 @@ instance Applicative f => EncodeF f (Enc xs c TL.Text) (Enc ("do-reverse" ': xs)
     encodeF = implEncodeP TL.reverse    
 
 newtype SizeLimit = SizeLimit {unSizeLimit :: Int} deriving (Eq, Show)
-instance (HasA c SizeLimit, Applicative f) => EncodeF f (Enc xs c T.Text) (Enc ("do-size-limit" ': xs) c T.Text) where
-    encodeF =  implEncodeP' (T.take . unSizeLimit . has (Proxy :: Proxy SizeLimit)) 
-instance (HasA c SizeLimit, Applicative f) => EncodeF f (Enc xs c B.ByteString) (Enc ("do-size-limit" ': xs) c B.ByteString) where
-    encodeF =  implEncodeP' (B.take . unSizeLimit . has (Proxy :: Proxy SizeLimit)) 
+instance (HasA SizeLimit c, Applicative f) => EncodeF f (Enc xs c T.Text) (Enc ("do-size-limit" ': xs) c T.Text) where
+    encodeF =  implEncodeP' (T.take . unSizeLimit . has @ SizeLimit) 
+instance (HasA SizeLimit c, Applicative f) => EncodeF f (Enc xs c B.ByteString) (Enc ("do-size-limit" ': xs) c B.ByteString) where
+    encodeF =  implEncodeP' (B.take . unSizeLimit .  has @ SizeLimit) 
 

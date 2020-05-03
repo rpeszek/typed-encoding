@@ -2,7 +2,7 @@
 Type level annotations, string transformations, and other goodies that make programming strings safer.
 
 ## Motivation
-I have recently spent a lot of time troubleshooting various `Base64`, `quoted-printable`, and `Utf8` encoding issues.  
+I have recently spent a lot of time troubleshooting various `Base64`, `quoted-printable`, and `UTF-8` encoding issues.  
 I decided to write a library that will help avoiding issues like these.
 
 This library allows to specify and work with types like
@@ -15,11 +15,19 @@ mydata :: Enc '["enc-B64"] ByteString
 myData :: Enc '["enc-B64", "r-UTF8"] ByteString
 ```
 
+It allows to define precise string content annotations like:
+
+```Haskell
+mydata :: Enc '["r-IpV4"] Text
+```
+
 and provides ways for 
    - encoding
    - decoding
    - recreation (encoding validation)
    - type conversions
+   - converting types to encoded strings
+   - typesafe conversion of encoded strings to types
 
 ... but this approach seems to be a bit more...
 
@@ -37,8 +45,17 @@ Transformations can be
  
 ## Examples 
 
-Please see `Examples.TypedEncoding` it the module list.
+Here are some code examples:
+   - [Overview](src/Examples/TypedEncoding/Overview.hs)
+   - [Conversions between encodings](src/Examples/TypedEncoding/Conversions.hs)
+   - [Adding a new encoding, error handling](src/Examples/TypedEncoding/DiySignEncoding.hs)
+   - [Unsafe - working inside encodings](src/Examples/TypedEncoding/Unsafe.hs)
  
+
+## Hackage
+
+https://hackage.haskell.org/package/typed-encoding
+
 ## Dependencies on other encoding libs
 
 Currently it uses
