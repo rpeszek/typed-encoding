@@ -12,7 +12,7 @@ module Data.TypedEncoding.Internal.Combinators where
 import           Data.TypedEncoding.Internal.Types
 import           Data.TypedEncoding.Internal.Class.IsStringR ()
 import           Data.TypedEncoding.Internal.Class.Recreate
-import           Data.TypedEncoding.Internal.Class.Util (KnownAnnotation)
+import           Data.TypedEncoding.Internal.Class.Util (SymbolList)
 import           GHC.TypeLits
 
 -- $setup
@@ -27,7 +27,7 @@ verifyUncheckedEnc :: forall (xs :: [Symbol]) f c str . (
                      RecreateFAll f xs c str
                      , RecreateErr f
                      , Applicative f
-                     , KnownAnnotation xs
+                     , SymbolList xs
                    ) 
                    =>
                    UncheckedEnc c str
@@ -43,7 +43,7 @@ verifyUncheckedEnc x =
 
 verifyUncheckedEnc' :: forall (xs :: [Symbol]) c str . (
                      RecreateFAll (Either RecreateEx) xs c str
-                     , KnownAnnotation xs
+                     , SymbolList xs
                    ) 
                    =>
                    UncheckedEnc c str

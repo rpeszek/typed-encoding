@@ -7,7 +7,6 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE AllowAmbiguousTypes #-}
--- {-# LANGUAGE RankNTypes #-}
 
 -- |
 -- Internal definition of types
@@ -38,10 +37,10 @@ toUncheckedEnc = MkUncheckedEnc
 getUncheckedEncAnn :: UncheckedEnc c str -> [EncAnn]
 getUncheckedEncAnn (MkUncheckedEnc ann _ _) = ann
 
-verifyAnn :: forall xs c str . KnownAnnotation xs => UncheckedEnc c str -> Either String (UncheckedEnc c str)
+verifyAnn :: forall xs c str . SymbolList xs => UncheckedEnc c str -> Either String (UncheckedEnc c str)
 verifyAnn x@(MkUncheckedEnc xs _ _) = 
     let p = Proxy :: Proxy xs
-    in if knownAnn @ xs == xs
+    in if symbolVals @ xs == xs
        then Right x
        else Left $ "UncheckedEnc has not matching annotation " ++ displ xs
 

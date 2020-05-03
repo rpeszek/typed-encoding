@@ -13,7 +13,7 @@
   - new functionality
     - 'ToEncString' - class allowing to convert types to `Enc` encoded strings
     - 'FromEncString' - class reverses ToEncString
-    - 'KnownAnnotation' class
+    - 'SymbolList' utility class
     - 'CheckedEnc' untyped version of `Enc` containing valid encoding
     - 'SomeEnc' existentially quantified version of `Enc` 
     - 'UncheckedEnc' contains not validated encoding

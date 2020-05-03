@@ -34,7 +34,7 @@ data Enc enc conf str where
 -- >>> let disptest = unsafeSetPayload () "hello" :: Enc '["TEST"] () T.Text
 -- >>> displ disptest
 -- "MkEnc '[TEST] () (Text hello)"
-instance (KnownAnnotation xs, Show c, Displ str) => Displ ( Enc xs c str) where
+instance (SymbolList xs, Show c, Displ str) => Displ ( Enc xs c str) where
     displ (MkEnc p c s) = 
         "MkEnc '" ++ displ (Proxy :: Proxy xs) ++ " " ++ show c ++ " " ++ displ s
 

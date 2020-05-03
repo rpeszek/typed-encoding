@@ -110,12 +110,14 @@ module Data.TypedEncoding (
     -- * Types
     , Enc
     , CheckedEnc
-    , SomeEnc (..)
-    , UncheckedEnc (..)
     , EncodeEx(..)
     , RecreateEx(..)
     , UnexpectedDecodeEx(..)
     , EncAnn 
+    -- * Existentially quantified version of @Enc@ and basic combinators
+    , module Data.TypedEncoding.Internal.Types.SomeEnc
+    -- * Types and combinators for not verfied encoding 
+    , module Data.TypedEncoding.Internal.Types.UncheckedEnc
     -- * Basic @Enc@ Combinators
     , getPayload 
     , unsafeSetPayload
@@ -127,26 +129,12 @@ module Data.TypedEncoding (
     , getCheckedEncPayload
     , toCheckedEnc
     , fromCheckedEnc
-    -- * Basic @SomeEnc@ Combinators  
-    , withSomeEnc
-    -- * Basic @UncheckedEnc@ Combinators
-    , toUncheckedEnc
-    , getUncheckedEncAnn
-    , verifyAnn
-     -- * Other Basic Combinators     
+    -- * Other Basic Combinators     
     , recreateErrUnknown
  ) where
 
--- import           Data.TypedEncoding.Internal.Types (Enc
---                                               , RecreateEx(..)
---                                               , UnexpectedDecodeEx(..)
---                                               , EncodeEx(..)
---                                               , getPayload
---                                               , unsafeSetPayload
---                                               , toEncoding
---                                               , fromEncoding
---                                               , CheckedEnc
---                                                )
 import           Data.TypedEncoding.Internal.Types
+import           Data.TypedEncoding.Internal.Types.SomeEnc
+import           Data.TypedEncoding.Internal.Types.UncheckedEnc
 import           Data.TypedEncoding.Internal.Class
 import           Data.TypedEncoding.Internal.Combinators

@@ -4,21 +4,20 @@
 -- {-# LANGUAGE DataKinds #-}
 -- {-# LANGUAGE TypeOperators #-}
 -- {-# LANGUAGE FlexibleInstances #-}
--- {-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE StandaloneDeriving #-}
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE AllowAmbiguousTypes #-}
 {-# LANGUAGE RankNTypes #-}
 
 -- |
--- Internal definition of types
+-- Module defines 'CheckedEnc' - untyped ADT version of 'Enc' 
 
 module Data.TypedEncoding.Internal.Types.CheckedEnc where
 
 import           Data.TypedEncoding.Internal.Types.Enc
-
-import           Data.Proxy
-import           Data.TypedEncoding.Internal.Class.Util
 import           Data.TypedEncoding.Internal.Types.Common
+import           Data.TypedEncoding.Internal.Class.Util
+import           Data.Proxy
 
 -- $setup
 -- >>> :set -XOverloadedStrings -XMultiParamTypeClasses -XDataKinds -XAllowAmbiguousTypes
@@ -47,29 +46,19 @@ getCheckedPayload = snd . getCheckedEncPayload
 getCheckedEncPayload :: CheckedEnc conf str -> ([EncAnn], str) 
 getCheckedEncPayload (MkCheckedEnc t _ s) = (t,s)
 
-toCheckedEnc :: forall xs c str . (KnownAnnotation xs) => Enc xs c str -> CheckedEnc c str 
+toCheckedEnc :: forall xs c str . (SymbolList xs) => Enc xs c str -> CheckedEnc c str 
 toCheckedEnc (MkEnc p c s) = 
-        MkCheckedEnc (knownAnn @ xs) c s   
+        MkCheckedEnc (symbolVals @ xs) c s   
 
 
-fromCheckedEnc :: forall xs c str . KnownAnnotation xs => CheckedEnc c str -> Maybe (Enc xs c str)
+fromCheckedEnc :: forall xs c str . SymbolList xs => CheckedEnc c str -> Maybe (Enc xs c str)
 fromCheckedEnc (MkCheckedEnc xs c s) = 
     let p = Proxy :: Proxy xs
-    in if knownAnn @ xs == xs
+    in if symbolVals @ xs == xs
        then Just $ MkEnc p c s
        else Nothing
 
-
--- | Existentially quantified quanitified @Enc@
-data SomeEnc conf str where
-    MkSomeEnc :: Enc xs conf str -> SomeEnc conf str
-    
--- fromSomeEnc :: forall xs c s . SomeEnc c s -> Enc xs c s
--- fromSomeEnc (MkSomeEnc enc) = enc
-
-withSomeEnc :: SomeEnc conf str -> (forall xs . Enc xs conf str -> r) -> r
-withSomeEnc (MkSomeEnc enc) f = f enc
-
+------------------------
 
 -- |
 -- >>> let encsometest = MkCheckedEnc ["TEST"] () $ T.pack "hello"
@@ -77,19 +66,20 @@ withSomeEnc (MkSomeEnc enc) f = f enc
 -- True
 -- >>> proc_toCheckedEncFromCheckedEnc @'["TEST1"] encsometest
 -- False
-proc_toCheckedEncFromCheckedEnc :: forall xs c str . (KnownAnnotation xs, Eq c, Eq str) => CheckedEnc c str -> Bool
+proc_toCheckedEncFromCheckedEnc :: forall xs c str . (SymbolList xs, Eq c, Eq str) => CheckedEnc c str -> Bool
 proc_toCheckedEncFromCheckedEnc x = (== Just x) . fmap (toCheckedEnc @ xs) . fromCheckedEnc $ x
 
 -- |
 -- >>> let enctest = unsafeSetPayload () "hello" :: Enc '["TEST"] () T.Text
 -- >>> proc_fromCheckedEncToCheckedEnc enctest
 -- True
-proc_fromCheckedEncToCheckedEnc :: forall xs c str . (KnownAnnotation xs, Eq c, Eq str) => Enc xs c str -> Bool
+proc_fromCheckedEncToCheckedEnc :: forall xs c str . (SymbolList xs, Eq c, Eq str) => Enc xs c str -> Bool
 proc_fromCheckedEncToCheckedEnc x = (== Just x) . fromCheckedEnc . toCheckedEnc $ x
 
 -- |
--- >>> displ $ MkCheckedEnc ["TEST"] () ("hello" :: T.Text)
+-- >>> displ $ unsafeCheckedEnc ["TEST"] () ("hello" :: T.Text)
 -- "MkCheckedEnc [TEST] () (Text hello)"
 instance (Show c, Displ str) => Displ (CheckedEnc c str) where
     displ (MkCheckedEnc xs c s) = 
         "MkCheckedEnc " ++ displ xs  ++ " " ++ show c ++ " " ++ displ s
+
