@@ -45,7 +45,16 @@ Transformations can be
  
 ## Examples 
 
-Please see `Examples.TypedEncoding` it the module list.
+Here are some code examples:
+   - [Overview](src/Examples/TypedEncoding/Overview.hs)
+   - [Conversions between encodings](src/Examples/TypedEncoding/Conversions.hs)
+   - [Adding a new encoding, error handling](src/Examples/TypedEncoding/DiySignEncoding.hs)
+   - [Unsafe - working inside encodings](src/Examples/TypedEncoding/Unsafe.hs)
+ 
+
+## Hackage
+
+https://hackage.haskell.org/package/typed-encoding
 
 ## Dependencies on other encoding libs
 
