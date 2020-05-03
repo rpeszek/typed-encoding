@@ -18,17 +18,20 @@
 -- This module shows use of 'ToEncString' and 'FromEncString'
 -- and demonstrates /composite/ encoding.
 --
--- Classing @Show@ and @Read@ use a very permissive String type likely resulting in 
--- read errors. This approach provides type safety over decoding process.
+-- @Show@ and @Read@ classes use a very permissive String type. This often results in 
+-- read errors. type-encoding approach provides type safety over decoding process.
 --
--- This module includes an interesting, non-homogenious case where constituent 
--- data elements do not have the same encoding. This is discussed
--- in the simplified email example.
+-- This module includes a simplified email example. This is a non-homogenious case, 
+-- email parts do not have the same encoding. 
 --
 -- Examples here could be made more type safe with use of dependently typed
 -- concepts like @Vect@, @HList@ or variant equivalents of these types.
 --
 -- Current version of typed-encoding does not have dependencies on such types. 
+--
+-- These examples use 'CheckedEnc' when untyped version of 'Enc' is needed.
+-- Alternatively, an existentially quantified 'SomeEnc' type could have been used.
+-- Both are isomorphic.  
 module Examples.TypedEncoding.ToEncString where
 
 import           Data.TypedEncoding
@@ -154,12 +157,12 @@ type EmailHeader = String
 
 -- | This section shows a type safe processing of emails.
 --
--- This over-simplified email type has parts that can be either 
+-- 'SimplifiedEmailF' is an over-simplified email type, it has parts that can be either 
 -- 
 -- * binary and have to be Base 64 encoded or 
 -- * are text that have either UTF8 or ASCII character set 
 --
--- The text parts can be optionally can be Base 64 encoded.
+-- The text parts can be optionally can be Base 64 encoded but do not have to be.
 --
 -- For simplicity, the layout of simplified headers is assumed the same as encoding annotations in this library.
 data SimplifiedEmailF a = SimplifiedEmailF {
@@ -174,6 +177,7 @@ type SimplifiedEmailEncB = SimplifiedEmailF (CheckedEnc () B.ByteString)
 -- TODO
 -- type SimplifiedEmailEncT = SimplifiedEmailF (CheckedEnc () T.Text)
 
+-- | @tstEmail@ contains some simple data to play with
 tstEmail :: SimplifiedEmail
 tstEmail = SimplifiedEmailF {
       emailHeader = "Some Header"
@@ -187,10 +191,10 @@ tstEmail = SimplifiedEmailF {
 
 -- | 
 -- This example encodes fields in 'SimplifiedEmailF' into an untyped version of @Enc@ which 
--- stores encoding at the value level: 
+-- stores verified encoded data and encoding information is stored at the value level: 
 -- @CheckedEnc () B.ByteString@.
 -- 
--- This example uses 'UncheckedEnc' type (that stores encoding information at the value level as well).
+-- Part of email are first converted to 'UncheckedEnc' (that stores encoding information at the value level as well).
 -- 'UncheckedEnc'  that can easily represent parts of the email
 --
 -- >>> let part = parts tstEmail L.!! 2
