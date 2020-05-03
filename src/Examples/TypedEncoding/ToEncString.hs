@@ -48,6 +48,7 @@ import qualified Data.Text as T
 import qualified Data.ByteString as B
 import           Control.Applicative -- ((<|>))
 import           Data.Maybe
+import           Data.Semigroup ((<>))
 
 
 
