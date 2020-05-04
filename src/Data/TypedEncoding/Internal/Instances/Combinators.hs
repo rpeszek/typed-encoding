@@ -79,7 +79,7 @@ splitSomePayload f (MkCheckedEnc ann1 c s1) = map (\(ann2, s2) -> MkCheckedEnc a
 -- Left "Payload does not satisfy format Word8-decimal: 256"
 -- >>> verifyWithRead @Word8 "Word8-decimal" (T.pack "123")
 -- Right "123"
-verifyWithRead :: forall a str . (IsStringR str, IsString str, Read a, Show a) => String -> str -> Either String str
+verifyWithRead :: forall a str . (IsStringR str, Read a, Show a) => String -> str -> Either String str
 verifyWithRead msg x = 
     let s = toString x
         a :: Maybe a = readMaybe s

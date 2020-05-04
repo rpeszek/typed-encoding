@@ -2,6 +2,8 @@
 
 
 ## Unreleased changes
+  - dropped IsString contraint from instances in `Data.TypedEncoding.Instances.Restriction.Common`
+  - added forall annotation to ecodeAll and decodeAll
 
 ## 0.2.0.0
   - breaking:

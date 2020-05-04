@@ -50,8 +50,12 @@ tests:
     - -with-rtsopts=-N
     dependencies:
     - typed-encoding
+    - hspec
     - QuickCheck
     - quickcheck-instances
+    other-modules: 
+    - Test.Bc.IsStringRSpec
+
   typed-encoding-doctest:
     main:                Spec.hs
     source-dirs:         doctest

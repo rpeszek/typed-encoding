@@ -37,7 +37,7 @@ instance (Monad f, DecodeFAll f xs c str, DecodeF f (Enc (x ': xs) c str) (Enc x
         let re :: f (Enc xs c str) = decodeF str
         in re >>= decodeFAll
 
-decodeAll :: DecodeFAll Identity (xs :: [Symbol]) c str => 
+decodeAll :: forall xs c str . DecodeFAll Identity (xs :: [Symbol]) c str => 
               Enc xs c str
               -> Enc '[] c str
 decodeAll = runIdentity . decodeFAll 

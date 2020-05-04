@@ -4,6 +4,8 @@
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE AllowAmbiguousTypes #-}
 
+-- | This Module will be removed in 0.3.x.x in favor of 
+-- "Data.TypedEncoding.Internal.Class.Util.RevIsString"
 module Data.TypedEncoding.Internal.Class.IsStringR where
 
 import           Data.Proxy
@@ -21,7 +23,10 @@ import qualified Data.Text.Lazy as TL
 -- >>> import Test.QuickCheck.Instances.Text()
 -- >>> import Test.QuickCheck.Instances.ByteString()
 
--- | Reverses 'Data.String.IsString'
+-- | This class will be removed in 0.3.x.x in favor of RevIsStringInj and RevIsStringIso definined in 
+-- "Data.TypedEncoding.Internal.Class.Util.RevIsString"
+--
+-- Reverses 'Data.String.IsString'
 --
 -- laws:
 --

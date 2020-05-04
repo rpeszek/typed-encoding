@@ -10,7 +10,6 @@
 module Data.TypedEncoding.Internal.Combinators where
 
 import           Data.TypedEncoding.Internal.Types
-import           Data.TypedEncoding.Internal.Class.IsStringR ()
 import           Data.TypedEncoding.Internal.Class.Recreate
 import           Data.TypedEncoding.Internal.Class.Util (SymbolList)
 import           GHC.TypeLits
