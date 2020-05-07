@@ -35,46 +35,70 @@ import           Data.TypedEncoding.Internal.Util.TypeLits
 
 import           Data.TypedEncoding.Instances.Restriction.BoundedAlphaNums 
 import           Data.TypedEncoding.Internal.Types.Enc
+import           Data.Either (either)
 
 -- $setup
 -- >>> :set -XOverloadedStrings -XMultiParamTypeClasses -XDataKinds -XTypeApplications
 -- >>> import qualified Data.Text as T
 
--- better compilation errors?
-type IsBool s =
-    "bool:" == s ||
-    (CmpSymbol "bool:" s == LT && CmpSymbol "bool;" s == GT)    
+-- | Faster that @BoolOp s ~ "or"@ constraint
+type IsBoolOr s =
+    "boolOr:" == s ||
+    (CmpSymbol "boolOr:"  s == LT && CmpSymbol "boolOr;" s == GT)    
 
--- white space significant?
--- tst :: Enc '["bool-or: (r-ban:ff-ff) (r-ban:ffff)"] () T.Text
+-- | Faster that @BoolOp s ~ "and"@ constraint
+type IsBoolAnd s =
+    "boolAnd:" == s ||
+    (CmpSymbol "boolAnd:"  s == LT && CmpSymbol "boolAnd;" s == GT)    
 
--- tst :: Enc '["bool: \"r-ban:ff-ff\" | \"r-ban:ffff\""] () T.Text
--- tst = unsafeLoadPayload () "ab-1e"
 
-
--- instance (IsStringR str, KnownSymbol s, Drop 4 s ~ "boo") =>  EncodeF (Either EncodeEx) (Enc xs c str) (Enc (s ': xs) c str) where
---     encodeF = undefined
-
--- TODOs
--- create Shared module with universal Decode instance based on "r-" prefix
-
--- DOES NOT WANT TO DISAMBIGUATE
--- encodeFAll . toEncoding () $ "c59f9fb7-4621-44d9-9020-ce37bf6e2bd1" :: Either EncodeEx (Enc '["bool:r-ban:ffffffff-ffff-ffff-ffff-ffffffffffff"] () T.Text)
--- instance {-# OVERLAPPING #-} (IsBool s ~ 'True, Drop 5 s ~ t, EncodeF f (Enc xs c str) (Enc (t ': xs) c str), Functor f) => EncodeF f (Enc xs c str) (Enc (s ': xs) c str) where
---    encodeF = implChangeAnn (encodeF @f @(Enc xs c str) @(Enc (t ': xs) c str))
--- instance (IsStringR str, KnownSymbol s, IsBan s ~ 'True) =>  EncodeF (Either EncodeEx) (Enc xs c str) (Enc (s ': xs) c str) where
---     encodeF = implEncodeF @s (verifyBoundedAlphaNum (Proxy :: Proxy s))
-
-encodeBool :: forall s xs f c str t . (IsBool s ~ 'True, Drop 5 s ~ t, EncodeF f (Enc xs c str) (Enc (t ': xs) c str), Functor f) =>
-    Enc xs c str -> f (Enc (s ': xs) c str)  
-encodeBool =  implChangeAnn (encodeF @f @(Enc xs c str) @(Enc (t ': xs) c str))       
+-- TODO error handling!
+encodeBoolOr :: forall s xs f c str t1 t2 . (
+    -- BoolOp s ~ "or" 
+    IsBoolOr s ~ 'True
+    , f ~ Either EncodeEx
+    , FirstTerm s ~ t1
+    , SecondTerm s ~ t2
+    , EncodeF f (Enc xs c str) (Enc (t1 ': xs) c str) 
+    , EncodeF f (Enc xs c str) (Enc (t2 ': xs) c str) 
+    ) => Enc xs c str -> f (Enc (s ': xs) c str)  
+encodeBoolOr en0 =  
+       let 
+           ent1 :: f (Enc (t1 ': xs) c str) = encodeF en0
+           ent2 :: f (Enc (t2 ': xs) c str) = encodeF en0
+       in 
+           either (const (withUnsafeCoerce id <$> ent1)) (Right . withUnsafeCoerce id) ent2 :: f (Enc (s ': xs) c str)
 
 -- TODO displ tst1 not compiling
-tst1 = encodeBool . toEncoding () $ "c59f9fb7-4621-44d9-9020-ce37bf6e2bd1" :: Either EncodeEx (Enc '["bool:r-ban:ffffffff-ffff-ffff-ffff-ffffffffffff"] () T.Text)
-tst = encodeFAll . toEncoding () $ "c59f9fb7-4621-44d9-9020-ce37bf6e2bd1" :: Either EncodeEx (Enc '["r-ban:ffffffff-ffff-ffff-ffff-ffffffffffff"] () T.Text)
+tst1, tst2, tst3 :: Either EncodeEx (Enc '["boolOr:(r-ban:999-999-9999)(r-ban:(999) 999-9999)"] () T.Text)
+tst1 = encodeBoolOr . toEncoding () $ "212-222-3333" 
+tst2 = encodeBoolOr . toEncoding () $ "(212) 222-3333" 
+tst3 = encodeBoolOr . toEncoding () $ "212 222 3333"
 
+-- TODO error handling!
+encodeBoolAnd :: forall s xs f c str t1 t2 . (
+    -- BoolOp s ~ "and" 
+    IsBoolAnd s ~ 'True
+    , f ~ Either EncodeEx
+    , FirstTerm s ~ t1
+    , SecondTerm s ~ t2
+    , EncodeF f (Enc xs c str) (Enc (t1 ': xs) c str) 
+    , EncodeF f (Enc xs c str) (Enc (t2 ': xs) c str) 
+    ) => Enc xs c str -> f (Enc (s ': xs) c str)  
+encodeBoolAnd en0 =  
+       let 
+           ent1 :: f (Enc (t1 ': xs) c str) = encodeF en0
+           ent2 :: f (Enc (t2 ': xs) c str) = encodeF en0
+       in 
+           undefined
 
 -- * Type family based parser 
+
+-- | 
+-- This works fast with @!kind@ but is much slower in declaration 
+-- :kind! BoolOp "boolOr:()()"
+type family BoolOp (s :: Symbol) :: Symbol where
+    BoolOp s = ToLower (TakeUntil (Drop 4 s) ":")
 
 -- dropLast . takeFstParen . parenCnt $ "((AGA)(bcd))(123)" 
 -- :kind! FirstTerm "(agag)(222)"
@@ -99,18 +123,6 @@ type family LParenCnt (s :: [Symbol]) :: [(Symbol, Nat)] where
     LParenCnt ("(" ': xs) = LParenCntHelper ('(,) "(" 'Decr) (LParenCnt xs) -- '(,) "(" (LParenCntFstCnt (LParenCnt xs) - 1) ': LParenCnt xs
     LParenCnt (")" ': xs) = LParenCntHelper ('(,) ")" 'Incr) (LParenCnt xs)
     LParenCnt (x ': xs) = LParenCntHelper ('(,) x 'NoChng) (LParenCnt xs)
-
--- parenCnt :: String -> [(Char, Int)]
--- parenCnt [] = []
--- parenCnt ('(' : xs) = parenCntHelper ('(', -1) (parenCnt xs) --('(', parenCntFstCnt (parenCnt xs) - 1) : parenCnt xs
--- parenCnt (')' : xs) = parenCntHelper (')', 1) (parenCnt xs)  -- (')', parenCntFstCnt (parenCnt xs) + 1) : parenCnt xs
--- parenCnt (x : xs) = parenCntHelper (x, 0) (parenCnt xs) -- (x, parenCntFstCnt (parenCnt xs) ) : parenCnt xs
-
-
--- type family LParenCntFstCnt (si :: [(Symbol, Nat)]) :: Nat where
---     LParenCntFstCnt '[] = 0
---     LParenCntFstCnt ('(,) _ i  ': _) = i
-
 
 data Adjust = Incr | Decr | NoChng
 
@@ -145,12 +157,6 @@ type family LTakeSndParen (n :: Nat)  (si :: [(Symbol, Nat)]) :: [Symbol] where
 -- map snd . parenCnt $ "((AGA)(bcd))(123) "
 -- dropLast . takeFstParen . parenCnt $ "((AGA)(bcd))(123)" 
 -- dropLast . takeSndParen 0 . parenCnt $ "((AGA)(bcd))(123)" 
-
--- parenCnt1 :: String -> [(Char, Int)]
--- parenCnt1 [] = []
--- parenCnt1 ('(' : xs) = ('(', parenCntFstCnt (parenCnt1 xs) - 1) : parenCnt1 xs
--- parenCnt1 (')' : xs) = (')', parenCntFstCnt (parenCnt1 xs) + 1) : parenCnt1 xs
--- parenCnt1 (x : xs) = (x, parenCntFstCnt (parenCnt1 xs) ) : parenCnt1 xs
 
 parenCnt :: String -> [(Char, Int)]
 parenCnt [] = []

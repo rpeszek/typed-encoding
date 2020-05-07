@@ -52,6 +52,21 @@ type family LDrop (n :: Nat) (s :: [k]) :: [k] where
     LDrop n '[] = '[]
     LDrop n (x ': xs) = LDrop (n - 1) xs 
 
+-- |
+-- :kind! TakeUntil "findme:blah" ":"
+type family TakeUntil (s :: Symbol) (stop :: Symbol) :: Symbol where
+    TakeUntil s stop = Concat (LTakeUntil (ToList s) stop)
+
+type family LTakeUntil (s :: [Symbol]) (stop :: Symbol) :: [Symbol] where
+    LTakeUntil '[] _ = '[]
+    LTakeUntil (x ': xs) stop = LTakeUntilHelper (x ': LTakeUntil xs stop) (CmpSymbol x stop)
+
+type family LTakeUntilHelper (s :: [Symbol]) (o :: Ordering) :: [Symbol] where
+    LTakeUntilHelper '[] _ = '[]
+    LTakeUntilHelper (x ': xs) 'EQ = '[]
+    LTakeUntilHelper (x ': xs) _ = (x ': xs)
+
+
 type family Length (s :: Symbol) :: Nat where  
     Length x = LLengh (ToList x)
 
