@@ -53,7 +53,7 @@ type IsBan s =
 -- |
 -- >>> encodeFAll . toEncoding () $ "c59f9fb7-4621-44d9-9020-ce37bf6e2bd1" :: Either EncodeEx (Enc '["r-ban:ffffffff-ffff-ffff-ffff-ffffffffffff"] () T.Text)
 -- Right (MkEnc Proxy () "c59f9fb7-4621-44d9-9020-ce37bf6e2bd1")
-instance (IsStringR str, KnownSymbol s, IsBan s ~ 'True) =>  EncodeF (Either EncodeEx) (Enc xs c str) (Enc (s ': xs) c str) where
+instance {-# OVERLAPS #-} (IsStringR str, KnownSymbol s, IsBan s ~ 'True) =>  EncodeF (Either EncodeEx) (Enc xs c str) (Enc (s ': xs) c str) where
     encodeF = implEncodeF @s (verifyBoundedAlphaNum (Proxy :: Proxy s))
 
 -- |
