@@ -102,6 +102,13 @@
 --
 -- * "Data.TypedEncoding.Instances.Support"
 --
+-- Defining annotations with combinators is an alternative to using typeclass instances 
+--
+-- Included combinator modules:
+--
+-- * "Data.TypedEncoding.Combinators.Restriction.Bool"
+-- * "Data.TypedEncoding.Combinators.Restriction.BoundedAlphaNums"
+--
 -- = Examples
 --
 -- Examples of how to use this library are included in

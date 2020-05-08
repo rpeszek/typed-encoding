@@ -44,14 +44,14 @@ Transformations can be
    - applied or undone partially (if encoding is reversible)
 
 Possibly the main use of this library are encoding restrictions.   
-(Arbitrary) bounded alpha-numeric (`r-ban`) restrictions and simple boolean algerba are included.
+(Arbitrary) bounded alpha-numeric (`r-ban`) restrictions and a simple annotation boolean algebra are included.
 
 ```Haskell
 phone :: Enc '["r-ban:999-999-9999"] () T.Text
 phone = ...
 
 -- simple boolean algebra:
-phone' :: Enc '["boolOr:(r-ban:999-999-9999)((999) 999-9999)"] () T.Text
+phone' :: Enc '["boolOr:(r-ban:999-999-9999)(r-ban:(999) 999-9999)"] () T.Text
 phone' = ...
 ```
 
