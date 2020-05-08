@@ -69,7 +69,7 @@ instance (IsStringR str, KnownSymbol s, IsBan s ~ 'True, Applicative f) => Decod
 -- |
 -- >>> verifyBoundedAlphaNum (Proxy :: Proxy "r-ban:ff-ff") (T.pack "12-3e")
 -- Right "12-3e"
--- verifyBoundedAlphaNum (Proxy :: Proxy "r-ban:ff-ff") (T.pack "1g-3e")
+-- >>> verifyBoundedAlphaNum (Proxy :: Proxy "r-ban:ff-ff") (T.pack "1g-3e")
 -- Left "'g' not boulded by 'f'"
 -- >>> verifyBoundedAlphaNum (Proxy :: Proxy "r-ban:ff-ff") (T.pack "13g3e")
 -- Left "'g' not matching '-'"
