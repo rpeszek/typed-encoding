@@ -79,6 +79,10 @@ implTranP' f  = implTranF' (\c -> pure . f c)
 implEncodeP' :: Applicative f => (conf -> str -> str) -> Enc enc1 conf str -> f (Enc enc2 conf str)
 implEncodeP' = implTranP'
 
+implChangeAnn :: Functor f => (Enc enc1 conf str -> f (Enc enc2a conf str)) -> Enc enc1 conf str -> f (Enc enc2b conf str)
+implChangeAnn fn = fmap (withUnsafeCoerce id) . fn
+
+
 
 getPayload :: Enc enc conf str -> str  
 getPayload (MkEnc _ _ str) = str

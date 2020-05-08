@@ -53,7 +53,7 @@ type IsBan s =
 -- |
 -- >>> encodeFAll . toEncoding () $ "c59f9fb7-4621-44d9-9020-ce37bf6e2bd1" :: Either EncodeEx (Enc '["r-ban:ffffffff-ffff-ffff-ffff-ffffffffffff"] () T.Text)
 -- Right (MkEnc Proxy () "c59f9fb7-4621-44d9-9020-ce37bf6e2bd1")
-instance (IsStringR str, KnownSymbol s, IsBan s ~ 'True) =>  EncodeF (Either EncodeEx) (Enc xs c str) (Enc (s ': xs) c str) where
+instance {-# OVERLAPS #-} (IsStringR str, KnownSymbol s, IsBan s ~ 'True) =>  EncodeF (Either EncodeEx) (Enc xs c str) (Enc (s ': xs) c str) where
     encodeF = implEncodeF @s (verifyBoundedAlphaNum (Proxy :: Proxy s))
 
 -- |
@@ -69,7 +69,7 @@ instance (IsStringR str, KnownSymbol s, IsBan s ~ 'True, Applicative f) => Decod
 -- |
 -- >>> verifyBoundedAlphaNum (Proxy :: Proxy "r-ban:ff-ff") (T.pack "12-3e")
 -- Right "12-3e"
--- verifyBoundedAlphaNum (Proxy :: Proxy "r-ban:ff-ff") (T.pack "1g-3e")
+-- >>> verifyBoundedAlphaNum (Proxy :: Proxy "r-ban:ff-ff") (T.pack "1g-3e")
 -- Left "'g' not boulded by 'f'"
 -- >>> verifyBoundedAlphaNum (Proxy :: Proxy "r-ban:ff-ff") (T.pack "13g3e")
 -- Left "'g' not matching '-'"

@@ -63,6 +63,12 @@ data EncodeEx where
 instance Show EncodeEx where
     show (EncodeEx prxy a) = "(EncodeEx \"" ++ symbolVal prxy ++ "\" (" ++ show a ++ "))"
 
+mergeEncodeEx ::  KnownSymbol x => Proxy x -> EncodeEx -> Maybe EncodeEx -> EncodeEx
+mergeEncodeEx _ ex Nothing = ex
+mergeEncodeEx p (EncodeEx _ a) (Just (EncodeEx _ b)) = EncodeEx p $ "Errors: " ++ show (a,b)
+
+emptyEncErr ::  KnownSymbol x =>  Proxy x -> EncodeEx 
+emptyEncErr p = EncodeEx p ("unexpected" :: String)
 
 -- | Type safety over encodings makes decoding process safe.
 -- However failures are still possible due to bugs or unsafe payload modifications.
@@ -87,3 +93,10 @@ implEncodeF = implEncodeF_ (Proxy :: Proxy x)
 
 implEncodeF_' :: (Show err, KnownSymbol x) => Proxy x -> (conf -> str -> Either err str) ->  Enc enc1 conf str -> Either EncodeEx (Enc enc2 conf str) 
 implEncodeF_' p f = implTranF' (\c -> either (Left . EncodeEx p) Right . f c) 
+
+
+mergeErrs :: err -> (err -> Maybe err -> err) -> Either err a -> Either err b -> Either err c
+mergeErrs _ fn (Left er1) (Left er2) = Left (fn er1 $ Just er2)
+mergeErrs _ fn (Left er1) _ = Left (fn er1 Nothing)
+mergeErrs _ fn _  (Left er2) = Left (fn er2 Nothing) 
+mergeErrs de fn (Right r) (Right y) = Left de
