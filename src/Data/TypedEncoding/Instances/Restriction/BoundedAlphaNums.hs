@@ -12,6 +12,12 @@
 {-# LANGUAGE TypeApplications #-}
 
 -- | 
+-- DEPRECATED in favor of  
+-- "Data.TypedEncoding.Combinators.Restriction.BoundedAlphaNums" 
+--
+-- This is likely to cause duplicate instance issues if more than one construction
+-- of this sort is introduced.
+--
 -- Restrictions @"r-ban:"@ cover commonly used fixed (short) size strings with restricted
 -- characters such as GUID, credit card numbers, etc.  
 -- 
@@ -31,20 +37,16 @@ module Data.TypedEncoding.Instances.Restriction.BoundedAlphaNums where
 import           GHC.TypeLits
 import           Data.Type.Bool -- ((||), (&&))
 import           Data.Type.Equality -- ((==))
-import qualified Data.List as L
-import           Data.Char
 import           Data.Proxy
-import           Data.Either
-
 
 import           Data.TypedEncoding.Internal.Class.IsStringR
 import           Data.TypedEncoding.Instances.Support
+import           Data.TypedEncoding.Combinators.Restriction.BoundedAlphaNums (verifyBoundedAlphaNum)
 
 -- $setup
 -- >>> :set -XOverloadedStrings -XMultiParamTypeClasses -XDataKinds -XTypeApplications
 -- >>> import qualified Data.Text as T
 
--- better compilation errors?
 type IsBan s =
     "r-ban:" == s ||
     (CmpSymbol "r-ban:" s == LT && CmpSymbol "r-ban;" s == GT)    
@@ -66,33 +68,3 @@ instance (IsStringR str, KnownSymbol s, IsBan s ~ 'True, Applicative f) => Decod
 
 
 
--- |
--- >>> verifyBoundedAlphaNum (Proxy :: Proxy "r-ban:ff-ff") (T.pack "12-3e")
--- Right "12-3e"
--- >>> verifyBoundedAlphaNum (Proxy :: Proxy "r-ban:ff-ff") (T.pack "1g-3e")
--- Left "'g' not boulded by 'f'"
--- >>> verifyBoundedAlphaNum (Proxy :: Proxy "r-ban:ff-ff") (T.pack "13g3e")
--- Left "'g' not matching '-'"
--- >>> verifyBoundedAlphaNum (Proxy :: Proxy "r-ban:ff-ff") (T.pack "13-234")
--- Left "Input list has wrong size expecting 5 but length \"13-234\" == 6"
-verifyBoundedAlphaNum :: forall s a str . (KnownSymbol s, IsStringR str) => Proxy s -> str -> Either String str
-verifyBoundedAlphaNum p str = 
-    if pattl == inpl 
-    then case lefts match of
-        (e: _) -> Left e
-        _ -> Right str
-    else Left $ "Input list has wrong size expecting " ++ show pattl ++ " but length " ++ show input ++ " == " ++ show inpl   
-    where 
-        patt = L.drop (L.length ("r-ban:" :: String)) . symbolVal $ p
-        input = toString str
-        pattl = L.length patt
-        inpl = L.length input 
-        
-        match = L.zipWith fn input patt
-
-
-        fn ci cp = case (isAlphaNum ci, isAlphaNum cp, ci <= cp, ci == cp) of
-            (True, True, True, _) -> Right ()
-            (_, _, _, True) -> Right ()
-            (_, True, _, False) -> Left $ show ci ++ " not boulded by " ++ show cp
-            (_, False, _, False) -> Left $ show ci ++ " not matching " ++ show cp

@@ -17,7 +17,9 @@ import           Data.TypedEncoding.Internal.Types (Enc(..)
                                               , toEncoding
                                               , withUnsafeCoerce
                                               , RecreateEx(..)
+                                              , getPayload
                                              )
+import           Data.TypedEncoding.Internal.Class.Util                                             
 import           Data.Proxy
 import           Data.Functor.Identity
 import           GHC.TypeLits
@@ -48,6 +50,29 @@ recreateAll :: forall xs c str . RecreateFAll Identity xs c str =>
               Enc '[] c str 
               -> Enc xs c str
 recreateAll = runIdentity . recreateFAll 
+
+
+-- | Usefull for partially manual recreation
+recreateFPart_ :: forall f xs xsf c str . (Functor f, RecreateFAll f xs c str) => Proxy xs -> Enc xsf c str -> f (Enc (Append xs xsf) c str)
+recreateFPart_ p (MkEnc _ conf str) = 
+    let re :: f (Enc xs c str) = recreateFAll $ MkEnc Proxy conf str
+    in  MkEnc Proxy conf . getPayload <$> re 
+
+
+recreateFPart :: forall (xs :: [Symbol]) xsf f c str . (Functor f, RecreateFAll f xs c str) => Enc xsf c str -> f (Enc (Append xs xsf) c str)
+recreateFPart = recreateFPart_ (Proxy :: Proxy xs) 
+
+
+recreatePart_ :: RecreateFAll Identity (xs :: [Symbol]) c str => 
+              Proxy xs 
+              -> Enc xsf c str
+              -> Enc (Append xs xsf) c str 
+recreatePart_ p = runIdentity . recreateFPart_ p
+
+recreatePart :: forall (xs :: [Symbol]) xsf c str . RecreateFAll Identity xs c str => 
+               Enc xsf c str
+              -> Enc (Append xs xsf) c str 
+recreatePart = recreatePart_ (Proxy :: Proxy xs)   
 
 -- TODO using RecreateErr typeclass is overkill
 

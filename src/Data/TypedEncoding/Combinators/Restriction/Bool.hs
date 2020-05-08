@@ -24,9 +24,10 @@
 -- Expected behavior is described next to corresponding combinator.
 --
 -- Typeclass encoding is not used to avoid instance overlapping.
---
--- Currently only encoding and some decoding combinators are defined.
 -- 
+-- Use 'Data.TypedEncoding.Combinators.Restriction.Common.recreateWithEncode' 
+-- to create manual recovery step that can be combined with 'recreateFPart'.
+
 -- This is very much in beta state.
 --
 -- @since 0.2.1.0
@@ -42,10 +43,10 @@ import           Data.TypedEncoding.Instances.Support
 import           Data.TypedEncoding.Internal.Util.TypeLits
 import           Data.TypedEncoding.Combinators.Restriction.Common
 
-
 -- import qualified Data.Text as T
 -- import           Data.TypedEncoding.Instances.Restriction.BoundedAlphaNums ()
 -- import           Data.TypedEncoding.Instances.Restriction.Common()
+
 
 
 -- $setup
