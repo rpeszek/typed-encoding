@@ -40,9 +40,23 @@ example = encodeAll . toEncoding () $ "some text goes here"
 It becomes a type directed, declarative approach to string transformations.
 
 Transformations can be
-   - used with parameters.
+   - used with parameters
    - applied or undone partially (if encoding is reversible)
- 
+
+Possibly the main use of this library are encoding restrictions.   
+(Arbitrary) bounded alpha-numeric (`r-ban`) restrictions and simple boolean algerba are included.
+
+```Haskell
+phone :: Enc '["r-ban:999-999-9999"] () T.Text
+phone = ...
+
+-- simple boolean algebra:
+phone' :: Enc '["boolOr:(r-ban:999-999-9999)((999) 999-9999)"] () T.Text
+phone' = ...
+```
+
+
+
 ## Examples 
 
 Here are some code examples:

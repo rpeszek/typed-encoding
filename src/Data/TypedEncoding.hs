@@ -58,7 +58,7 @@
 -- * /recreation/ is a partial identity (matching encoding)
 -- * /decoding/ is identity
 --
--- Examples: @"r-UTF8"@, @"r-ASCII"@
+-- Examples: @"r-UTF8"@, @"r-ASCII"@, /r-ban/ restrictions like @"r-999-999-9999"@
 --
 -- == "do-" transformations
 --
@@ -76,6 +76,12 @@
 --
 -- Examples: @"enc-B64"@
 -- 
+-- == "bool[Op]:" encodings
+--
+-- Encodings that are defined in terms of other encodings using boolean algebra.
+--
+-- (early, beta version)
+--
 -- = Usage
 --
 -- To use this library import this module and one or more /instance/ module.
