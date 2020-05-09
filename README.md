@@ -60,17 +60,7 @@ phone' = ...
 
 ## Examples 
 
-Here are some code examples:
-   - [Overview](src/Examples/TypedEncoding/Overview.hs)
-   - [Conversions between encodings](src/Examples/TypedEncoding/Conversions.hs)
-   - [Adding a new encoding, error handling](src/Examples/TypedEncoding/DiySignEncoding.hs)
-   - [To and from string conversions](src/Examples/TypedEncoding/ToEncString.hs)
-   - [Unsafe - working inside encodings](src/Examples/TypedEncoding/Unsafe.hs)
- 
-
-## Hackage
-
-https://hackage.haskell.org/package/typed-encoding
+Please see `Examples.TypedEncoding` it the module list.
 
 ## Dependencies on other encoding libs
 
@@ -84,6 +74,7 @@ Currently it uses
 
 ## Tested with
    - stack (1.9.3) lts-14.27 (ghc-8.6.5)
+   - needs ghc >= 8.2.2, base >=4.10 for GHC.TypeLits support
 
 ## Known issues
    - running test suite: cabal has problems with doctest, use stack  
