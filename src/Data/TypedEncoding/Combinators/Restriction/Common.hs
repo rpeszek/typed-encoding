@@ -10,6 +10,10 @@
 -- {-# LANGUAGE KindSignatures  #-}s
 {-# LANGUAGE UndecidableInstances #-}
 
+-- |
+-- Common combinators used across encodings.
+--
+-- @since 0.2.1.0
 module Data.TypedEncoding.Combinators.Restriction.Common where 
 
 import           GHC.TypeLits
@@ -40,11 +44,13 @@ unsafeRecWithEncR :: forall (s :: Symbol) xs c str .
 unsafeRecWithEncR fn = either (Left . encToRecrEx) Right . fn
 
 -- |
--- :kind! IsR "r-UPPER"
--- ... 'True
--- :kind! IsR "do-UPPER"
+-- >>> :kind! IsR "r-UPPER"
 -- ...
--- ... TypeError ... 
+-- ... 'True
+--
+-- >>> :kind! IsR "do-UPPER"
+-- ...
+-- = (TypeError ... 
 type family IsR (s :: Symbol) :: Bool where
     IsR s = AcceptEq ('Text "Not restriction encoding " ':<>: ShowType s ) (CmpSymbol "r-" (Take 2 s))
 

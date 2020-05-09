@@ -11,6 +11,8 @@
 
 -- |
 -- Boolean algebra on encodings
+--
+-- @since 0.2.1.0
 -- 
 -- == Grammar
 -- 
@@ -30,7 +32,6 @@
 
 -- This is very much in beta state.
 --
--- @since 0.2.1.0
 module Data.TypedEncoding.Combinators.Restriction.Bool where 
 
 
