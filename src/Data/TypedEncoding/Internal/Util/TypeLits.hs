@@ -13,7 +13,7 @@
 {-# LANGUAGE AllowAmbiguousTypes #-}
 
 
--- | TypeLits relelated utilities.
+-- | TypeLits related utilities.
 --
 -- Lots of this could be avoided by adding @singletons@ as dependency.
 --
@@ -92,7 +92,7 @@ type family LTake (n :: Nat) (s :: [k]) :: [k] where
     LTake n '[] = '[]
     LTake n (x ': xs) = x ': LTake (n - 1) xs 
 
--- |
+-- 
 -- :kind! TakeUntil "findme:blah" ":"
 type family TakeUntil (s :: Symbol) (stop :: Symbol) :: Symbol where
     TakeUntil s stop = Concat (LTakeUntil (ToList s) stop)
@@ -113,5 +113,3 @@ type family Length (s :: Symbol) :: Nat where
 type family LLengh (s :: [k]) :: Nat where
     LLengh '[] = 0
     LLengh (x ': xs) = 1 + LLengh xs
-
-

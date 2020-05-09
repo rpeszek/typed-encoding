@@ -30,9 +30,6 @@ import           Data.Functor.Identity
 import           GHC.TypeLits
 
 
--- TODO would be nice to have EncodeFAll1 and DecodeFAll1 that starts
--- end stops at frist encoding.           
-
 -- | 
 -- Generalized Java @toString@ or a type safe version of Haskell's 'Show'.
 --

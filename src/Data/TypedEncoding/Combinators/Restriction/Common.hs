@@ -27,7 +27,7 @@ decFR = implTranP id
 
 
 -- | 
--- Manual recreate step compbinator converting typical encode function to a recreate step
+-- Manual recreate step combinator converting typical encode function to a recreate step
 recWithEncR :: forall (s :: Symbol) xs c str . (IsR s ~ 'True) 
                        => (Enc xs c str -> Either EncodeEx (Enc (s ': xs) c str)) 
                        -> Enc xs c str -> Either RecreateEx (Enc (s ': xs) c str)
@@ -52,4 +52,3 @@ type family IsR (s :: Symbol) :: Bool where
 type family IsROrEmpty (s :: Symbol) :: Bool where
     IsROrEmpty "" = True
     IsROrEmpty x  = IsR x
-

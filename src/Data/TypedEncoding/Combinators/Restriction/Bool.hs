@@ -280,7 +280,7 @@ type family FirstTerm (s :: Symbol) :: Symbol where
     FirstTerm s = LeftTerm s
 
 -- | 
--- returns "" for uniary operator
+-- returns "" for unary operator
 type family SecondTerm (s :: Symbol) :: Symbol where
     FirstTerm s = RightTerm s
 
