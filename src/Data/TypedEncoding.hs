@@ -82,8 +82,11 @@
 --
 -- (early, beta version)
 --
--- Examples: @"boolOr(r-ban:ffffffff-ffff-ffff-ffff-ffffffffffff)(r-ban:ffffffffffffffffffffffffffffffff)"@ 
--- "@boolNot(r-ASCII)"
+-- Examples: 
+--
+-- @"boolOr:(r-ban:ffffffff-ffff-ffff-ffff-ffffffffffff)(r-ban:ffffffffffffffffffffffffffffffff)"@ 
+--
+-- "@boolNot:(r-ASCII)"
 --
 -- = Usage
 --
