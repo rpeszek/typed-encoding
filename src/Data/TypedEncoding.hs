@@ -4,7 +4,7 @@
 -- |
 -- = Overview
 --
--- This library allows to specify and work with types like
+-- This library uses 'GHC.TypeLits' symbols to specify and work with types like
 --
 -- @
 -- -- Base 64 encoded bytes (could represent binary files)
@@ -24,7 +24,7 @@
 -- upper = ...
 -- @
 --
--- or define precise types to use with 'toEncString' and 'fromEncString'
+-- or to define precise types to use with 'toEncString' and 'fromEncString'
 -- 
 -- @
 -- date :: Enc '["r-date-%d/%b/%Y:%X %Z"] Text
@@ -58,7 +58,7 @@
 -- * /recreation/ is a partial identity (matching encoding)
 -- * /decoding/ is identity
 --
--- Examples: @"r-UTF8"@, @"r-ASCII"@, /r-ban/ restrictions like @"r-999-999-9999"@
+-- Examples: @"r-UTF8"@, @"r-ASCII"@, upper alpha-numeric bound /r-ban/ restrictions like @"r-999-999-9999"@
 --
 -- == "do-" transformations
 --
@@ -82,9 +82,12 @@
 --
 -- (early, beta version)
 --
+-- Examples: @"boolOr(r-ban:ffffffff-ffff-ffff-ffff-ffffffffffff)(r-ban:ffffffffffffffffffffffffffffffff)"@ 
+-- "@boolNot(r-ASCII)"
+--
 -- = Usage
 --
--- To use this library import this module and one or more /instance/ module.
+-- To use this library import this module and one or more /instance/ or /combinator/ module.
 --
 -- Here is list of instance modules available in typed-encoding library itself
 --

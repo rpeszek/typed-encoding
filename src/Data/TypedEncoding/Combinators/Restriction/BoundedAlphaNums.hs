@@ -25,10 +25,12 @@
 -- This is a simple implementation that converts to @String@, should be used
 -- only with short length data.
 --
--- Decoding function @decodeFR@ is located in
+-- This module does not create instances of @EncodeF@ typeclass to avoid duplicate instance issues.
+--
+-- Decoding function @decFR@ is located in
 -- "Data.TypedEncoding.Combinators.Restriction.Common"
 --
--- Use 'Data.TypedEncoding.Combinators.Restriction.Common.recreateWithEncode' 
+-- Use 'Data.TypedEncoding.Combinators.Restriction.Common.recWithEncR' 
 -- to create manual recovery step that can be combined with 'recreateFPart'.
 --
 -- @since 0.2.1.0
@@ -48,15 +50,20 @@ import           Data.TypedEncoding.Instances.Support
 -- $setup
 -- >>> :set -XOverloadedStrings -XMultiParamTypeClasses -XDataKinds -XTypeApplications
 -- >>> import qualified Data.Text as T
+-- >>> import           Data.TypedEncoding.Combinators.Restriction.Common
 
 -- better compilation errors?
 type family IsBan (s :: Symbol) :: Bool where
     IsBan s = AcceptEq ('Text "Not ban restriction encoding " ':<>: ShowType s ) (CmpSymbol "r-ban:" (Take 6 s))
 
+
 -- |
--- >>> encodeFBan . toEncoding () $ "c59f9fb7-4621-44d9-9020-ce37bf6e2bd1" :: Either EncodeEx (Enc '["r-ban:ffffffff-ffff-ffff-ffff-ffffffffffff"] () T.Text)
+-- >>> encFBan . toEncoding () $ "c59f9fb7-4621-44d9-9020-ce37bf6e2bd1" :: Either EncodeEx (Enc '["r-ban:ffffffff-ffff-ffff-ffff-ffffffffffff"] () T.Text)
 -- Right (MkEnc Proxy () "c59f9fb7-4621-44d9-9020-ce37bf6e2bd1")
-encodeFBan :: forall f s t xs c str .
+-- 
+-- >>> recWithEncR encFBan . toEncoding () $ "211-22-9934" :: Either RecreateEx (Enc '["r-ban:999-99-9999"] () T.Text)
+-- Right (MkEnc Proxy () "211-22-9934")
+encFBan :: forall f s t xs c str .
               (
                 IsStringR str
               , KnownSymbol s
@@ -64,7 +71,7 @@ encodeFBan :: forall f s t xs c str .
               , f ~ Either EncodeEx
               ) => 
               Enc xs c str -> f (Enc (s ': xs) c str)  
-encodeFBan = implEncodeF @s (verifyBoundedAlphaNum (Proxy :: Proxy s))              
+encFBan = implEncodeF @s (verifyBoundedAlphaNum (Proxy :: Proxy s))              
 
 
 

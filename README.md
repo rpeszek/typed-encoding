@@ -18,7 +18,7 @@ myData :: Enc '["enc-B64", "r-UTF8"] ByteString
 It allows to define precise string content annotations like:
 
 ```Haskell
-mydata :: Enc '["r-IpV4"] Text
+ipaddr :: Enc '["r-IpV4"] Text
 ```
 
 and provides ways for 
@@ -43,8 +43,9 @@ Transformations can be
    - used with parameters
    - applied or undone partially (if encoding is reversible)
 
-Possibly the main use of this library are encoding restrictions.   
-(Arbitrary) bounded alpha-numeric (`r-ban`) restrictions and a simple annotation boolean algebra are included.
+One of more intersting uses of this library are encoding restrictions.   
+(Arbitrary) bounded alpha-numeric (`r-ban`) restrictions 
+and a simple annotation boolean algebra are both provided.
 
 ```Haskell
 phone :: Enc '["r-ban:999-999-9999"] () T.Text

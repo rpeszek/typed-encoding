@@ -15,6 +15,10 @@
 
 -- | TypeLits relelated utilities.
 --
+-- Lots of this could be avoided by adding @singletons@ as dependency.
+--
+-- Uses @symbols@ library for its ToList type family.
+--
 -- Currently this is spread out in different modules
 --
 -- * "Data.TypedEncoding.Internal.Class.Util"
@@ -35,6 +39,13 @@ type family AcceptEq (msg :: ErrorMessage) (c :: Ordering) :: Bool where
     AcceptEq _  EQ = True
     AcceptEq msg _ =  TypeError msg
 
+type family And (b1 :: Bool) (b2 :: Bool) :: Bool where
+    And 'True 'True = 'True
+    And _ _ = 'False
+
+type family Or (b1 :: Bool) (b2 :: Bool) :: Bool where
+    Or 'False 'False = 'False
+    Or _ _ = 'True
 
 type family Repeat (n :: Nat) (s :: Symbol) :: Symbol where
     Repeat 0 s = ""
