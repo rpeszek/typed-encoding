@@ -243,7 +243,7 @@ type family BoolOpHelper (x :: (Symbol, Symbol)) :: (Symbol, Bool) where
 
 
 type family IsBool (s :: Symbol) :: Bool where
-    IsR s = AcceptEq ('Text "Not boolean encoding " ':<>: ShowType s ) (CmpSymbol "bool" (Take 4 s))
+    IsBool s = AcceptEq ('Text "Not boolean encoding " ':<>: ShowType s ) (CmpSymbol "bool" (Take 4 s))
 
 -- |
 -- 
@@ -283,7 +283,7 @@ type family FirstTerm (s :: Symbol) :: Symbol where
 -- | 
 -- returns "" for unary operator
 type family SecondTerm (s :: Symbol) :: Symbol where
-    FirstTerm s = RightTerm s
+    SecondTerm s = RightTerm s
 
 
 -- |

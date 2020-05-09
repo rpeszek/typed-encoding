@@ -83,7 +83,7 @@ type family LDrop (n :: Nat) (s :: [k]) :: [k] where
 -- | 
 -- :kind! Take 3 "123456"
 type family Take (n :: Nat) (s :: Symbol) :: Symbol where
-    Drop n s = Concat (LTake n (ToList s))
+    Take n s = Concat (LTake n (ToList s))
 
 -- TODO create TypeList.List
 -- | :kind! LTake 3 (ToList "123456")
