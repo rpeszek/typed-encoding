@@ -18,7 +18,7 @@ myData :: Enc '["enc-B64", "r-UTF8"] ByteString
 It allows to define precise string content annotations like:
 
 ```Haskell
-mydata :: Enc '["r-IpV4"] Text
+ipaddr :: Enc '["r-IpV4"] Text
 ```
 
 and provides ways for 
@@ -40,12 +40,37 @@ example = encodeAll . toEncoding () $ "some text goes here"
 It becomes a type directed, declarative approach to string transformations.
 
 Transformations can be
-   - used with parameters.
+   - used with parameters
    - applied or undone partially (if encoding is reversible)
- 
+
+One of more intersting uses of this library are encoding restrictions.   
+(Arbitrary) bounded alpha-numeric (`r-ban`) restrictions 
+and a simple annotation boolean algebra are both provided.
+
+```Haskell
+phone :: Enc '["r-ban:999-999-9999"] () T.Text
+phone = ...
+
+-- simple boolean algebra:
+phone' :: Enc '["boolOr:(r-ban:999-999-9999)(r-ban:(999) 999-9999)"] () T.Text
+phone' = ...
+```
+
+
+
 ## Examples 
 
-Please see `Examples.TypedEncoding` it the module list.
+Here are some code examples:
+   - [Overview](src/Examples/TypedEncoding/Overview.hs)
+   - [Conversions between encodings](src/Examples/TypedEncoding/Conversions.hs)
+   - [Adding a new encoding, error handling](src/Examples/TypedEncoding/DiySignEncoding.hs)
+   - [To and from string conversions](src/Examples/TypedEncoding/ToEncString.hs)
+   - [Unsafe - working inside encodings](src/Examples/TypedEncoding/Unsafe.hs)
+ 
+
+## Hackage
+
+https://hackage.haskell.org/package/typed-encoding
 
 ## Dependencies on other encoding libs
 

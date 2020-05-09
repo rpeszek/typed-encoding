@@ -39,5 +39,6 @@ instance IsString str => ToEncString "r-Int-decimal" str Identity Int where
 instance IsString str => ToEncString "r-Word8-decimal" str Identity Word8 where
     toEncStringF i = Identity $ MkEnc Proxy () (fromString . show $ i)
 
+-- All instances of "r-Word8-decimal" are  @Show@ / @Read@ based
 instance (IsStringR str, UnexpectedDecodeErr f, Applicative f) => FromEncString Word8 f str "r-Word8-decimal" where
     fromEncStringF  = asUnexpected @ "r-Word8-decimal" . readEither . toString . getPayload

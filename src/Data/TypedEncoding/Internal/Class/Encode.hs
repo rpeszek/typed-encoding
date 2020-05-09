@@ -39,7 +39,7 @@ instance (Monad f, EncodeFAll f xs c str, EncodeF f (Enc xs c str) (Enc (x ': xs
         in re >>= encodeF
 
 
-encodeAll :: EncodeFAll Identity (xs :: [Symbol]) c str => 
+encodeAll :: forall xs c str . EncodeFAll Identity (xs :: [Symbol]) c str => 
               Enc '[] c str 
               -> Enc xs c str
 encodeAll = runIdentity . encodeFAll             
