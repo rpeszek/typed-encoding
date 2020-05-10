@@ -5,8 +5,12 @@
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE TypeApplications #-}
 
--- | Strings can move to 'Enc "r-ASCII' only if they contain only ascii characters.
--- they always decode back
+-- | Strings can be encoded as 'Enc "r-ASCII"@ only if they contain only ascii characters (first 128 characters of the Unicode character set).
+--
+-- This is sometimes referred to as ASCII-7 and future versions of @type-encoding@ may change @"r-ASCII"@ symbol annotation to reflect this.
+--  
+-- prop> B8.all ((< 128) . ord) . getPayload @ '["r-ASCII"] @() @B.ByteString
+-- 
 -- >>> :set -XOverloadedStrings -XMultiParamTypeClasses -XDataKinds
 -- >>> encodeFAll . toEncoding () $ "Hello World" :: Either EncodeEx (Enc '["r-ASCII"] () T.Text)
 -- Right (MkEnc Proxy () "Hello World")
@@ -36,10 +40,31 @@ import           Control.Arrow
 
 -- $setup
 -- >>> :set -XDataKinds -XTypeApplications
+-- >>> import Test.QuickCheck
+-- >>> import Test.QuickCheck.Instances.Text()
+-- >>> import Test.QuickCheck.Instances.ByteString()
+-- >>> :{
+-- instance Arbitrary (Enc '["r-ASCII"] () B.ByteString) where 
+--      arbitrary =  fmap (unsafeSetPayload ()) 
+--                   . flip suchThat (B8.all isAscii) 
+--                        $ arbitrary 
+-- instance Arbitrary (Enc '["r-ASCII"] () T.Text) where 
+--      arbitrary =  fmap (unsafeSetPayload ()) 
+--                   . flip suchThat (T.all isAscii) 
+--                        $ arbitrary 
+-- :}
+--
 
 -----------------
 -- Conversions --
 -----------------
+
+-- |
+-- text2ByteStringS and  byteString2TextS form isomorphism
+--
+-- prop> \x -> getPayload x == (getPayload . text2ByteStringS . byteString2TextS @ '[] @() $ x)
+--
+-- prop> \x -> getPayload x == (getPayload . byteString2TextS . text2ByteStringS @ '[] @() $ x)
 
 byteString2TextS :: Enc ("r-ASCII" ': ys) c B.ByteString -> Enc ("r-ASCII" ': ys) c T.Text 
 byteString2TextS = withUnsafe (fmap TE.decodeUtf8)
@@ -56,6 +81,10 @@ text2ByteStringL  = withUnsafe (fmap TEL.encodeUtf8)
 
 -- | allow to treat ASCII encodings as UTF8 forgetting about B64 encoding
 -- 
+-- UTF-8 is backward compatible on first 128 characters using just one byte to store it.
+-- 
+-- Payload does not change when @ASCII@ only strings are encoded to @UTF8@ in types like @ByteString@.
+--
 -- >>> let Right tstAscii = encodeFAll . toEncoding () $ "Hello World" :: Either EncodeEx (Enc '["r-ASCII"] () T.Text)
 -- >>> displ (inject @ "r-UTF8" tstAscii)
 -- "MkEnc '[r-UTF8] () (Text Hello World)"
@@ -101,6 +130,7 @@ instance (RecreateErr f, Applicative f) => RecreateF f (Enc xs c BL.ByteString) 
     checkPrevF = implCheckPrevF (asRecreateErr @"r-ASCII" . encodeImpl (\p -> BL8.filter p &&& BL8.filter (not . p)) BL8.head BL8.null)
 instance Applicative f => DecodeF f (Enc ("r-ASCII" ': xs) c BL.ByteString) (Enc xs c BL.ByteString) where
     decodeF = implTranP id 
+
 
 encodeImpl :: 
    ((Char -> Bool) -> a -> (a, a))

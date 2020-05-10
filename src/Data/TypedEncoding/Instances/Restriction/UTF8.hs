@@ -41,7 +41,7 @@ import           Data.Either
 -- >>> instance Arbitrary (Enc '["r-UTF8"] () B.ByteString) where 
 --      arbitrary =  fmap (fromRight (emptyUTF8B ())) 
 --                   . flip suchThat isRight 
---                   . fmap (proxiedId prxyArb . encodeFAll . toEncoding ()) $ arbitrary 
+--                   . fmap (encodeFAll @(Either EncodeEx) @'["r-UTF8"] @(). toEncoding ()) $ arbitrary 
 -- :}
 
 -- | empty string is valid utf8
