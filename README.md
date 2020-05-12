@@ -22,12 +22,13 @@ ipaddr :: Enc '["r-IpV4"] Text
 ```
 
 and provides ways for 
-   - encoding
-   - decoding
-   - recreation (encoding validation)
-   - type conversions
-   - converting types to encoded strings
-   - typesafe conversion of encoded strings to types
+
+- encoding
+- decoding
+- recreation (encoding validation)
+- type conversions
+- converting types to encoded strings
+- typesafe conversion of encoded strings to types
 
 ... but this approach seems to be a bit more...
 
@@ -40,8 +41,9 @@ example = encodeAll . toEncoding () $ "some text goes here"
 It becomes a type directed, declarative approach to string transformations.
 
 Transformations can be
-   - used with parameters
-   - applied or undone partially (if encoding is reversible)
+
+- used with parameters
+- applied or undone partially (if encoding is reversible)
 
 One of more intersting uses of this library are encoding restrictions.   
 (Arbitrary) bounded alpha-numeric (`r-ban`) restrictions 
@@ -57,15 +59,15 @@ phone' = ...
 ```
 
 
-
 ## Examples 
 
 Here are some code examples:
-   - [Overview](src/Examples/TypedEncoding/Overview.hs)
-   - [Conversions between encodings](src/Examples/TypedEncoding/Conversions.hs)
-   - [Adding a new encoding, error handling](src/Examples/TypedEncoding/DiySignEncoding.hs)
-   - [To and from string conversions](src/Examples/TypedEncoding/ToEncString.hs)
-   - [Unsafe - working inside encodings](src/Examples/TypedEncoding/Unsafe.hs)
+
+- [Overview](src/Examples/TypedEncoding/Overview.hs)
+- [Conversions between encodings](src/Examples/TypedEncoding/Conversions.hs)
+- [Adding a new encoding, error handling](src/Examples/TypedEncoding/DiySignEncoding.hs)
+- [To and from string conversions](src/Examples/TypedEncoding/ToEncString.hs)
+- [Unsafe - working inside encodings](src/Examples/TypedEncoding/Unsafe.hs)
  
 
 ## Hackage
@@ -73,20 +75,27 @@ Here are some code examples:
 https://hackage.haskell.org/package/typed-encoding
 
 
-## Dependencies on other encoding libs
+## Other encoding packages
 
-Currently it uses
-   - `base64-bytestring` because it was my driving example
-   - I will try to separate other deps like `servant`, specific encoding libraries, etc into separate libs if there is interest. I consider orphan instances to be OK in this context. (GHC will classify them as such despite use of unique symbols.)
+My approach will be to write specific encodings (e.g. _HTTP_) or wrap encodings from other packages using separate "bridge" projects.
+
+Currently `typed-encoding` depends on
+
+- `base64-bytestring` because it was my driving example, this is likely to move out to a separate bridge project at some point. 
+
+Bridge work:
+
+- [typed-encoding-encoding](https://github.com/rpeszek/typed-encoding-encoding) bridges [encoding](https://github.com/dmwit/encoding) package
 
 ## Plans, some TODOs
-   - lensifying conversions 
-   - better implementation type safety
+
+- lensifying conversions 
+- better implementation type safety
 
 ## Tested with
-   - stack (1.9.3) lts-14.27 (ghc-8.6.5)
-   - needs ghc >= 8.2.2, base >=4.10 for GHC.TypeLits support
+- stack (1.9.3) lts-14.27 (ghc-8.6.5)
+- needs ghc >= 8.2.2, base >=4.10 for GHC.TypeLits support
 
 ## Known issues
-   - running test suite: cabal has problems with doctest, use stack  
+- running test suite: cabal has problems with doctest, use stack  
    https://github.com/haskell/cabal/issues/6087   
