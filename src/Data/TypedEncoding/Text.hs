@@ -9,7 +9,7 @@ import           Data.TypedEncoding.Instances.Support
 
 
 -- $setup
--- >>> :set -XDataKinds -TypeFamilies -XTypeApplications
+-- >>> :set -XDataKinds -XTypeFamilies -XTypeApplications
 
 
 -- | This assumes that each of the encodings in @xs@ work work equivalently in @String@ and @Text@. 

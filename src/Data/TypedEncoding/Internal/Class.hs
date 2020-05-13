@@ -55,7 +55,15 @@ fromEncString = runIdentity . fromEncStringF
 -- Other classes --
 
 -- | Subsets are useful for restriction encodings
--- like r-UFT8 but not for other encodings.
+-- like r-UFT8 but should not be used for other encodings.
+--
+-- This would be dangerous, it would, for example, permit converting encoded binary 
+-- @"Enc '["enc-"] c ByteString@ to @"Enc '["enc-"] c Text@, decoding which
+-- could result in rutime errors.
+--
+-- @
+-- instance Superset "r-ASCII" "enc-B64" where -- DANGEROUS
+-- @
 --
 -- 'inject' is identity on payloads
 --
@@ -70,6 +78,14 @@ instance Superset x x where
 -- prop_Superset :: forall y x xs c str . (Superset y x, Eq str) => Enc (x ': xs) c str -> Bool
 -- prop_Superset x = getPayload x == (getPayload . inject @y @x $ x)
 
+
+-- | Flatten is more permissive than 'Superset'
+-- @
+-- instance FlattenAs "r-ASCII" "enc-B64" where -- OK
+-- @
+-- 
+-- Now encoded data has form @Enc '["r-ASCII"] c str@ 
+-- and there is no danger of it begin incorrectly decoded.
 
 class FlattenAs (y :: Symbol) (x :: Symbol) where
     flattenAs ::  Enc (x ': xs) c str ->  Enc '[y] c str

@@ -35,28 +35,36 @@ import qualified Data.ByteString.Base64.Lazy as BL64
 -----------------
 
 -- | 
--- DEPRECTATED
+-- DEPRECATED use 'Data.TypedEncoding.Text.Encoding.decodeUtf8'
+-- and 'Data.TypedEncoding.Text.utf8Demote'
+-- 
+-- Will be removed in 0.3.x.x
 --
 -- See warning in 'Data.TypedEncoding.Instances.Restriction.ASCII.byteString2TextS'
--- 
--- Type-safer version of Byte-string to text conversion that prevent invalid UTF8 bytestrings
--- to be conversted to B64 encoded Text.
 byteString2TextS :: Enc ("enc-B64" ': "r-UTF8" ': ys) c B.ByteString -> Enc ("enc-B64" ': ys) c T.Text 
 byteString2TextS = withUnsafeCoerce TE.decodeUtf8
 
 -- | 
--- DEPRECTATED
+-- DEPRECATED use 'Data.TypedEncoding.Text.Lazy.Encoding.decodeUtf8'
+-- and 'Data.TypedEncoding.Text.utf8Demote'
+--
+-- Will be removed in 0.3.x.x
 --
 -- See warning in 'Data.TypedEncoding.Instances.Restriction.ASCII.byteString2TextS'
 byteString2TextL :: Enc ("enc-B64" ': "r-UTF8" ': ys) c BL.ByteString -> Enc ("enc-B64" ': ys) c TL.Text 
 byteString2TextL = withUnsafeCoerce TEL.decodeUtf8
 
--- | Converts encoded text to ByteString adding "r-UTF8" annotation.
--- The question is why "r-UTF8", not for example, "r-UTF16"?
--- No reason, there maybe a diffrent combinator for that in the future or one that accepts a proxy.
+-- DEPRECATED use 'Data.TypedEncoding.Text.Encoding.encodeUtf8'
+-- and 'Data.TypedEncoding.Text.utf8Promote'
+-- 
+-- Will be removed in 0.3.x.x
 text2ByteStringS :: Enc ("enc-B64" ': ys) c T.Text -> Enc ("enc-B64" ': "r-UTF8" ': ys) c B.ByteString 
 text2ByteStringS = withUnsafeCoerce TE.encodeUtf8
 
+-- DEPRECATED use 'Data.TypedEncoding.Text.Lazy.Encoding.encodeUtf8'
+-- and 'Data.TypedEncoding.Text.utf8Promote'
+-- 
+-- Will be removed in 0.3.x.x
 text2ByteStringL  :: Enc ("enc-B64" ': ys) c TL.Text -> Enc ("enc-B64" ': "r-UTF8" ': ys) c BL.ByteString 
 text2ByteStringL  = withUnsafeCoerce TEL.encodeUtf8
 
@@ -66,14 +74,19 @@ text2ByteStringL  = withUnsafeCoerce TEL.encodeUtf8
 byteString2TextS' :: Enc ("enc-B64" ': ys) c B.ByteString -> Enc ("enc-B64-nontext" ': ys) c T.Text 
 byteString2TextS' = withUnsafeCoerce TE.decodeUtf8
 
+-- DEPRECATED 
 byteString2TextL' :: Enc ("enc-B64" ': ys) c BL.ByteString -> Enc ("enc-B64-nontext" ': ys) c TL.Text 
 byteString2TextL' = withUnsafeCoerce TEL.decodeUtf8
 
+-- DEPRECATED 
 text2ByteStringS' :: Enc ("enc-B64-nontext" ': ys) c T.Text -> Enc ("enc-B64" ': ys) c B.ByteString 
 text2ByteStringS' = withUnsafeCoerce TE.encodeUtf8
 
+-- DEPRECATED 
 text2ByteStringL'  :: Enc ("enc-B64-nontext" ': ys) c TL.Text -> Enc ("enc-B64" ': ys) c BL.ByteString 
 text2ByteStringL'  = withUnsafeCoerce TEL.encodeUtf8
+
+
 
 acceptLenientS :: Enc ("enc-B64-len" ': ys) c B.ByteString -> Enc ("enc-B64" ': ys) c B.ByteString 
 acceptLenientS = withUnsafeCoerce (B64.encode . B64.decodeLenient)
@@ -90,6 +103,10 @@ acceptLenientL = withUnsafeCoerce (BL64.encode . BL64.decodeLenient)
 instance FlattenAs "r-ASCII" "enc-B64-nontext" where
 instance FlattenAs "r-ASCII" "enc-B64" where
 
+-- DEPRECATED will be removed
+--
+-- dangerous, with new approach.
+-- Supersets are for "r-" types only
 instance Superset "r-ASCII" "enc-B64-nontext" where
 instance Superset "r-ASCII" "enc-B64" where
 
