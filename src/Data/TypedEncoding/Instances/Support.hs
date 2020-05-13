@@ -10,7 +10,10 @@ module Data.TypedEncoding.Instances.Support (
     , module Data.TypedEncoding.Internal.Class
     -- * Combinators
     , module Data.TypedEncoding.Internal.Instances.Combinators
+    -- * Type level conveniences
+    , module Data.TypedEncoding.Internal.Util.TypeLits
    ) where
 import           Data.TypedEncoding.Internal.Types
 import           Data.TypedEncoding.Internal.Class 
 import           Data.TypedEncoding.Internal.Instances.Combinators 
+import           Data.TypedEncoding.Internal.Util.TypeLits 

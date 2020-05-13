@@ -44,7 +44,8 @@ import           Data.Either
 --                   . fmap (encodeFAll @(Either EncodeEx) @'["r-UTF8"] @(). toEncoding ()) $ arbitrary 
 -- :}
 
--- | empty string is valid utf8
+-- | DEPRECTED will be removed in 0.3 
+-- empty string is valid utf8
 emptyUTF8B :: c -> Enc '["r-UTF8"] c B.ByteString
 emptyUTF8B c = unsafeSetPayload c ""   
 
@@ -52,38 +53,44 @@ emptyUTF8B c = unsafeSetPayload c ""
 -- Conversions --
 -----------------
 
--- Right tst = encodeFAll . toEncoding () $ "Hello World" :: Either EncodeEx (Enc '["r-UTF8"] () B.ByteString)
--- tstTxt = byteString2TextS tst
-
--- | Type-safer version of @Data.Text.Encoding.encodeUtf8@
---
--- >>> displ $ text2ByteStringS $ toEncoding () ("text" :: T.Text)
--- "MkEnc '[r-UTF8] () (ByteString text)"
+-- |
+-- | DEPRECTED will be removed in 0.3 
+-- 
+-- use 'Data.TypedEncoding.Text.Lazy.Encoding.encodeUtf8'
+-- and 'Data.TypedEncoding.Text.utf8Promote'
 text2ByteStringS :: Enc ys c T.Text -> Enc ("r-UTF8" ': ys) c B.ByteString
 text2ByteStringS = withUnsafeCoerce TE.encodeUtf8
 
--- | Type-safer version of Data.Text.Encoding.decodeUtf8
+-- | 
+-- DEPRECTATED
 --
--- >>> let Right tst = encodeFAll . toEncoding () $ "Hello World" :: Either EncodeEx (Enc '["r-UTF8"] () B.ByteString)
--- >>> displ $ byteString2TextS tst
--- "MkEnc '[] () (Text Hello World)"
+-- | DEPRECTED will be removed in 0.3 
+-- 
+-- use 'Data.TypedEncoding.Text.Lazy.Encoding.decodeUtf8'
+-- and 'Data.TypedEncoding.Text.utf8Demote'
+--
+-- See warning in 'Data.TypedEncoding.Instances.Restriction.ASCII.byteString2TextS'
+--
+-- Type-safer version of Data.Text.Encoding.decodeUtf8
+--
 byteString2TextS :: Enc ("r-UTF8" ': ys) c B.ByteString -> Enc ys c T.Text 
 byteString2TextS = withUnsafeCoerce TE.decodeUtf8
 
--- | Identity property "byteString2TextS . text2ByteStringS == id"
--- prop> \t -> t == (fromEncoding . txtBsSIdProp (Proxy :: Proxy '[]) . toEncoding () $ t)
+-- | To be removed
 txtBsSIdProp :: Proxy (ys :: [Symbol]) -> Enc ys c T.Text -> Enc ys c T.Text
 txtBsSIdProp _ = byteString2TextS . text2ByteStringS 
 
--- | Identity property "text2ByteStringS . byteString2TextS == id".
---
--- prop> \(t :: Enc '["r-UTF8"] () B.ByteString) -> t == (bsTxtIdProp (Proxy :: Proxy '[]) $ t)
+-- To be removed
 bsTxtIdProp :: Proxy (ys :: [Symbol]) -> Enc ("r-UTF8" ': ys) c B.ByteString -> Enc ("r-UTF8" ': ys) c B.ByteString
 bsTxtIdProp _ = text2ByteStringS . byteString2TextS
 
+-- DEPRECTATED see above
 text2ByteStringL :: Enc ys c TL.Text -> Enc ("r-UTF8" ': ys) c BL.ByteString
 text2ByteStringL = withUnsafeCoerce TEL.encodeUtf8
 
+-- DEPRECTATED
+--
+-- See warning in 'Data.TypedEncoding.Instances.Restriction.ASCII.byteString2TextS'
 byteString2TextL :: Enc ("r-UTF8" ': ys) c BL.ByteString -> Enc ys c TL.Text 
 byteString2TextL = withUnsafeCoerce TEL.decodeUtf8
 

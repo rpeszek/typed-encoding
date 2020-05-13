@@ -7,7 +7,7 @@
 {-# LANGUAGE FlexibleContexts #-}
 -- {-# LANGUAGE UndecidableInstances #-}
 {-# LANGUAGE ScopedTypeVariables #-}
--- {-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE AllowAmbiguousTypes #-}
 
@@ -58,10 +58,14 @@ fromEncString = runIdentity . fromEncStringF
 -- like r-UFT8 but not for other encodings.
 --
 -- 'inject' is identity on payloads
+--
+-- @Superset bigger smaller@ reads as @bigger@ is a superset of @smaller@
 class Superset (y :: Symbol) (x :: Symbol) where
     inject :: Enc (x ': xs) c str ->  Enc (y ': xs) c str
     inject = withUnsafeCoerce id
 
+
+instance Superset x x where
 
 -- prop_Superset :: forall y x xs c str . (Superset y x, Eq str) => Enc (x ': xs) c str -> Bool
 -- prop_Superset x = getPayload x == (getPayload . inject @y @x $ x)

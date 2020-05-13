@@ -113,3 +113,34 @@ type family Length (s :: Symbol) :: Nat where
 type family LLengh (s :: [k]) :: Nat where
     LLengh '[] = 0
     LLengh (x ': xs) = 1 + LLengh xs
+
+
+-- |
+-- >>> :kind! LLast '["1","2","3"]
+-- ...
+-- = "3"
+type family LLast (s :: [k]) :: k where
+    LLast '[] = TypeError ('Text "No Head on empty list")
+    LLast '[x] = x
+    LLast (_ ': xs) = LLast xs
+
+
+-- |
+-- Concat (Snoc '["1","2","3"] "4") 
+-- ...
+-- = "1234"
+type family Snoc (s :: [k]) (t :: k) :: [k] where
+    Snoc '[] x = '[x]
+    Snoc (x ': xs) y = x ': Snoc xs y
+
+
+-- |
+-- :kind! UnSnoc '["1","2","3"]    
+type family UnSnoc (s :: [k]) :: ([k], k) where
+    UnSnoc '[] = TypeError ('Text "Empty list, no last element")     
+    UnSnoc '[x] = '(,) '[] x
+    UnSnoc (x ': xs) = UnSnocHelper x (UnSnoc xs)
+
+
+type family UnSnocHelper (s :: k) (t :: ([k], k)) :: ([k], k) where 
+   UnSnocHelper y ('(,) xs x) = '(,) (y ': xs) x   

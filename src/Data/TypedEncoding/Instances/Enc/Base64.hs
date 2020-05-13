@@ -34,11 +34,20 @@ import qualified Data.ByteString.Base64.Lazy as BL64
 -- Conversions --
 -----------------
 
--- | Type-safer version of Byte-string to text conversion that prevent invalid UTF8 bytestrings
+-- | 
+-- DEPRECTATED
+--
+-- See warning in 'Data.TypedEncoding.Instances.Restriction.ASCII.byteString2TextS'
+-- 
+-- Type-safer version of Byte-string to text conversion that prevent invalid UTF8 bytestrings
 -- to be conversted to B64 encoded Text.
 byteString2TextS :: Enc ("enc-B64" ': "r-UTF8" ': ys) c B.ByteString -> Enc ("enc-B64" ': ys) c T.Text 
 byteString2TextS = withUnsafeCoerce TE.decodeUtf8
 
+-- | 
+-- DEPRECTATED
+--
+-- See warning in 'Data.TypedEncoding.Instances.Restriction.ASCII.byteString2TextS'
 byteString2TextL :: Enc ("enc-B64" ': "r-UTF8" ': ys) c BL.ByteString -> Enc ("enc-B64" ': ys) c TL.Text 
 byteString2TextL = withUnsafeCoerce TEL.decodeUtf8
 
@@ -81,6 +90,8 @@ acceptLenientL = withUnsafeCoerce (BL64.encode . BL64.decodeLenient)
 instance FlattenAs "r-ASCII" "enc-B64-nontext" where
 instance FlattenAs "r-ASCII" "enc-B64" where
 
+instance Superset "r-ASCII" "enc-B64-nontext" where
+instance Superset "r-ASCII" "enc-B64" where
 
 -----------------
 -- Encodings   --

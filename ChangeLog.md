@@ -1,10 +1,15 @@
 # Changelog for typed-encoding
 
 ## Unreleased changes
+- new functionality:
+  - `Enc` versions for pack / unpack for `Text` and `ByteString`. 
 
 ## Anticipated future breaking changes
 
 - `Data.TypedEncoding.Internal.Class.IsStringR` expected to be be changed / replaced
+- ByteString / Text conversion functions in `Data.TypedEncoding.Instances.Restriction.ASCII`, 
+  `Data.TypedEncoding.Instances.Restriction.ASCII` and `Data.TypedEncoding.Instances.Enc.Base64`
+  are not type safe and will be adjusted
 
 ## 0.2.1.0
 

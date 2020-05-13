@@ -41,40 +41,56 @@ import           Control.Arrow
 -- $setup
 -- >>> :set -XDataKinds -XTypeApplications
 -- >>> import Test.QuickCheck
--- >>> import Test.QuickCheck.Instances.Text()
 -- >>> import Test.QuickCheck.Instances.ByteString()
 -- >>> :{
 -- instance Arbitrary (Enc '["r-ASCII"] () B.ByteString) where 
 --      arbitrary =  fmap (unsafeSetPayload ()) 
 --                   . flip suchThat (B8.all isAscii) 
 --                        $ arbitrary 
--- instance Arbitrary (Enc '["r-ASCII"] () T.Text) where 
---      arbitrary =  fmap (unsafeSetPayload ()) 
---                   . flip suchThat (T.all isAscii) 
---                        $ arbitrary 
 -- :}
 --
+
 
 -----------------
 -- Conversions --
 -----------------
 
 -- |
--- text2ByteStringS and  byteString2TextS form isomorphism
+-- DEPRECATED use 'Data.TypedEncoding.Text.Encoding.decodeUtf8'
+-- 
+-- Will be removed in 0.3.x.x
 --
--- prop> \x -> getPayload x == (getPayload . text2ByteStringS . byteString2TextS @ '[] @() $ x)
+-- This is not type safe, for example, would allow converting
 --
--- prop> \x -> getPayload x == (getPayload . byteString2TextS . text2ByteStringS @ '[] @() $ x)
+-- @Enc `["r-ASCII", "enc-B64"] c B.ByteString@ containing B64 encoded binary 
+-- to @Enc `["r-ASCII", "enc-B64"] c T.Text@ and which then could be decoded causing 
+-- unexpected error.  
 
 byteString2TextS :: Enc ("r-ASCII" ': ys) c B.ByteString -> Enc ("r-ASCII" ': ys) c T.Text 
 byteString2TextS = withUnsafe (fmap TE.decodeUtf8)
 
+-- | 
+-- DEPRECATED use 'Data.TypedEncoding.Text.Lazy.Encoding.decodeUtf8'
+-- 
+-- Will be removed in 0.3.x.x
+--
+-- see 'byteString2TextS'
 byteString2TextL :: Enc ("r-ASCII" ': ys) c BL.ByteString -> Enc ("r-ASCII" ': ys) c TL.Text 
 byteString2TextL = withUnsafe (fmap TEL.decodeUtf8)
 
+-- | 
+-- DEPRECATED use 'Data.TypedEncoding.Text.Encoding.encodeUtf8'
+-- 
+-- Will be removed in 0.3.x.x
+--
 text2ByteStringS :: Enc ("r-ASCII" ': ys) c T.Text -> Enc ("r-ASCII" ': ys) c B.ByteString 
 text2ByteStringS = withUnsafe (fmap TE.encodeUtf8)
 
+-- | 
+-- DEPRECATED use 'Data.TypedEncoding.Text.Lazy.Encoding.encodeUtf8'
+-- 
+-- Will be removed in 0.3.x.x
+--
 text2ByteStringL  :: Enc ("r-ASCII" ': ys) c TL.Text -> Enc ("r-ASCII" ': ys) c BL.ByteString 
 text2ByteStringL  = withUnsafe (fmap TEL.encodeUtf8)
 

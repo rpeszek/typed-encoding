@@ -9,6 +9,13 @@
 -- | Examples or moving between type annotated encodings
 --
 -- Modules that define encoding and decoding instances also provide conversion functions.
+--
+-- In general, conversions aim at provinding type safety when moving between encoded string-like types.
+--
+-- __The assumption__ made by `typed-encoding` is that encodings work in equivalent way independently of the payload type.
+-- For example, one could implement "enc-B64" as identity on Text and then, instead of properly encoding
+-- ByteString, convert to Text, encode, convert back. This package, obviously, does not guard against 
+-- problems like these.
 -- 
 -- Currently, these are separate functions, generalization of conversions seems hard.
 --
