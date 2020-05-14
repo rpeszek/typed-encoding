@@ -119,8 +119,8 @@ type family LLengh (s :: [k]) :: Nat where
 -- >>> :kind! LLast '["1","2","3"]
 -- ...
 -- = "3"
-type family LLast (s :: [k]) :: k where
-    LLast '[] = TypeError ('Text "No Head on empty list")
+type family LLast (s :: [Symbol]) :: Symbol where
+    LLast '[] = TypeError ('Text "Empty Symbol list not allowed")
     LLast '[x] = x
     LLast (_ ': xs) = LLast xs
 

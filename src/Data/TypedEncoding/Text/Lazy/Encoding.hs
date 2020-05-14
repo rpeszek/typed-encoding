@@ -19,9 +19,9 @@ import           Data.TypedEncoding.Unsafe (withUnsafe)
 
 
 
-decodeUtf8 :: forall xs c t. (LLast xs ~ t, Superset "r-UTF8" t) => Enc xs c BL.ByteString -> Enc xs c TL.Text 
+decodeUtf8 :: forall xs c t. (LLast xs ~ t, IsSuperset "r-UTF8" t ~ 'True) => Enc xs c BL.ByteString -> Enc xs c TL.Text 
 decodeUtf8 = withUnsafe (fmap TEL.decodeUtf8)
 
 
-encodeUtf8 :: forall xs c t.  (LLast xs ~ t, Superset "r-UTF8" t) => Enc xs c TL.Text -> Enc xs c BL.ByteString 
+encodeUtf8 :: forall xs c t.  (LLast xs ~ t, IsSuperset "r-UTF8" t ~ 'True) => Enc xs c TL.Text -> Enc xs c BL.ByteString 
 encodeUtf8 = withUnsafe (fmap TEL.encodeUtf8)

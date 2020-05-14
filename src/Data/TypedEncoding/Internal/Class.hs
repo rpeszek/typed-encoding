@@ -75,6 +75,7 @@ class Superset (y :: Symbol) (x :: Symbol) where
     inject :: Enc (x ': xs) c str ->  Enc (y ': xs) c str
     inject = withUnsafeCoerce id
 
+type family IsSuperset (y :: Symbol) (x :: Symbol) :: Bool
 
 instance Superset x x where
 

@@ -67,11 +67,11 @@ import           Data.TypedEncoding.Unsafe (withUnsafe)
 --
 -- prop> \x -> getPayload x == (getPayload . encodeUtf8 . decodeUtf8 @ '["r-ASCII"] @() $ x)
 -- prop> \x -> getPayload x == (getPayload . decodeUtf8 . encodeUtf8 @ '["r-ASCII"] @() $ x)
-decodeUtf8 :: forall xs c t. (LLast xs ~ t, Superset "r-UTF8" t) => Enc xs c B.ByteString -> Enc xs c T.Text 
+decodeUtf8 :: forall xs c t. (LLast xs ~ t, IsSuperset "r-UTF8" t ~ 'True) => Enc xs c B.ByteString -> Enc xs c T.Text 
 decodeUtf8 = withUnsafe (fmap TE.decodeUtf8)
 
 -- |
 -- >>> displ $ encodeUtf8 $ utf8Promote $ toEncoding () ("text" :: T.Text)
 -- "MkEnc '[r-UTF8] () (ByteString text)"
-encodeUtf8 :: forall xs c t.  (LLast xs ~ t, Superset "r-UTF8" t) => Enc xs c T.Text -> Enc xs c B.ByteString 
+encodeUtf8 :: forall xs c t.  (LLast xs ~ t, IsSuperset "r-UTF8" t ~ 'True) => Enc xs c T.Text -> Enc xs c B.ByteString 
 encodeUtf8 = withUnsafe (fmap TE.encodeUtf8)

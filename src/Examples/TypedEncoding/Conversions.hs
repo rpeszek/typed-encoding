@@ -91,7 +91,7 @@ helloZero = toEncoding () "Hello"
 -- ... error:
 -- ...
 --
--- But this does not compile (error message is TODO).
+-- But this does not compile.
 -- 
 -- >>> fmap (displ . EncB8.pack) . encodeFAll @(Either EncodeEx) @'["r-ASCII"] $ helloZero
 -- Right "MkEnc '[r-ASCII] () (ByteString Hello)"
