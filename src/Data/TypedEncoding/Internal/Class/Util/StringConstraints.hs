@@ -63,6 +63,9 @@ instance ToStrInj String TL.Text where
     toString = TL.unpack  
 
 
+instance ToStrInj String String where
+    toString = id
+
 -- will not work!
 -- prop> prop_toStringFromString (Proxy :: Proxy B.ByteString) 
 -- instance ToStrInj String B.ByteString where
@@ -92,6 +95,8 @@ instance ToStrIso String T.Text where
 -- |
 -- prop> prop_fromStringToString @TL.Text
 instance ToStrIso String TL.Text where    
+
+instance ToStrIso String String where
 
 -- |
 -- Used to find exceptions that violated "r-" encoding

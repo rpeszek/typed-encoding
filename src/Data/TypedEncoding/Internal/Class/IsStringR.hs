@@ -3,6 +3,7 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE AllowAmbiguousTypes #-}
+{-# LANGUAGE FlexibleInstances #-}
 
 -- | This Module will be removed in 0.3.x.x in favor of 
 -- "Data.TypedEncoding.Internal.Class.Util.StringConstraints"
@@ -67,3 +68,6 @@ instance IsStringR T.Text where
 -- prop> prop_fromStringToString @TL.Text
 instance IsStringR TL.Text where
     toString = TL.unpack  
+
+instance IsStringR [Char] where
+    toString = id

@@ -61,6 +61,9 @@ fromEncString = runIdentity . fromEncStringF
 -- @"Enc '["enc-"] c ByteString@ to @"Enc '["enc-"] c Text@, decoding which
 -- could result in rutime errors.
 --
+-- The requirement is that that the decoding in the superset
+-- can replace the decoding from injected subset.
+--
 -- @
 -- instance Superset "r-ASCII" "enc-B64" where -- DANGEROUS
 -- @

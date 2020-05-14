@@ -29,6 +29,7 @@ import qualified Data.Text as T
 import qualified Data.Text.Lazy as TL
 import qualified Data.Text.Encoding as TE 
 import qualified Data.Text.Lazy.Encoding as TEL 
+import qualified Data.List as L
 
 import qualified Data.ByteString.Char8 as B8
 import qualified Data.ByteString.Lazy.Char8 as BL8
@@ -117,6 +118,13 @@ prxyAscii = Proxy :: Proxy "r-ASCII"
 instance EncodeF (Either EncodeEx) (Enc xs c Char) (Enc ("r-ASCII" ': xs) c Char) where
     encodeF = implEncodeF_ prxyAscii (\c -> explainBool NonAsciiChar (c, isAscii c))    
 instance Applicative f => DecodeF f (Enc ("r-ASCII" ': xs) c Char) (Enc xs c Char) where
+    decodeF = implTranP id 
+
+instance EncodeF (Either EncodeEx) (Enc xs c String) (Enc ("r-ASCII" ': xs) c String) where
+    encodeF = implEncodeF_ prxyAscii (encodeImpl L.partition L.head L.null)
+instance (RecreateErr f, Applicative f) => RecreateF f (Enc xs c String) (Enc ("r-ASCII" ': xs) c String) where
+    checkPrevF = implCheckPrevF (asRecreateErr @"r-ASCII" . encodeImpl L.partition L.head L.null)
+instance Applicative f => DecodeF f (Enc ("r-ASCII" ': xs) c String) (Enc xs c String) where
     decodeF = implTranP id 
 
 instance EncodeF (Either EncodeEx) (Enc xs c T.Text) (Enc ("r-ASCII" ': xs) c T.Text) where

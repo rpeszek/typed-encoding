@@ -1,15 +1,29 @@
 # Changelog for typed-encoding
 
-## Unreleased changes
-- new functionality:
-  - `Enc` versions for pack / unpack for `Text` and `ByteString`. 
-
 ## Anticipated future breaking changes
 
-- `Data.TypedEncoding.Internal.Class.IsStringR` expected to be be changed / replaced
 - ByteString / Text conversion functions in `Data.TypedEncoding.Instances.Restriction.ASCII`, 
   `Data.TypedEncoding.Instances.Restriction.ASCII` and `Data.TypedEncoding.Instances.Enc.Base64`
-  are not type safe and will be adjusted
+  are now deprecated and will be removed. 
+- `Data.TypedEncoding.Internal.Class.IsStringR` expected to be be changed / replaced
+- functions used to create encoding instances or encoding combinators (e.g. `implEncodeP`) will get more constraints. 
+- (never ending) rework of internal module stucture to make it easier to navigate 
+- module `Data.TypedEncoding.Instances.Support` needs to be imported when working on encoding combinators but name suggests instance work, 
+  this needs rethinking. 
+- "enc-B64" will be moved to a different package (more distant goal)
+
+## Unreleased changes
+
+- new functionality:
+  - `Enc` versions for `pack`/ `unpack` for `Text` and `ByteString`. 
+  - `Enc` versions of `decodeUtf8` / `encodeUtf8`
+  - new and corrected approach to conversions (all old conversion functions have been deprecated)
+  - more modules exported from `Data.TypedEncoding.Instances.Support` for instance and combinator creation
+  - more utility type famililes `Data.TypedEncoding.Internal.Util.TypeLits` 
+  - more utility combinators for creating encoding instances and combinators.
+  - String instance added for "r-ASCII"
+- deprecation warnings (see above) 
+- other
 
 ## 0.2.1.0
 
