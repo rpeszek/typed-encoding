@@ -56,6 +56,8 @@ import           Data.TypedEncoding.Instances.Support
 type family IsBan (s :: Symbol) :: Bool where
     IsBan s = AcceptEq ('Text "Not ban restriction encoding " ':<>: ShowType s ) (CmpSymbol "r-ban:" (Take 6 s))
 
+type instance IsSupersetOpen "r-ASCII" "r-ban" xs = 'True
+
 
 -- |
 -- >>> encFBan . toEncoding () $ "c59f9fb7-4621-44d9-9020-ce37bf6e2bd1" :: Either EncodeEx (Enc '["r-ban:ffffffff-ffff-ffff-ffff-ffffffffffff"] () T.Text)
@@ -73,6 +75,7 @@ encFBan :: forall f s t xs c str .
               Enc xs c str -> f (Enc (s ': xs) c str)  
 encFBan = implEncodeF @s (verifyBoundedAlphaNum (Proxy :: Proxy s))              
 
+-- TODO remove f from forall in encFBan (slightly breaking chanage)
 
 
 -- |

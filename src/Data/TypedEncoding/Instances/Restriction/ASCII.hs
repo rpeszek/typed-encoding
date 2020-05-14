@@ -108,8 +108,8 @@ text2ByteStringL  = withUnsafe (fmap TEL.encodeUtf8)
 -- "MkEnc '[r-UTF8] () (Text Hello World)"
 instance Superset "r-UTF8" "r-ASCII" where
 
-type instance IsSuperset "r-UTF8" "r-ASCII" = True  
-type instance IsSuperset "r-ASCII" "r-ASCII" = True  
+-- type instance IsSuperset "r-UTF8" "r-ASCII" = True  
+-- type instance IsSuperset "r-ASCII" "r-ASCII" = True  
 
 -----------------
 -- Encondings  --

@@ -5,7 +5,7 @@
 {-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE FlexibleContexts #-}
--- {-# LANGUAGE UndecidableInstances #-}
+{-# LANGUAGE UndecidableInstances #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE TypeApplications #-}
@@ -23,6 +23,7 @@ import           Data.TypedEncoding.Internal.Class.Util
 import           Data.TypedEncoding.Internal.Class.Encode
 import           Data.TypedEncoding.Internal.Class.Decode
 import           Data.TypedEncoding.Internal.Class.Recreate
+import           Data.TypedEncoding.Internal.Util.TypeLits
 
 import           Data.TypedEncoding.Internal.Types (Enc(..) 
                                                    , withUnsafeCoerce
@@ -30,7 +31,7 @@ import           Data.TypedEncoding.Internal.Types (Enc(..)
                                                    )
 import           Data.Functor.Identity
 import           GHC.TypeLits
-
+import           Data.Symbol.Ascii
 
 -- | 
 -- Generalized Java @toString@ or a type safe version of Haskell's 'Show'.
@@ -75,7 +76,13 @@ class Superset (y :: Symbol) (x :: Symbol) where
     inject :: Enc (x ': xs) c str ->  Enc (y ': xs) c str
     inject = withUnsafeCoerce id
 
-type family IsSuperset (y :: Symbol) (x :: Symbol) :: Bool
+type family IsSuperset (y :: Symbol) (x :: Symbol) :: Bool where
+    IsSuperset "r-ASCII" "r-ASCII" = 'True
+    IsSuperset "r-UTF8"  "r-ASCII" = 'True
+    IsSuperset "r-UTF8"  "r-UTF8" = 'True
+    IsSuperset y x = IsSupersetOpen y (TakeUntil x ":") (ToList x)
+
+type family IsSupersetOpen (y :: Symbol) (x :: Symbol) (xs :: [Symbol]) :: Bool
 
 instance Superset x x where
 
