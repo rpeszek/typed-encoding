@@ -1,6 +1,6 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
--- {-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE KindSignatures #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE OverloadedStrings #-}
@@ -36,7 +36,7 @@
 -- EncodeF SomeErr (Enc xs () Text) (Enc ("enc-B64" ': xs) () Text)    
 -- @
 -- 
--- Then @typed-encoding@ expects these to commute:
+-- Then @typed-encoding@ expects @pack@ @encodeF@ to commute:
 -- 
 -- @
 --  str     -- EncT.pack -->   txt
@@ -46,6 +46,8 @@
 --   v                          v
 --  estr -- fmap EncT.pack --> etxt
 -- @
+--
+-- (@unpack@ and $decode$ are expected to satisfy similar diagrams, not shown)
 --
 -- Basically, it should not matter which type we run the encoding on (other than performance cost).
 --
@@ -58,19 +60,20 @@ import           Data.TypedEncoding.Instances.Enc.Base64 ()
 import           Data.TypedEncoding.Instances.Restriction.ASCII ()
 import           Data.TypedEncoding.Instances.Restriction.UTF8 ()
 
-import qualified Data.TypedEncoding.Conv.Text as EncT (utf8Demote)
+import qualified Data.TypedEncoding.Conv.Text as EncT 
 import qualified Data.TypedEncoding.Conv.Text.Encoding as EncTe (decodeUtf8)
 
 import qualified Data.Text as T
 import qualified Data.ByteString as B
+import           GHC.TypeLits
 
 import qualified Data.TypedEncoding.Conv.ByteString.Char8 as EncB8
 import           Data.TypedEncoding.Combinators.Restriction.BoundedAlphaNums
 
 -- $setup
--- >>> :set -XOverloadedStrings -XMultiParamTypeClasses -XDataKinds -XTypeApplications -XPolyKinds -XFlexibleInstances -XFlexibleContexts -XScopedTypeVariables
+-- >>> :set -XDataKinds -XMultiParamTypeClasses -XKindSignatures -XFlexibleInstances -XFlexibleContexts -XOverloadedStrings -XTypeApplications -XScopedTypeVariables
 -- >>> import qualified Data.TypedEncoding.Instances.Enc.Base64 as EnB64 (acceptLenientS)
--- >>> import qualified Data.TypedEncoding.Conv.Text as EncT (utf8Promote, utf8Demote)
+-- >>> import qualified Data.TypedEncoding.Conv.Text as EncT (pack, utf8Promote, utf8Demote)
 -- >>> import qualified Data.TypedEncoding.Conv.ByteString.Char8 as EncB8 (pack, unpack)
 -- >>> import qualified Data.TypedEncoding.Conv.Text.Encoding as EncTe (decodeUtf8, encodeUtf8)
 -- >>> import           Data.Proxy
@@ -83,27 +86,51 @@ import           Data.TypedEncoding.Combinators.Restriction.BoundedAlphaNums
 
 -- * pack and unpack
 
-helloZero :: Enc '[] () String
+helloZero :: Enc ('[] :: [Symbol]) () String
 helloZero = toEncoding () "Hello"
 -- ^ Consider 0-encoding of a 'String',  to move it to @Enc '[] () String@ one could try:
 --
+-- >>> displ . EncT.pack $ helloZero
+-- "MkEnc '[] () (Text Hello)"
+--
+-- this works, but:
+-- 
 -- >>> EncB8.pack helloZero
 -- ...
 -- ... error: 
+-- ... Empty Symbol list not allowed
 -- ...
 --
--- But this does not compile.  And it should not. @pack@ from "Data.ByteString.Char8" is error prone.
--- It is not an injectionm, it only considers first 7 bits of information from each 'Char'.  
--- I doubt that there are many code examples of its intential use on a String that is not ASCII. 
+-- this does not compile.  And it should not. @pack@ from "Data.ByteString.Char8" is error prone.
+-- It is not an injection as it only considers first 7 bits of information from each 'Char'.  
+-- I doubt that there are any code examples of its intential use on a String that is not ASCII. 
 -- 
 -- @EncB8.pack@ will not compile unless the encoding is ASCII restricted, this works:
 -- 
 -- >>> fmap (displ . EncB8.pack) . encodeFAll @(Either EncodeEx) @'["r-ASCII"] $ helloZero
 -- Right "MkEnc '[r-ASCII] () (ByteString Hello)"
+--
+-- And the result is a @ByteString@ with bonus annoation describing its content.
 
 
 helloRestricted :: Either EncodeEx (Enc '["r-ban:zzzzz"] () B.ByteString)
 helloRestricted = fmap EncB8.pack . encFBan $ toEncoding () "Hello"
+-- ^ more interstingly @EncB8.pack@ works fine on "r-" encodings that are subsets of "r-ASCII"
+-- this example @"r-ban:zzzzz"@ restricts to 5 alapha-numeric charaters all < 'z'
+-- 
+-- >>> displ <$> helloRestricted
+-- Right "MkEnc '[r-ban:zzzzz] () (ByteString Hello)"
+--
+-- Adding @"r-ASCII"@ annotation on this ByteString would have been redunant since @"r-ban:zzzzz"@ is more
+-- restrictive.
+--
+-- @unpack@, as expected will put us back in a String keeping the annotation
+--
+-- >>> fmap (displ . EncB8.unpack) helloRestricted
+-- Right "MkEnc '[r-ban:zzzzz] () Hello"
+-- 
+
+
 
 -- * Moving between Text and ByteString
 

@@ -15,12 +15,12 @@
 -- Restrictions @"r-ban:"@ cover commonly used fixed (short) size strings with restricted
 -- characters such as GUID, credit card numbers, etc.  
 -- 
--- Alphanumeric chars are ordered: @0-9@ followed by 
--- @a-z@ followed by @A-Z@. Annotation specifies upper character bound. 
+-- Alphanumeric chars are ordered: @0-9@ followed by @A-Z@,
+-- followed by @a-z@. Annotation specifies upper character bound. 
 -- Any non alpha numeric characters are considered fixed delimiters
 -- and need to be present exactly as specified.
 -- For example @"r-ban:999-99-9999"@ could be used to describe SSN numbers,
--- @"r-ban:ffff" would describe strings consisting of 4 hex digits.
+-- @"r-ban:FFFF" would describe strings consisting of 4 hex digits.
 --
 -- This is a simple implementation that converts to @String@, should be used
 -- only with short length data.
@@ -60,8 +60,8 @@ type instance IsSupersetOpen "r-ASCII" "r-ban" xs = 'True
 
 
 -- |
--- >>> encFBan . toEncoding () $ "c59f9fb7-4621-44d9-9020-ce37bf6e2bd1" :: Either EncodeEx (Enc '["r-ban:ffffffff-ffff-ffff-ffff-ffffffffffff"] () T.Text)
--- Right (MkEnc Proxy () "c59f9fb7-4621-44d9-9020-ce37bf6e2bd1")
+-- >>> encFBan . toEncoding () $ "C59F9FB7-4621-44D9-9020-CE37BF6E2BD1" :: Either EncodeEx (Enc '["r-ban:FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF"] () T.Text)
+-- Right (MkEnc Proxy () "C59F9FB7-4621-44D9-9020-CE37BF6E2BD1")
 -- 
 -- >>> recWithEncR encFBan . toEncoding () $ "211-22-9934" :: Either RecreateEx (Enc '["r-ban:999-99-9999"] () T.Text)
 -- Right (MkEnc Proxy () "211-22-9934")
@@ -79,13 +79,13 @@ encFBan = implEncodeF @s (verifyBoundedAlphaNum (Proxy :: Proxy s))
 
 
 -- |
--- >>> verifyBoundedAlphaNum (Proxy :: Proxy "r-ban:ff-ff") (T.pack "12-3e")
--- Right "12-3e"
--- >>> verifyBoundedAlphaNum (Proxy :: Proxy "r-ban:ff-ff") (T.pack "1g-3e")
--- Left "'g' not boulded by 'f'"
--- >>> verifyBoundedAlphaNum (Proxy :: Proxy "r-ban:ff-ff") (T.pack "13g3e")
--- Left "'g' not matching '-'"
--- >>> verifyBoundedAlphaNum (Proxy :: Proxy "r-ban:ff-ff") (T.pack "13-234")
+-- >>> verifyBoundedAlphaNum (Proxy :: Proxy "r-ban:FF-FF") (T.pack "12-3E")
+-- Right "12-3E"
+-- >>> verifyBoundedAlphaNum (Proxy :: Proxy "r-ban:FF-FF") (T.pack "1G-3E")
+-- Left "'G' not boulded by 'F'"
+-- >>> verifyBoundedAlphaNum (Proxy :: Proxy "r-ban:FF-FF") (T.pack "13G3E")
+-- Left "'G' not matching '-'"
+-- >>> verifyBoundedAlphaNum (Proxy :: Proxy "r-ban:FF-FF") (T.pack "13-234")
 -- Left "Input list has wrong size expecting 5 but length \"13-234\" == 6"
 verifyBoundedAlphaNum :: forall s a str . (KnownSymbol s, IsStringR str) => Proxy s -> str -> Either String str
 verifyBoundedAlphaNum p str = 

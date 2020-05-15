@@ -2,6 +2,7 @@
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE PolyKinds #-} -- removes need to annotate kinds as [Symbol]
 
 -- | ByteString encoding combinators that do not belong 
 -- in a module specific to a particual encoding.

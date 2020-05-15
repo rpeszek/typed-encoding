@@ -2,6 +2,7 @@
 -- | Lazy version of "Data.TypedEncoding.Conv.Text"
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE PolyKinds #-} -- removes need to annotate kinds as [Symbol]
 
 module Data.TypedEncoding.Conv.Text.Lazy where
 

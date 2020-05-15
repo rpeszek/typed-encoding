@@ -2,6 +2,7 @@
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE PolyKinds #-} -- removes need to annotate kinds as [Symbol]
 
 -- | Lazy version of "Data.TypedEncoding.Conv.ByteString.Lazy"
 module Data.TypedEncoding.Conv.ByteString.Lazy.Char8 where

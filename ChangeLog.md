@@ -18,6 +18,7 @@
 - Fixes
   - Conversions type safety issues
   - new and corrected approach to conversions (all old conversion functions have been deprecated)
+  - corrected documentation in `Data.TypedEncoding.Combinators.Restriction.BoundedAlphaNums`
 - new functionality:
   - `Enc` versions for `pack`/ `unpack` for `Text` and `ByteString`. 
   - `Enc` versions of `decodeUtf8` / `encodeUtf8`

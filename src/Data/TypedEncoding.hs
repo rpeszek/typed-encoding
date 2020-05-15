@@ -84,7 +84,7 @@
 --
 -- Examples: 
 --
--- @"boolOr:(r-ban:ffffffff-ffff-ffff-ffff-ffffffffffff)(r-ban:ffffffffffffffffffffffffffffffff)"@ 
+-- @"boolOr:(r-ban:FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF)(r-ban:FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF)"@ 
 --
 -- "@boolNot:(r-ASCII)"
 --

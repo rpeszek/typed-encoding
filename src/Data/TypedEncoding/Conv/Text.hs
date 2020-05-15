@@ -1,5 +1,6 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE PolyKinds #-} -- removes need to annotate kinds as [Symbol]
 
 -- | Text encoding combinators specific to 'T.Text'
 module Data.TypedEncoding.Conv.Text where
