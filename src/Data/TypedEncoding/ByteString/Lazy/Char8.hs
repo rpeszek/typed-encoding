@@ -21,10 +21,10 @@ import           Data.TypedEncoding
 --
 -- :t pack (undefined :: Enc '["r-bar", "r-ASCII"] () String)
 -- :t pack (undefined :: Enc '["r-bar", "r-foo"] () String)
-pack :: (Knds.LLast xs ~ t, Superset "r-ASCII" t) => Enc xs c String -> Enc xs c BL8.ByteString
+pack :: (Knds.LLast xs ~ t, IsSuperset "r-ASCII" t ~ 'True) => Enc xs c String -> Enc xs c BL8.ByteString
 pack = unsafeChangePayload BL8.pack
 
 -- | 
 -- Type safe version of 'BL8.unpack'.
-unpack :: (Knds.LLast xs ~ t, Superset "r-ASCII" t) => Enc xs c BL8.ByteString -> Enc xs c String
+unpack :: (Knds.LLast xs ~ t, IsSuperset "r-ASCII" t ~ 'True) => Enc xs c BL8.ByteString -> Enc xs c String
 unpack = unsafeChangePayload BL8.unpack          

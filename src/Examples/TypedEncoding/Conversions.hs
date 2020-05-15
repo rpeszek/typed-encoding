@@ -1,6 +1,6 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
-{-# LANGUAGE TypeOperators #-}
+-- {-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE OverloadedStrings #-}
@@ -65,9 +65,10 @@ import qualified Data.Text as T
 import qualified Data.ByteString as B
 
 import qualified Data.TypedEncoding.ByteString.Char8 as EncB8
+import           Data.TypedEncoding.Combinators.Restriction.BoundedAlphaNums
 
 -- $setup
--- >>> :set -XOverloadedStrings -XMultiParamTypeClasses -XDataKinds -XTypeApplications
+-- >>> :set -XOverloadedStrings -XMultiParamTypeClasses -XDataKinds -XTypeApplications -XPolyKinds -XFlexibleInstances -XFlexibleContexts -XScopedTypeVariables
 -- >>> import qualified Data.TypedEncoding.Instances.Enc.Base64 as EnB64 (acceptLenientS)
 -- >>> import qualified Data.TypedEncoding.Text as EncT (utf8Promote, utf8Demote)
 -- >>> import qualified Data.TypedEncoding.ByteString.Char8 as EncB8 (pack, unpack)
@@ -88,14 +89,21 @@ helloZero = toEncoding () "Hello"
 --
 -- >>> EncB8.pack helloZero
 -- ...
--- ... error:
+-- ... error: 
 -- ...
 --
--- But this does not compile (error message is TODO).
+-- But this does not compile.  And it should not. @pack@ from "Data.ByteString.Char8" is error prone.
+-- It is not an injectionm, it only considers first 7 bits of information from each 'Char'.  
+-- I doubt that there are many code examples of its intential use on a String that is not ASCII. 
+-- 
+-- @EncB8.pack@ will not compile unless the encoding is ASCII restricted, this works:
 -- 
 -- >>> fmap (displ . EncB8.pack) . encodeFAll @(Either EncodeEx) @'["r-ASCII"] $ helloZero
 -- Right "MkEnc '[r-ASCII] () (ByteString Hello)"
 
+
+helloRestricted :: Either EncodeEx (Enc '["r-ban:zzzzz"] () B.ByteString)
+helloRestricted = fmap EncB8.pack . encFBan $ toEncoding () "Hello"
 
 -- * Moving between Text and ByteString
 
@@ -166,7 +174,8 @@ helloUtf8B64T = EncT.utf8Demote . EncTe.decodeUtf8 $ helloUtf8B64B
 -- 
 -- >>> :t EncTe.encodeUtf8 helloUtf8B64T
 -- ...
--- ... No instance for (Superset "r-UTF8" "enc-B64")
+-- ... Couldn't match type ‘IsSupersetOpen
+-- ... "r-UTF8" "enc-B64" ...
 -- ...
 --
 -- This is not allowed! We need to add the redundant "r-UTF8" back:
@@ -185,7 +194,9 @@ notTextB = encodeAll . toEncoding () $ "\195\177"
 --
 -- >>> :t EncTe.decodeUtf8 notTextB
 -- ...
--- ... No instance for (Superset "r-UTF8" "enc-B64")
+-- ... error:
+-- ... Couldn't match type ...
+-- ... "r-UTF8" "enc-B64" ...
 -- ...
 --
 -- This is good because having the payload inside of @Enc '["enc-B64"] () Text@ would allow us

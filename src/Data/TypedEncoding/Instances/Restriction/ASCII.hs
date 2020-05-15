@@ -4,6 +4,7 @@
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE TypeFamilies #-}
 
 -- | Strings can be encoded as 'Enc "r-ASCII"@ only if they contain only ascii characters (first 128 characters of the Unicode character set).
 --
@@ -106,6 +107,9 @@ text2ByteStringL  = withUnsafe (fmap TEL.encodeUtf8)
 -- >>> displ (inject @ "r-UTF8" tstAscii)
 -- "MkEnc '[r-UTF8] () (Text Hello World)"
 instance Superset "r-UTF8" "r-ASCII" where
+
+-- type instance IsSuperset "r-UTF8" "r-ASCII" = True  
+-- type instance IsSuperset "r-ASCII" "r-ASCII" = True  
 
 -----------------
 -- Encondings  --

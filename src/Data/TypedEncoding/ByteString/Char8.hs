@@ -24,16 +24,18 @@ import           Data.TypedEncoding
 --
 -- >>> :t pack (undefined :: Enc '["r-bar", "r-foo"] () String)
 -- ...
--- ... No instance for (Superset "r-ASCII" "r-foo")
+-- ... error:
+-- ... Couldn't match type ...
+-- ... "r-ASCII" "r-foo" ...
 -- ...
 --
 -- >>> displ $ pack (unsafeSetPayload () "Hello" :: Enc '["r-bar", "r-ASCII"] () String)
 -- "MkEnc '[r-bar,r-ASCII] () (ByteString Hello)"
-pack :: (Knds.LLast xs ~ t, Superset "r-ASCII" t) => Enc xs c String -> Enc xs c B8.ByteString
+pack :: (Knds.LLast xs ~ t, IsSuperset "r-ASCII" t ~ 'True) => Enc xs c String -> Enc xs c B8.ByteString
 pack = unsafeChangePayload B8.pack
 
 -- | @unpack@ on encoded strings.
 --
 -- See 'pack'
-unpack :: (Knds.LLast xs ~ t, Superset "r-ASCII" t) => Enc xs c B8.ByteString -> Enc xs c String
+unpack :: (Knds.LLast xs ~ t, IsSuperset "r-ASCII" t ~ 'True) => Enc xs c B8.ByteString -> Enc xs c String
 unpack = unsafeChangePayload B8.unpack      
