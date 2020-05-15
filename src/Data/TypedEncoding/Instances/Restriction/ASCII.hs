@@ -58,7 +58,7 @@ import           Control.Arrow
 -----------------
 
 -- |
--- DEPRECATED use 'Data.TypedEncoding.Text.Encoding.decodeUtf8'
+-- DEPRECATED use 'Data.TypedEncoding.Conv.Text.Encoding.decodeUtf8'
 -- 
 -- Will be removed in 0.3.x.x
 --
@@ -72,7 +72,7 @@ byteString2TextS :: Enc ("r-ASCII" ': ys) c B.ByteString -> Enc ("r-ASCII" ': ys
 byteString2TextS = withUnsafe (fmap TE.decodeUtf8)
 
 -- | 
--- DEPRECATED use 'Data.TypedEncoding.Text.Lazy.Encoding.decodeUtf8'
+-- DEPRECATED use 'Data.TypedEncoding.Conv.Text.Lazy.Encoding.decodeUtf8'
 -- 
 -- Will be removed in 0.3.x.x
 --
@@ -81,7 +81,7 @@ byteString2TextL :: Enc ("r-ASCII" ': ys) c BL.ByteString -> Enc ("r-ASCII" ': y
 byteString2TextL = withUnsafe (fmap TEL.decodeUtf8)
 
 -- | 
--- DEPRECATED use 'Data.TypedEncoding.Text.Encoding.encodeUtf8'
+-- DEPRECATED use 'Data.TypedEncoding.Conv.Text.Encoding.encodeUtf8'
 -- 
 -- Will be removed in 0.3.x.x
 --
@@ -89,7 +89,7 @@ text2ByteStringS :: Enc ("r-ASCII" ': ys) c T.Text -> Enc ("r-ASCII" ': ys) c B.
 text2ByteStringS = withUnsafe (fmap TE.encodeUtf8)
 
 -- | 
--- DEPRECATED use 'Data.TypedEncoding.Text.Lazy.Encoding.encodeUtf8'
+-- DEPRECATED use 'Data.TypedEncoding.Conv.Text.Lazy.Encoding.encodeUtf8'
 -- 
 -- Will be removed in 0.3.x.x
 --

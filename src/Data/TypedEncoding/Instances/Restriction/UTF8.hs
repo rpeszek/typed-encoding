@@ -56,8 +56,8 @@ emptyUTF8B c = unsafeSetPayload c ""
 -- |
 -- | DEPRECTED will be removed in 0.3 
 -- 
--- use 'Data.TypedEncoding.Text.Lazy.Encoding.encodeUtf8'
--- and 'Data.TypedEncoding.Text.utf8Promote'
+-- use 'Data.TypedEncoding.Conv.Text.Lazy.Encoding.encodeUtf8'
+-- and 'Data.TypedEncoding.Conv.Text.utf8Promote'
 text2ByteStringS :: Enc ys c T.Text -> Enc ("r-UTF8" ': ys) c B.ByteString
 text2ByteStringS = withUnsafeCoerce TE.encodeUtf8
 
@@ -66,8 +66,8 @@ text2ByteStringS = withUnsafeCoerce TE.encodeUtf8
 --
 -- | DEPRECTED will be removed in 0.3 
 -- 
--- use 'Data.TypedEncoding.Text.Lazy.Encoding.decodeUtf8'
--- and 'Data.TypedEncoding.Text.utf8Demote'
+-- use 'Data.TypedEncoding.Conv.Text.Lazy.Encoding.decodeUtf8'
+-- and 'Data.TypedEncoding.Conv.Text.utf8Demote'
 --
 -- See warning in 'Data.TypedEncoding.Instances.Restriction.ASCII.byteString2TextS'
 --

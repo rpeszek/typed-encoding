@@ -5,7 +5,7 @@
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 
-module Data.TypedEncoding.Text.Encoding where
+module Data.TypedEncoding.Conv.Text.Encoding where
 
 import qualified Data.ByteString as B
 import qualified Data.Text as T
@@ -25,7 +25,7 @@ import           Data.TypedEncoding.Unsafe (withUnsafe)
 -- >>> import qualified Data.ByteString.Char8 as B8
 -- >>> import Data.Char
 -- >>> import Data.Either
--- >>> import Data.TypedEncoding.Text
+-- >>> import Data.TypedEncoding.Conv.Text
 -- >>> let emptyUTF8B = unsafeSetPayload () "" :: Enc '["r-UTF8"] () B.ByteString  
 -- >>> :{
 -- instance Arbitrary (Enc '["r-UTF8"] () B.ByteString) where 

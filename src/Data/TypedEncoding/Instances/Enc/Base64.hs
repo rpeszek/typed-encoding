@@ -35,8 +35,8 @@ import qualified Data.ByteString.Base64.Lazy as BL64
 -----------------
 
 -- | 
--- DEPRECATED use 'Data.TypedEncoding.Text.Encoding.decodeUtf8'
--- and 'Data.TypedEncoding.Text.utf8Demote'
+-- DEPRECATED use 'Data.TypedEncoding.Conv.Text.Encoding.decodeUtf8'
+-- and 'Data.TypedEncoding.Conv.Text.utf8Demote'
 -- 
 -- Will be removed in 0.3.x.x
 --
@@ -45,8 +45,8 @@ byteString2TextS :: Enc ("enc-B64" ': "r-UTF8" ': ys) c B.ByteString -> Enc ("en
 byteString2TextS = withUnsafeCoerce TE.decodeUtf8
 
 -- | 
--- DEPRECATED use 'Data.TypedEncoding.Text.Lazy.Encoding.decodeUtf8'
--- and 'Data.TypedEncoding.Text.utf8Demote'
+-- DEPRECATED use 'Data.TypedEncoding.Conv.Text.Lazy.Encoding.decodeUtf8'
+-- and 'Data.TypedEncoding.Conv.Text.utf8Demote'
 --
 -- Will be removed in 0.3.x.x
 --
@@ -54,15 +54,15 @@ byteString2TextS = withUnsafeCoerce TE.decodeUtf8
 byteString2TextL :: Enc ("enc-B64" ': "r-UTF8" ': ys) c BL.ByteString -> Enc ("enc-B64" ': ys) c TL.Text 
 byteString2TextL = withUnsafeCoerce TEL.decodeUtf8
 
--- DEPRECATED use 'Data.TypedEncoding.Text.Encoding.encodeUtf8'
--- and 'Data.TypedEncoding.Text.utf8Promote'
+-- DEPRECATED use 'Data.TypedEncoding.Conv.Text.Encoding.encodeUtf8'
+-- and 'Data.TypedEncoding.Conv.Text.utf8Promote'
 -- 
 -- Will be removed in 0.3.x.x
 text2ByteStringS :: Enc ("enc-B64" ': ys) c T.Text -> Enc ("enc-B64" ': "r-UTF8" ': ys) c B.ByteString 
 text2ByteStringS = withUnsafeCoerce TE.encodeUtf8
 
--- DEPRECATED use 'Data.TypedEncoding.Text.Lazy.Encoding.encodeUtf8'
--- and 'Data.TypedEncoding.Text.utf8Promote'
+-- DEPRECATED use 'Data.TypedEncoding.Conv.Text.Lazy.Encoding.encodeUtf8'
+-- and 'Data.TypedEncoding.Conv.Text.utf8Promote'
 -- 
 -- Will be removed in 0.3.x.x
 text2ByteStringL  :: Enc ("enc-B64" ': ys) c TL.Text -> Enc ("enc-B64" ': "r-UTF8" ': ys) c BL.ByteString 

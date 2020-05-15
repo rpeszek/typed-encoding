@@ -5,8 +5,8 @@
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 
--- | Lazy version of "Data.TypedEncoding.Text.Encoding"
-module Data.TypedEncoding.Text.Lazy.Encoding where
+-- | Lazy version of "Data.TypedEncoding.Conv.Text.Encoding"
+module Data.TypedEncoding.Conv.Text.Lazy.Encoding where
 
 import qualified Data.ByteString.Lazy as BL
 import qualified Data.Text.Lazy as TL

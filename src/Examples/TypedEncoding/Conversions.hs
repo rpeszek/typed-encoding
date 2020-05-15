@@ -21,9 +21,9 @@
 -- Enc-specific equivalents can be found in:
 --
 -- @
--- import qualified Data.TypedEncoding.Text as EncT (pack, unpack)
--- import qualified Data.TypedEncoding.ByteString.Char8 as EncB8 (pack, unpack)
--- import           Data.TypedEncoding.Text.Encoding (decodeUtf8, encodeUtf8)
+-- import qualified Data.TypedEncoding.Conv.Text as EncT (pack, unpack)
+-- import qualified Data.TypedEncoding.Conv.ByteString.Char8 as EncB8 (pack, unpack)
+-- import           Data.TypedEncoding.Conv.Text.Encoding (decodeUtf8, encodeUtf8)
 -- @    
 --
 -- Conversions aim at provinding type safety when moving between encoded string-like types.
@@ -58,21 +58,21 @@ import           Data.TypedEncoding.Instances.Enc.Base64 ()
 import           Data.TypedEncoding.Instances.Restriction.ASCII ()
 import           Data.TypedEncoding.Instances.Restriction.UTF8 ()
 
-import qualified Data.TypedEncoding.Text as EncT (utf8Demote)
-import qualified Data.TypedEncoding.Text.Encoding as EncTe (decodeUtf8)
+import qualified Data.TypedEncoding.Conv.Text as EncT (utf8Demote)
+import qualified Data.TypedEncoding.Conv.Text.Encoding as EncTe (decodeUtf8)
 
 import qualified Data.Text as T
 import qualified Data.ByteString as B
 
-import qualified Data.TypedEncoding.ByteString.Char8 as EncB8
+import qualified Data.TypedEncoding.Conv.ByteString.Char8 as EncB8
 import           Data.TypedEncoding.Combinators.Restriction.BoundedAlphaNums
 
 -- $setup
 -- >>> :set -XOverloadedStrings -XMultiParamTypeClasses -XDataKinds -XTypeApplications -XPolyKinds -XFlexibleInstances -XFlexibleContexts -XScopedTypeVariables
 -- >>> import qualified Data.TypedEncoding.Instances.Enc.Base64 as EnB64 (acceptLenientS)
--- >>> import qualified Data.TypedEncoding.Text as EncT (utf8Promote, utf8Demote)
--- >>> import qualified Data.TypedEncoding.ByteString.Char8 as EncB8 (pack, unpack)
--- >>> import qualified Data.TypedEncoding.Text.Encoding as EncTe (decodeUtf8, encodeUtf8)
+-- >>> import qualified Data.TypedEncoding.Conv.Text as EncT (utf8Promote, utf8Demote)
+-- >>> import qualified Data.TypedEncoding.Conv.ByteString.Char8 as EncB8 (pack, unpack)
+-- >>> import qualified Data.TypedEncoding.Conv.Text.Encoding as EncTe (decodeUtf8, encodeUtf8)
 -- >>> import           Data.Proxy
 --
 -- This module contains some ghci friendly values to play with.

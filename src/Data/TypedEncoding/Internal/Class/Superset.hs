@@ -15,11 +15,11 @@
 module Data.TypedEncoding.Internal.Class.Superset where
 
 import           Data.TypedEncoding.Internal.Util.TypeLits
-import           Data.TypedEncoding.Internal.Class.Util (displ)
+--import           Data.TypedEncoding.Internal.Class.Util (displ)
 
 import           Data.TypedEncoding.Internal.Types (Enc(..) 
                                                    , withUnsafeCoerce
-                                                   , unsafeSetPayload
+                                                   --, unsafeSetPayload
                                                    )
 import           GHC.TypeLits
 import           Data.Symbol.Ascii

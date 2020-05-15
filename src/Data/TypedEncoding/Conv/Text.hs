@@ -2,7 +2,7 @@
 {-# LANGUAGE TypeFamilies #-}
 
 -- | Text encoding combinators specific to 'T.Text'
-module Data.TypedEncoding.Text where
+module Data.TypedEncoding.Conv.Text where
 
 import qualified Data.Text as T
 import           Data.TypedEncoding.Instances.Support

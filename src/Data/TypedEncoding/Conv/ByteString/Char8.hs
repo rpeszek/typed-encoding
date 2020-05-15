@@ -5,7 +5,7 @@
 
 -- | ByteString encoding combinators that do not belong 
 -- in a module specific to a particual encoding.
-module Data.TypedEncoding.ByteString.Char8 where
+module Data.TypedEncoding.Conv.ByteString.Char8 where
 
 import qualified Data.ByteString.Char8 as B8
 import           Data.TypedEncoding.Internal.Types.Enc (Enc, unsafeChangePayload)

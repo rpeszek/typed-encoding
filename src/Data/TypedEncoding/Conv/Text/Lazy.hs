@@ -1,9 +1,9 @@
 
--- | Lazy version of "Data.TypedEncoding.Text"
+-- | Lazy version of "Data.TypedEncoding.Conv.Text"
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE TypeFamilies #-}
 
-module Data.TypedEncoding.Text.Lazy where
+module Data.TypedEncoding.Conv.Text.Lazy where
 
 import qualified Data.Text.Lazy as TL
 import           Data.TypedEncoding.Instances.Support

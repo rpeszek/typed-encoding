@@ -3,8 +3,8 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE FlexibleContexts #-}
 
--- | Lazy version of "Data.TypedEncoding.ByteString.Lazy"
-module Data.TypedEncoding.ByteString.Lazy.Char8 where
+-- | Lazy version of "Data.TypedEncoding.Conv.ByteString.Lazy"
+module Data.TypedEncoding.Conv.ByteString.Lazy.Char8 where
 
 import qualified Data.ByteString.Lazy.Char8 as BL8
 import           Data.TypedEncoding.Internal.Types.Enc (Enc, unsafeChangePayload)
