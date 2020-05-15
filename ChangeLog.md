@@ -11,9 +11,13 @@
 - module `Data.TypedEncoding.Instances.Support` needs to be imported when working on encoding combinators but name suggests instance work, 
   this needs rethinking. 
 - "enc-B64" will be moved to a different package (more distant goal)
+- Displ String instance (used in examples, will be made consistent with Text and ByteString)
 
 ## Unreleased changes
 
+- Fixes
+  - Conversions type safety issues
+  - new and corrected approach to conversions (all old conversion functions have been deprecated)
 - new functionality:
   - `Enc` versions for `pack`/ `unpack` for `Text` and `ByteString`. 
   - `Enc` versions of `decodeUtf8` / `encodeUtf8`
@@ -25,7 +29,6 @@
   - String instance added in number of places, including for "r-ASCII" encoding
   - few more support conveniece functions.
 - deprecation warnings (see above) 
-- other
 
 ## 0.2.1.0
 

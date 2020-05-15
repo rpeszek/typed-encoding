@@ -4,8 +4,8 @@
 -- {-# LANGUAGE DataKinds #-}
 -- {-# LANGUAGE TypeOperators #-}
 -- {-# LANGUAGE FlexibleInstances #-}
-{-# LANGUAGE StandaloneDeriving #-}
-{-# LANGUAGE TypeApplications #-}
+-- {-# LANGUAGE StandaloneDeriving #-}
+-- {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE AllowAmbiguousTypes #-}
 {-# LANGUAGE RankNTypes #-}
 
@@ -47,7 +47,7 @@ someToChecked se = withSomeEnc se toCheckedEnc
 -- | 
 -- >>> let tst = unsafeCheckedEnc ["TEST"] () "test"
 -- >>> displ $ checkedToSome tst
--- "Some (MkEnc '[TEST] () (String test))"
+-- "Some (MkEnc '[TEST] () test)"
 checkedToSome :: CheckedEnc conf str -> SomeEnc conf str
 checkedToSome (MkCheckedEnc xs c s) = withSomeAnnotation (someAnnValue xs) (\p -> MkSomeEnc (MkEnc p c s))
 

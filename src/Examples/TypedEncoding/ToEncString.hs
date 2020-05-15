@@ -92,7 +92,7 @@ tstIp = IpV4F 128 1 1 10
 -- >>> let fn a b = if b == "" then a else a <> "." <> b
 -- >>> let reduce = EnT.foldEncStr @'["r-IPv4"] @'["r-Word8-decimal"] () fn
 -- >>>  displ . reduce . fmap toEncString $ tstIp
--- "MkEnc '[r-IPv4] () (String 128.1.1.10)"
+-- "MkEnc '[r-IPv4] () 128.1.1.10"
 --
 -- Note lack of type safety here, the same code would work just fine if we added
 -- 5th field to 'IpV4F' constructor.  
