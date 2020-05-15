@@ -13,6 +13,7 @@ import           Data.TypedEncoding.Internal.Types
 import           Data.TypedEncoding.Internal.Class.Recreate
 import           Data.TypedEncoding.Internal.Class.Util (SymbolList)
 import           GHC.TypeLits
+import           Data.Proxy
 
 -- $setup
 -- >>> :set -XTypeApplications
@@ -48,3 +49,20 @@ verifyUncheckedEnc' :: forall (xs :: [Symbol]) c str . (
                    UncheckedEnc c str
                    ->  Maybe (Either RecreateEx (Enc xs c str))
 verifyUncheckedEnc' = verifyUncheckedEnc
+
+
+-- | Convenience function for checking if @str@ decodes properly
+-- using @enc@ encoding markers and decoders that can pick decoder based
+-- on that marker
+verifyDynEnc :: forall s str err1 err2 enc a. (KnownSymbol s, Show err1, Show err2) => 
+                  Proxy s   -- ^ proxy defining encoding annotation
+                  -> (Proxy s -> Either err1 enc)  -- ^ finds encoding marker @enc@ for given annotation or fails
+                  -> (enc -> str -> Either err2 a)  -- ^ decoder based on @enc@ marker
+                  -> str                            -- ^ input
+                  -> Either EncodeEx str
+verifyDynEnc p findenc decoder str = 
+  do
+    enc <- asEncodeEx p . findenc $ p
+    case decoder enc str of
+      Left err -> Left $ EncodeEx p err
+      Right r -> Right str

@@ -18,10 +18,12 @@
   - `Enc` versions for `pack`/ `unpack` for `Text` and `ByteString`. 
   - `Enc` versions of `decodeUtf8` / `encodeUtf8`
   - new and corrected approach to conversions (all old conversion functions have been deprecated)
+  - `IsSuperset` type family with basic combiators deprecates `Superset` typeclass.
   - more modules exported from `Data.TypedEncoding.Instances.Support` for instance and combinator creation
   - more utility type famililes `Data.TypedEncoding.Internal.Util.TypeLits` 
   - more utility combinators for creating encoding instances and combinators.
-  - String instance added for "r-ASCII"
+  - String instance added in number of places, including for "r-ASCII" encoding
+  - few more support conveniece functions.
 - deprecation warnings (see above) 
 - other
 

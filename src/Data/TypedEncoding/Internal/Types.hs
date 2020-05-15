@@ -63,6 +63,10 @@ data EncodeEx where
 instance Show EncodeEx where
     show (EncodeEx prxy a) = "(EncodeEx \"" ++ symbolVal prxy ++ "\" (" ++ show a ++ "))"
 
+asEncodeEx :: (Show a, KnownSymbol x) => Proxy x -> Either a b -> Either EncodeEx b
+asEncodeEx p = either (Left . EncodeEx p) Right 
+
+
 -- | usefull when manually recreating using recovery
 encToRecrEx :: EncodeEx ->  RecreateEx
 encToRecrEx (EncodeEx p a) = RecreateEx p a

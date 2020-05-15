@@ -50,10 +50,8 @@ symbolVals_ _ = symbolVals @xs
 class Displ x where 
     displ :: x -> String
 
-instance Displ EncAnn where
-    displ = id 
 instance Displ [EncAnn] where 
-    displ x = "[" ++ L.intercalate "," (map displ x) ++ "]"
+    displ x = "[" ++ L.intercalate "," x ++ "]"
 instance Displ T.Text where
     displ x = "(Text " ++ T.unpack x ++ ")"
 instance Displ TL.Text where
@@ -62,6 +60,8 @@ instance Displ B.ByteString where
     displ x = "(ByteString " ++ B.unpack x ++ ")" 
 instance Displ BL.ByteString where
     displ x = "(ByteString " ++ BL.unpack x ++ ")" 
+instance Displ String where
+    displ x = "(String " ++ x ++ ")" 
 
 
 
