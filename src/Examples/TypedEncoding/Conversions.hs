@@ -84,6 +84,26 @@ import           Data.TypedEncoding.Combinators.Restriction.BoundedAlphaNums
 -- These documents generate a test suite for this library as well.
 
 
+-- * Moving between Text and ByteString
+
+eHelloAsciiB :: Either EncodeEx (Enc '["r-ASCII"] () B.ByteString)
+eHelloAsciiB = encodeFAll . toEncoding () $ "HeLlo world" 
+-- ^ Example value to play with
+--
+-- >>>  encodeFAll . toEncoding () $ "HeLlo world" :: Either EncodeEx (Enc '["r-ASCII"] () B.ByteString) 
+-- Right (MkEnc Proxy () "HeLlo world")
+
+Right helloAsciiB = eHelloAsciiB
+-- ^ above with either removed
+
+helloAsciiT :: Enc '["r-ASCII"] () T.Text
+helloAsciiT = EncTe.decodeUtf8 helloAsciiB
+-- ^ When converted to Text the annotation is preserved.
+--
+-- >>> displ $ EncTe.decodeUtf8 helloAsciiB
+-- "MkEnc '[r-ASCII] () (Text HeLlo world)"
+
+
 -- * pack and unpack
 
 helloZero :: Enc ('[] :: [Symbol]) () String
@@ -122,7 +142,7 @@ helloRestricted = fmap EncB8.pack . encFBan $ toEncoding () "Hello"
 -- Right "MkEnc '[r-ban:zzzzz] () (ByteString Hello)"
 --
 -- Adding @"r-ASCII"@ annotation on this ByteString would have been redunant since @"r-ban:zzzzz"@ is more
--- restrictive.
+-- restrictive (see Supersets below).
 --
 -- @unpack@, as expected will put us back in a String keeping the annotation
 --
@@ -131,31 +151,10 @@ helloRestricted = fmap EncB8.pack . encFBan $ toEncoding () "Hello"
 -- 
 
 
-
--- * Moving between Text and ByteString
-
-eHelloAsciiB :: Either EncodeEx (Enc '["r-ASCII"] () B.ByteString)
-eHelloAsciiB = encodeFAll . toEncoding () $ "HeLlo world" 
--- ^ Example value to play with
---
--- >>>  encodeFAll . toEncoding () $ "HeLlo world" :: Either EncodeEx (Enc '["r-ASCII"] () B.ByteString) 
--- Right (MkEnc Proxy () "HeLlo world")
-
-Right helloAsciiB = eHelloAsciiB
--- ^ above with either removed
-
-helloAsciiT :: Enc '["r-ASCII"] () T.Text
-helloAsciiT = EncTe.decodeUtf8 helloAsciiB
--- ^ When converted to Text the annotation is preserved.
---
--- >>> displ $ EncTe.decodeUtf8 helloAsciiB
--- "MkEnc '[r-ASCII] () (Text HeLlo world)"
-
--- * Subsets
-
+-- * Supersets
 
 helloUtf8B :: Enc '["r-UTF8"] () B.ByteString
-helloUtf8B = inject helloAsciiB
+helloUtf8B = injectInto helloAsciiB
 -- ^ To get UTF8 annotation, instead of doing this: 
 --
 -- >>> encodeFAll . toEncoding () $ "HeLlo world" :: Either EncodeEx (Enc '["r-UTF8"] () B.ByteString)
@@ -167,7 +166,7 @@ helloUtf8B = inject helloAsciiB
 --
 -- @inject@ method accepts proxy to specify superset to use.
 --
--- >>> displ $ inject @ "r-UTF8" helloAsciiB
+-- >>> displ $ injectInto @ "r-UTF8" helloAsciiB
 -- "MkEnc '[r-UTF8] () (ByteString HeLlo world)"
 --
 -- Superset is intended for @"r-"@ annotations only, should not be used
