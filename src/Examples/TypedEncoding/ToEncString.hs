@@ -175,8 +175,6 @@ type SimplifiedEmail = SimplifiedEmailF (PartHeader, B.ByteString)
 
 type SimplifiedEmailEncB = SimplifiedEmailF (CheckedEnc () B.ByteString)
 
--- TODO
--- type SimplifiedEmailEncT = SimplifiedEmailF (CheckedEnc () T.Text)
 
 -- | @tstEmail@ contains some simple data to play with
 tstEmail :: SimplifiedEmail

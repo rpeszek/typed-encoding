@@ -6,6 +6,7 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 
 -- | Lazy version of "Data.TypedEncoding.Conv.Text.Encoding"
+-- @since 0.2.2.0
 module Data.TypedEncoding.Conv.Text.Lazy.Encoding where
 
 import qualified Data.ByteString.Lazy as BL

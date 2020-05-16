@@ -17,7 +17,9 @@ module Data.TypedEncoding.Internal.Class (
     , module Data.TypedEncoding.Internal.Class.Encode
     , module Data.TypedEncoding.Internal.Class.Decode
     , module Data.TypedEncoding.Internal.Class.Recreate 
-    , module Data.TypedEncoding.Internal.Class.Superset  
+    , module Data.TypedEncoding.Internal.Class.Superset 
+    -- * Encoder and Encoding replace EncodeFAll
+    , module Data.TypedEncoding.Internal.Class.Encoder 
   ) where
 
 import           Data.TypedEncoding.Internal.Class.Util
@@ -25,6 +27,7 @@ import           Data.TypedEncoding.Internal.Class.Encode
 import           Data.TypedEncoding.Internal.Class.Decode
 import           Data.TypedEncoding.Internal.Class.Recreate
 import           Data.TypedEncoding.Internal.Class.Superset
+import           Data.TypedEncoding.Internal.Class.Encoder 
 
 import           Data.TypedEncoding.Internal.Types (Enc(..) 
                                                    , withUnsafeCoerce

@@ -4,8 +4,8 @@
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE PolyKinds #-} -- removes need to annotate kinds as [Symbol]
 
--- | ByteString encoding combinators that do not belong 
--- in a module specific to a particual encoding.
+-- | Encoding safe version of "Data.ByteString.Char8"
+-- @since 0.2.2.0
 module Data.TypedEncoding.Conv.ByteString.Char8 where
 
 import qualified Data.ByteString.Char8 as B8

@@ -1,5 +1,6 @@
 
 -- | Lazy version of "Data.TypedEncoding.Conv.Text"
+-- @since 0.2.2.0
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE PolyKinds #-} -- removes need to annotate kinds as [Symbol]

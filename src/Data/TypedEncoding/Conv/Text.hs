@@ -3,6 +3,7 @@
 {-# LANGUAGE PolyKinds #-} -- removes need to annotate kinds as [Symbol]
 
 -- | Text encoding combinators specific to 'T.Text'
+-- @since 0.2.2.0
 module Data.TypedEncoding.Conv.Text where
 
 import qualified Data.Text as T

@@ -54,10 +54,12 @@ import           Data.TypedEncoding.Instances.Support
 
 -- better compilation errors?
 type family IsBan (s :: Symbol) :: Bool where
-    IsBan s = AcceptEq ('Text "Not ban restriction encoding " ':<>: ShowType s ) (CmpSymbol "r-ban:" (Take 6 s))
+    IsBan s = AcceptEq ('Text "Not ban restriction encoding " ':<>: ShowType s ) (CmpSymbol (TakeUntil s ":") "r-ban")
 
 type instance IsSupersetOpen "r-ASCII" "r-ban" xs = 'True
 
+instance  (KnownSymbol s, "r-ban" ~ TakeUntil s ":" , IsStringR str, Encodings (Either EncodeEx) xs grps c str) => Encodings (Either EncodeEx) (s ': xs) ("r-ban" ': grps) c str where
+    encodings = AppendEnc encFBan encodings
 
 -- |
 -- >>> encFBan . toEncoding () $ "C59F9FB7-4621-44D9-9020-CE37BF6E2BD1" :: Either EncodeEx (Enc '["r-ban:FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF"] () T.Text)
@@ -75,7 +77,7 @@ encFBan :: forall f s t xs c str .
               Enc xs c str -> f (Enc (s ': xs) c str)  
 encFBan = implEncodeF @s (verifyBoundedAlphaNum (Proxy :: Proxy s))              
 
--- TODO remove f from forall in encFBan (slightly breaking chanage)
+-- TODO v0.3 remove f from forall in encFBan (slightly breaking chanage)
 
 
 -- |

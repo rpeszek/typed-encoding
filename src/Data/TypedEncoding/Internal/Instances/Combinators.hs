@@ -77,6 +77,7 @@ splitSomePayload f (MkCheckedEnc ann1 c s1) = map (\(ann2, s2) -> MkCheckedEnc a
 --
 -- >>> verifyWithRead @Word8 "Word8-decimal" (T.pack "256")
 -- Left "Payload does not satisfy format Word8-decimal: 256"
+--
 -- >>> verifyWithRead @Word8 "Word8-decimal" (T.pack "123")
 -- Right "123"
 verifyWithRead :: forall a str . (IsStringR str, Read a, Show a) => String -> str -> Either String str
@@ -87,3 +88,20 @@ verifyWithRead msg x =
     in if check
        then Right x
        else Left $ "Payload does not satisfy format " ++ msg ++ ": " ++ s    
+
+
+-- | Convenience function for checking if @str@ decodes properly
+-- using @enc@ encoding markers and decoders that can pick decoder based
+-- on that marker
+verifyDynEnc :: forall s str err1 err2 enc a. (KnownSymbol s, Show err1, Show err2) => 
+                  Proxy s   -- ^ proxy defining encoding annotation
+                  -> (Proxy s -> Either err1 enc)  -- ^ finds encoding marker @enc@ for given annotation or fails
+                  -> (enc -> str -> Either err2 a)  -- ^ decoder based on @enc@ marker
+                  -> str                            -- ^ input
+                  -> Either EncodeEx str
+verifyDynEnc p findenc decoder str = 
+  do
+    enc <- asEncodeEx p . findenc $ p
+    case decoder enc str of
+      Left err -> Left $ EncodeEx p err
+      Right r -> Right str

@@ -5,6 +5,8 @@
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TypeApplications #-}
+-- {-# LANGUAGE PartialTypeSignatures #-}
+-- {-# OPTIONS_GHC -Wno-partial-type-signatures #-}
 
 -- | Examples or moving between type annotated encodings
 --
@@ -68,7 +70,7 @@ import qualified Data.ByteString as B
 import           GHC.TypeLits
 
 import qualified Data.TypedEncoding.Conv.ByteString.Char8 as EncB8
-import           Data.TypedEncoding.Combinators.Restriction.BoundedAlphaNums
+import           Data.TypedEncoding.Combinators.Restriction.BoundedAlphaNums ()
 
 -- $setup
 -- >>> :set -XDataKinds -XMultiParamTypeClasses -XKindSignatures -XFlexibleInstances -XFlexibleContexts -XOverloadedStrings -XTypeApplications -XScopedTypeVariables
@@ -98,7 +100,11 @@ Right helloAsciiB = eHelloAsciiB
 
 helloAsciiT :: Enc '["r-ASCII"] () T.Text
 helloAsciiT = EncTe.decodeUtf8 helloAsciiB
--- ^ When converted to Text the annotation is preserved.
+-- ^ 
+-- We use a tween function to the popular 'Data.Text.Encoding.decodeUtf8' 
+-- from the @test@ package.
+--
+-- Notice the encoding annotation is preserved.
 --
 -- >>> displ $ EncTe.decodeUtf8 helloAsciiB
 -- "MkEnc '[r-ASCII] () (Text HeLlo world)"
@@ -134,7 +140,7 @@ helloZero = toEncoding () "Hello"
 
 
 helloRestricted :: Either EncodeEx (Enc '["r-ban:zzzzz"] () B.ByteString)
-helloRestricted = fmap EncB8.pack . encFBan $ toEncoding () "Hello"
+helloRestricted = fmap EncB8.pack . runEncoder @'["r-ban"] encodings $ toEncoding () "Hello"
 -- ^ more interstingly @EncB8.pack@ works fine on "r-" encodings that are subsets of "r-ASCII"
 -- this example @"r-ban:zzzzz"@ restricts to 5 alapha-numeric charaters all < 'z'
 -- 
@@ -160,11 +166,11 @@ helloUtf8B = injectInto helloAsciiB
 -- >>> encodeFAll . toEncoding () $ "HeLlo world" :: Either EncodeEx (Enc '["r-UTF8"] () B.ByteString)
 -- Right (MkEnc Proxy () "HeLlo world")
 -- 
--- We should be able to convert the ASCII version.
+-- We should be able to convert the ASCII version we already have.
 --
 -- This is done using 'Superset' typeclass.
 --
--- @inject@ method accepts proxy to specify superset to use.
+-- @injectInto@ method accepts proxy to specify superset to use.
 --
 -- >>> displ $ injectInto @ "r-UTF8" helloAsciiB
 -- "MkEnc '[r-UTF8] () (ByteString HeLlo world)"
@@ -208,6 +214,10 @@ helloUtf8B64T = EncT.utf8Demote . EncTe.decodeUtf8 $ helloUtf8B64B
 --
 -- >>> displ .  EncTe.encodeUtf8 . EncT.utf8Promote $ helloUtf8B64T
 -- "MkEnc '[enc-B64,r-UTF8] () (ByteString SGVMbG8gd29ybGQ=)"
+--
+-- To achieve type safety, our @encodeUtf8@ and @decodeUtf8@ require "r-UTF8" annotation. 
+-- But since @Text@ values can always emit @UTF8@ layout, we can simply add and remove
+-- these annotations on @Text@ encodings.  This approach gives us type level safety over UTF8 encoding/decoding errors.
 
 notTextB :: Enc '["enc-B64"] () B.ByteString
 notTextB = encodeAll . toEncoding () $ "\195\177"

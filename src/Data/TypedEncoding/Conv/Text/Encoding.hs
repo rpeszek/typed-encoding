@@ -5,6 +5,8 @@
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 
+-- |
+-- @since 0.2.2.0
 module Data.TypedEncoding.Conv.Text.Encoding where
 
 import qualified Data.ByteString as B

@@ -4,15 +4,14 @@
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE PolyKinds #-} -- removes need to annotate kinds as [Symbol]
 
--- | Lazy version of "Data.TypedEncoding.Conv.ByteString.Lazy"
+-- | Lazy version of "Data.TypedEncoding.Conv.ByteString.Char8"
+-- @since 0.2.2.0
 module Data.TypedEncoding.Conv.ByteString.Lazy.Char8 where
 
 import qualified Data.ByteString.Lazy.Char8 as BL8
 import           Data.TypedEncoding.Internal.Types.Enc (Enc, unsafeChangePayload)
 import qualified Data.TypedEncoding.Internal.Util.TypeLits as Knds
 import           Data.TypedEncoding
-
--- TODO superset game?
 
 -- $setup
 -- >>> :set -XDataKinds -XTypeApplications -XOverloadedStrings

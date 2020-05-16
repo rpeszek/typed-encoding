@@ -114,6 +114,8 @@ instance Superset "r-ASCII" "enc-B64" where
 -- Encodings   --
 -----------------
 
+instance Encodings (Either EncodeEx) xs grps c B.ByteString => Encodings (Either EncodeEx) ("enc-B64" ': xs) ("enc-B64" ': grps) c B.ByteString where
+    encodings = encodeFEncoder @(Either EncodeEx) @"enc-B64" @"enc-B64"
 
 instance Applicative f => EncodeF f (Enc xs c B.ByteString) (Enc ("enc-B64" ': xs) c B.ByteString) where
     encodeF = implEncodeP B64.encode 

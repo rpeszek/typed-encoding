@@ -28,7 +28,6 @@ import           Data.TypedEncoding.Internal.Types.CheckedEnc
 import           Data.TypedEncoding.Internal.Types.UncheckedEnc
 import           Data.TypedEncoding.Internal.Types.Common
 
-
 import           Data.Proxy
 -- import           Data.Functor.Identity
 import           GHC.TypeLits

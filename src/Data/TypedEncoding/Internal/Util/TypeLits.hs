@@ -24,7 +24,7 @@
 -- * "Data.TypedEncoding.Internal.Class.Util"
 -- * "Data.TypedEncoding.Internal.Types.SomeAnnotation"
 --
--- TODO these will need to get consolidated here
+-- (TODO) these will need to get consolidated.
 module  Data.TypedEncoding.Internal.Util.TypeLits where
 
 import           GHC.TypeLits
@@ -66,7 +66,8 @@ type family Concat (s :: [Symbol]) :: Symbol where
 type family Drop (n :: Nat) (s :: Symbol) :: Symbol where
     Drop n s = Concat (LDrop n (ToList s))
 
--- TODO create TypeList.List
+-- TODO create TypeList.List module ?
+
 -- | :kind! LDrop 6 (ToList "bool: \"r-ban:ff-ff\" | \"r-ban:ffff\"")
 type family LDrop (n :: Nat) (s :: [k]) :: [k] where
     LDrop 0 s = s
@@ -85,7 +86,6 @@ type family LDrop (n :: Nat) (s :: [k]) :: [k] where
 type family Take (n :: Nat) (s :: Symbol) :: Symbol where
     Take n s = Concat (LTake n (ToList s))
 
--- TODO create TypeList.List
 -- | :kind! LTake 3 (ToList "123456")
 type family LTake (n :: Nat) (s :: [k]) :: [k] where
     LTake 0 s = '[]

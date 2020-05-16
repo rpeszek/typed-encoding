@@ -74,8 +74,6 @@ recreatePart :: forall (xs :: [Symbol]) xsf c str . RecreateFAll Identity xs c s
               -> Enc (Append xs xsf) c str 
 recreatePart = recreatePart_ (Proxy :: Proxy xs)   
 
--- TODO using RecreateErr typeclass is overkill
-
 -- | Recovery errors are expected unless Recovery allows Identity instance
 class RecreateErr f where 
     recoveryErr :: RecreateEx -> f a
