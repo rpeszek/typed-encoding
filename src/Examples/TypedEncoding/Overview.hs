@@ -3,6 +3,9 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE TypeApplications #-}
 
+-- {-# LANGUAGE PartialTypeSignatures #-}
+-- {-# OPTIONS_GHC -Wno-partial-type-signatures #-}
+
 -- | type-encoding overview examples. 
 --
 -- This library is concerned with 3 main operations done on strings:
@@ -47,6 +50,13 @@ import qualified Data.Text as T
 -- 
 -- >>> encodeAll . toEncoding () $ "Hello World" :: Enc '["enc-B64"] () B.ByteString
 -- MkEnc Proxy () "SGVsbG8gV29ybGQ="
+--
+-- There is currently an alternative polymorphic way (prototype) to create encodings by /running/ 'Encoder' on 'encodings'.
+-- This approach works better with more open / dynamic encoding setup it also provides first class @Encoder@. 
+-- In future versions encodeAll will either be improved to provide similar flexibility or will be deprecated and removed.
+-- 
+-- >>> displ <$> (runEncoder @'["enc-B64"] encodings $ toEncoding () "Hello" :: Either EncodeEx (Enc '["enc-B64"] () B.ByteString))
+-- Right "MkEnc '[enc-B64] () (ByteString SGVsbG8=)"
 helloB64 :: Enc '["enc-B64"] () B.ByteString
 helloB64 = encodeAll . toEncoding () $ "Hello World"
 

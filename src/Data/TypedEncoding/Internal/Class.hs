@@ -5,27 +5,34 @@
 {-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE FlexibleContexts #-}
--- {-# LANGUAGE UndecidableInstances #-}
+{-# LANGUAGE UndecidableInstances #-}
 {-# LANGUAGE ScopedTypeVariables #-}
--- {-# LANGUAGE TypeFamilies #-}
--- {-# LANGUAGE TypeApplications #-}
--- {-# LANGUAGE AllowAmbiguousTypes #-}
+{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE AllowAmbiguousTypes #-}
 
 module Data.TypedEncoding.Internal.Class (
     module Data.TypedEncoding.Internal.Class
     , module Data.TypedEncoding.Internal.Class.Util
     , module Data.TypedEncoding.Internal.Class.Encode
     , module Data.TypedEncoding.Internal.Class.Decode
-    , module Data.TypedEncoding.Internal.Class.Recreate   
+    , module Data.TypedEncoding.Internal.Class.Recreate 
+    , module Data.TypedEncoding.Internal.Class.Superset 
+    -- * Encoder and Encoding replace EncodeFAll
+    , module Data.TypedEncoding.Internal.Class.Encoder 
   ) where
 
 import           Data.TypedEncoding.Internal.Class.Util
 import           Data.TypedEncoding.Internal.Class.Encode
 import           Data.TypedEncoding.Internal.Class.Decode
 import           Data.TypedEncoding.Internal.Class.Recreate
+import           Data.TypedEncoding.Internal.Class.Superset
+import           Data.TypedEncoding.Internal.Class.Encoder 
 
 import           Data.TypedEncoding.Internal.Types (Enc(..) 
-                                                   , withUnsafeCoerce)
+                                                   , withUnsafeCoerce
+                                                   -- , getPayload
+                                                   )
 import           Data.Functor.Identity
 import           GHC.TypeLits
 
@@ -52,11 +59,13 @@ fromEncString = runIdentity . fromEncStringF
 
 -- Other classes --
 
--- | subsets are useful for restriction encodings
--- like r-UFT8 but not for other encodings.
-class Superset (y :: Symbol) (x :: Symbol) where
-    inject :: Enc (x ': xs) c str ->  Enc (y ': xs) c str
-    inject = withUnsafeCoerce id
+-- | Flatten is more permissive than 'Superset'
+-- @
+-- instance FlattenAs "r-ASCII" "enc-B64" where -- OK
+-- @
+-- 
+-- Now encoded data has form @Enc '["r-ASCII"] c str@ 
+-- and there is no danger of it begin incorrectly decoded.
 
 class FlattenAs (y :: Symbol) (x :: Symbol) where
     flattenAs ::  Enc (x ': xs) c str ->  Enc '[y] c str

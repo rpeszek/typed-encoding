@@ -1,10 +1,38 @@
 # Changelog for typed-encoding
 
-## Unreleased changes
-
 ## Anticipated future breaking changes
 
+- ByteString / Text conversion functions in `Data.TypedEncoding.Instances.Restriction.ASCII`, 
+  `Data.TypedEncoding.Instances.Restriction.ASCII` and `Data.TypedEncoding.Instances.Enc.Base64`
+  are now deprecated and will be removed.
+- `EncodeFAll`, `DecodeFAll`, `RecreateFAll`, `EncodeF`, etc do not work well with more open 
+   encoding  annotation such as `"r-ban:soething"` they will be either changed or deprecated / replaced with constructions similar to `Encoder` in `Data.TypedEncoding.Internal.Class.Encoder`.
 - `Data.TypedEncoding.Internal.Class.IsStringR` expected to be be changed / replaced
+- functions used to create encoding instances or encoding combinators (e.g. `implEncodeP`) will get more constraints. 
+- (never ending) rework of internal module stucture to make it easier to navigate 
+- Instance and Combinator modules will be merged.
+- Displ String instance (used in examples, will be made consistent with Text and ByteString)
+- (post 0.3) "enc-B64" will be moved to a different package (more distant goal)
+
+## 0.2.2 
+
+- Next version (0.3) will have number of breaking changes, some rethinking and a lot of cleanup,
+  this version preps for some of that (see section above)
+- Fixes
+  - Conversions type safety issues
+  - new and corrected approach to conversions (all old conversion functions have been deprecated)
+  - corrected documentation in `Data.TypedEncoding.Combinators.Restriction.BoundedAlphaNums`
+- new functionality:
+  - `Enc` versions for `pack`/ `unpack` for `Text` and `ByteString`. 
+  - `Enc` versions of `decodeUtf8` / `encodeUtf8`
+  - new and corrected approach to conversions (all old conversion functions have been deprecated)
+  - `IsSuperset` type family with basic combinators deprecates `Superset` typeclass.
+  - more modules exported from `Data.TypedEncoding.Instances.Support` for instance and combinator creation
+  - more utility type families `Data.TypedEncoding.Internal.Util.TypeLits` 
+  - more utility combinators for creating encoding instances and combinators.
+  - String instance added in number of places, including for "r-ASCII" encoding
+  - few more support convenience functions.
+- deprecation warnings (see above) 
 
 ## 0.2.1.0
 
@@ -12,8 +40,8 @@
   - bounded alpha-numeric restriction encodings (`r-ban`)
   - boolean algebra of encodings 
 - minor improvements
-  - dropped IsString contraint from instances in `Data.TypedEncoding.Instances.Restriction.Common`
-  - added forall annotation to ecodeAll and decodeAll
+  - dropped IsString constraint from instances in `Data.TypedEncoding.Instances.Restriction.Common`
+  - added forall annotation to encodeAll and decodeAll
 
 ## 0.2.0.0
 

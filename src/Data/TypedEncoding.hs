@@ -84,9 +84,10 @@
 --
 -- Examples: 
 --
--- @"boolOr:(r-ban:ffffffff-ffff-ffff-ffff-ffffffffffff)(r-ban:ffffffffffffffffffffffffffffffff)"@ 
+-- @"boolOr:(r-ban:FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF)(r-ban:FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF)"@ 
 --
 -- "@boolNot:(r-ASCII)"
+--
 --
 -- = Usage
 --
@@ -108,12 +109,25 @@
 --
 -- * "Data.TypedEncoding.Instances.Support"
 --
--- Defining annotations with combinators is an alternative to using typeclass instances 
+-- Defining annotations with combinators is an alternative to using typeclass instances. 
+--
+-- Combinator modules with be merged with Instances modules in the future.
 --
 -- Included combinator modules:
 --
 -- * "Data.TypedEncoding.Combinators.Restriction.Bool"
 -- * "Data.TypedEncoding.Combinators.Restriction.BoundedAlphaNums"
+--
+-- Conversion combinator module structure is similar to one found in @text@ and @bytestring@ packages
+-- And can be found (since 0.2.2) in
+--
+-- * "Data.TypedEncoding.Conv.Text"
+-- * "Data.TypedEncoding.Conv.Text.Encoding"
+-- * "Data.TypedEncoding.Conv.Text.Lazy"    
+-- * "Data.TypedEncoding.Conv.Text.Lazy.Encoding"
+-- * "Data.TypedEncoding.Conv.ByteString.Char8"
+-- * "Data.TypedEncoding.Conv.ByteString.Lazy.Char8"
+--
 --
 -- = Examples
 --
@@ -124,6 +138,8 @@ module Data.TypedEncoding (
     module Data.TypedEncoding
     -- * Classes
     , module Data.TypedEncoding.Internal.Class
+    -- * Encoding class and Encoder (replaces EncodeFAll)
+    , module Data.TypedEncoding.Internal.Class.Encoder
     -- * Combinators
     , module Data.TypedEncoding.Internal.Combinators
     -- * Types
@@ -157,3 +173,4 @@ import           Data.TypedEncoding.Internal.Types.SomeEnc
 import           Data.TypedEncoding.Internal.Types.UncheckedEnc
 import           Data.TypedEncoding.Internal.Class
 import           Data.TypedEncoding.Internal.Combinators
+import           Data.TypedEncoding.Internal.Class.Encoder

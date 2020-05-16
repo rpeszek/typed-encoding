@@ -41,7 +41,7 @@ import           Data.Symbol.Ascii
 
 import           Data.TypedEncoding
 import           Data.TypedEncoding.Instances.Support
-import           Data.TypedEncoding.Internal.Util.TypeLits
+-- import           Data.TypedEncoding.Internal.Util.TypeLits
 import           Data.TypedEncoding.Combinators.Restriction.Common
 
 -- import qualified Data.Text as T
@@ -255,7 +255,7 @@ type family IsBool (s :: Symbol) :: Bool where
 -- ...
 -- = 'True
 --
--- :kind! NestedR "boolOr:(boolAnd:(r-ab)(ac))(boolNot:(r-cd))"
+-- >>> :kind! NestedR "boolOr:(boolAnd:(r-ab)(ac))(boolNot:(r-cd))"
 -- ...
 -- ... (TypeError ...)
 -- ...

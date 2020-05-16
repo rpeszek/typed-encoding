@@ -4,8 +4,8 @@
 -- {-# LANGUAGE DataKinds #-}
 -- {-# LANGUAGE TypeOperators #-}
 -- {-# LANGUAGE FlexibleInstances #-}
-{-# LANGUAGE StandaloneDeriving #-}
-{-# LANGUAGE TypeApplications #-}
+-- {-# LANGUAGE StandaloneDeriving #-}
+-- {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE AllowAmbiguousTypes #-}
 {-# LANGUAGE RankNTypes #-}
 

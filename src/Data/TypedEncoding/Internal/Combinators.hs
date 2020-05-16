@@ -7,12 +7,14 @@
 {-# LANGUAGE AllowAmbiguousTypes #-}
 {-# LANGUAGE FlexibleContexts #-}
 
+-- | Combinators reexported in Data.TypedEncoding
 module Data.TypedEncoding.Internal.Combinators where
 
 import           Data.TypedEncoding.Internal.Types
 import           Data.TypedEncoding.Internal.Class.Recreate
 import           Data.TypedEncoding.Internal.Class.Util (SymbolList)
 import           GHC.TypeLits
+-- import           Data.Proxy
 
 -- $setup
 -- >>> :set -XTypeApplications
@@ -48,3 +50,5 @@ verifyUncheckedEnc' :: forall (xs :: [Symbol]) c str . (
                    UncheckedEnc c str
                    ->  Maybe (Either RecreateEx (Enc xs c str))
 verifyUncheckedEnc' = verifyUncheckedEnc
+
+

@@ -31,7 +31,11 @@ decFR = implTranP id
 
 
 -- | 
--- Manual recreate step combinator converting typical encode function to a recreate step
+-- Manual recreate step combinator converting @"r-"@ encode function to a recreate step.
+--
+-- For "r-" encoding recreate and encode are the same other than the exception type used. 
+--
+-- The convention in @typed-encoding@ is to implement encode and convert it to recreate.
 recWithEncR :: forall (s :: Symbol) xs c str . (IsR s ~ 'True) 
                        => (Enc xs c str -> Either EncodeEx (Enc (s ': xs) c str)) 
                        -> Enc xs c str -> Either RecreateEx (Enc (s ': xs) c str)

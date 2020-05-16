@@ -63,6 +63,9 @@ instance ToStrInj String TL.Text where
     toString = TL.unpack  
 
 
+instance ToStrInj String String where
+    toString = id
+
 -- will not work!
 -- prop> prop_toStringFromString (Proxy :: Proxy B.ByteString) 
 -- instance ToStrInj String B.ByteString where
@@ -93,6 +96,8 @@ instance ToStrIso String T.Text where
 -- prop> prop_fromStringToString @TL.Text
 instance ToStrIso String TL.Text where    
 
+instance ToStrIso String String where
+
 -- |
 -- Used to find exceptions that violated "r-" encoding
 -- Expected to be used to check encoding of ASCII-7 so Text and ByteString are compatible.
@@ -118,7 +123,7 @@ instance Char7Find TL.Text where
 -- >>> B.length $ B8.pack "\160582"
 -- 1
 --
--- This instance allows to check elementes of ByteString interpreting them as Char.
+-- This instance allows to check elements of ByteString interpreting them as Char.
 -- 
 -- This may or may not work with UTF8 conversions.
 -- Safe if restricting to 7bit code points.s

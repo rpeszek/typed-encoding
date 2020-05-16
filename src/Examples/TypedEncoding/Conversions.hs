@@ -1,31 +1,83 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
-{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE KindSignatures #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TypeApplications #-}
+-- {-# LANGUAGE PartialTypeSignatures #-}
+-- {-# OPTIONS_GHC -Wno-partial-type-signatures #-}
 
 -- | Examples or moving between type annotated encodings
 --
--- Modules that define encoding and decoding instances also provide conversion functions.
--- 
--- Currently, these are separate functions, generalization of conversions seems hard.
+-- Haskell programs typically make these imports to do String, ByteString, and Text conversions:
 --
--- These examples discuss handling of __subsets__ (for character sets), __leniency__, and __flattening__. 
+-- @
+-- import qualified Data.Text as T (pack, unpack)
+-- import qualified Data.ByteString.Char8 as B8 (pack, unpack)
+-- import           Data.Text.Encoding (decodeUtf8, encodeUtf8)
+-- @
+--
+-- or corresponding @Lazy@ imports (not shown).
+--
+-- Enc-specific equivalents can be found in:
+--
+-- @
+-- import qualified Data.TypedEncoding.Conv.Text as EncT (pack, unpack)
+-- import qualified Data.TypedEncoding.Conv.ByteString.Char8 as EncB8 (pack, unpack)
+-- import           Data.TypedEncoding.Conv.Text.Encoding (decodeUtf8, encodeUtf8)
+-- @    
+--
+-- Conversions aim at providing type safety when moving between encoded string-like types.
+--
+-- __The assumption__ made by `typed-encoding` is that encodings work in equivalent way independently of the payload type.
+-- For example, if the following instances exist:
+--
+-- @
+-- EncodeF SomeErr (Enc xs () String) (Enc ("enc-B64" ': xs) () String)    
+-- EncodeF SomeErr (Enc xs () Text) (Enc ("enc-B64" ': xs) () Text)    
+-- @
+-- 
+-- Then @typed-encoding@ expects @pack@ @encodeF@ to commute:
+-- 
+-- @
+--  str     -- EncT.pack -->   txt
+--   |                          |
+--  encodeF                  encodeF
+--   |                          | 
+--   v                          v
+--  estr -- fmap EncT.pack --> etxt
+-- @
+--
+-- (@unpack@ and $decode$ are expected to satisfy similar diagrams, not shown)
+--
+-- Basically, it should not matter which type we run the encoding on (other than performance cost).
+--
+--
+-- This module also discusses concepts of __Superset__ (for @"r-"@ encodings), __leniency__, and __flattening__. 
 module Examples.TypedEncoding.Conversions where
 
 import           Data.TypedEncoding
-import qualified Data.TypedEncoding.Instances.Enc.Base64 as EnB64
-import qualified Data.TypedEncoding.Instances.Restriction.ASCII as EnASCII
--- import qualified Data.TypedEncoding.Instances.Restriction.UTF8  as EnUTF8
+import           Data.TypedEncoding.Instances.Enc.Base64 () 
+import           Data.TypedEncoding.Instances.Restriction.ASCII ()
+import           Data.TypedEncoding.Instances.Restriction.UTF8 ()
+
+import qualified Data.TypedEncoding.Conv.Text as EncT 
+import qualified Data.TypedEncoding.Conv.Text.Encoding as EncTe (decodeUtf8)
 
 import qualified Data.Text as T
 import qualified Data.ByteString as B
+import           GHC.TypeLits
+
+import qualified Data.TypedEncoding.Conv.ByteString.Char8 as EncB8
+import           Data.TypedEncoding.Combinators.Restriction.BoundedAlphaNums ()
 
 -- $setup
--- >>> :set -XOverloadedStrings -XMultiParamTypeClasses -XDataKinds -XTypeApplications
--- >>> import           Data.TypedEncoding.Instances.Restriction.UTF8 ()
+-- >>> :set -XDataKinds -XMultiParamTypeClasses -XKindSignatures -XFlexibleInstances -XFlexibleContexts -XOverloadedStrings -XTypeApplications -XScopedTypeVariables
+-- >>> import qualified Data.TypedEncoding.Instances.Enc.Base64 as EnB64 (acceptLenientS)
+-- >>> import qualified Data.TypedEncoding.Conv.Text as EncT (pack, utf8Promote, utf8Demote)
+-- >>> import qualified Data.TypedEncoding.Conv.ByteString.Char8 as EncB8 (pack, unpack)
+-- >>> import qualified Data.TypedEncoding.Conv.Text.Encoding as EncTe (decodeUtf8, encodeUtf8)
 -- >>> import           Data.Proxy
 --
 -- This module contains some ghci friendly values to play with.
@@ -35,7 +87,6 @@ import qualified Data.ByteString as B
 
 
 -- * Moving between Text and ByteString
-
 
 eHelloAsciiB :: Either EncodeEx (Enc '["r-ASCII"] () B.ByteString)
 eHelloAsciiB = encodeFAll . toEncoding () $ "HeLlo world" 
@@ -48,32 +99,85 @@ Right helloAsciiB = eHelloAsciiB
 -- ^ above with either removed
 
 helloAsciiT :: Enc '["r-ASCII"] () T.Text
-helloAsciiT = EnASCII.byteString2TextS helloAsciiB
--- ^ When converted to Text the annotation is preserved.
+helloAsciiT = EncTe.decodeUtf8 helloAsciiB
+-- ^ 
+-- We use a tween function to the popular 'Data.Text.Encoding.decodeUtf8' 
+-- from the @test@ package.
 --
--- Currently separate function is defined for each allowed conversion. 
+-- Notice the encoding annotation is preserved.
 --
--- >>> displ $ EnASCII.byteString2TextS helloAsciiB
+-- >>> displ $ EncTe.decodeUtf8 helloAsciiB
 -- "MkEnc '[r-ASCII] () (Text HeLlo world)"
 
--- * Subsets
 
+-- * pack and unpack
+
+helloZero :: Enc ('[] :: [Symbol]) () String
+helloZero = toEncoding () "Hello"
+-- ^ Consider 0-encoding of a 'String',  to move it to @Enc '[] () String@ one could try:
+--
+-- >>> displ . EncT.pack $ helloZero
+-- "MkEnc '[] () (Text Hello)"
+--
+-- this works, but:
+-- 
+-- >>> EncB8.pack helloZero
+-- ...
+-- ... error: 
+-- ... Empty Symbol list not allowed
+-- ...
+--
+-- this does not compile.  And it should not. @pack@ from "Data.ByteString.Char8" is error prone.
+-- It is not an injection as it only considers first 7 bits of information from each 'Char'.  
+-- I doubt that there are any code examples of its intentional use on a String that is not ASCII. 
+-- 
+-- @EncB8.pack@ will not compile unless the encoding is ASCII restricted, this works:
+-- 
+-- >>> fmap (displ . EncB8.pack) . encodeFAll @(Either EncodeEx) @'["r-ASCII"] $ helloZero
+-- Right "MkEnc '[r-ASCII] () (ByteString Hello)"
+--
+-- And the result is a @ByteString@ with bonus annotation describing its content.
+
+
+helloRestricted :: Either EncodeEx (Enc '["r-ban:zzzzz"] () B.ByteString)
+helloRestricted = fmap EncB8.pack . runEncoder @'["r-ban"] encodings $ toEncoding () "Hello"
+-- ^ more interstingly @EncB8.pack@ works fine on "r-" encodings that are subsets of "r-ASCII"
+-- this example @"r-ban:zzzzz"@ restricts to 5 alapha-numeric charters all < 'z'
+-- 
+-- >>> displ <$> helloRestricted
+-- Right "MkEnc '[r-ban:zzzzz] () (ByteString Hello)"
+--
+-- Adding @"r-ASCII"@ annotation on this ByteString would have been redundant since @"r-ban:zzzzz"@ is more
+-- restrictive (see Supersets below).
+--
+-- @unpack@, as expected will put us back in a String keeping the annotation
+--
+-- >>> fmap (displ . EncB8.unpack) helloRestricted
+-- Right "MkEnc '[r-ban:zzzzz] () Hello"
+-- 
+
+
+-- * Supersets
 
 helloUtf8B :: Enc '["r-UTF8"] () B.ByteString
-helloUtf8B = inject helloAsciiB
+helloUtf8B = injectInto helloAsciiB
 -- ^ To get UTF8 annotation, instead of doing this: 
 --
 -- >>> encodeFAll . toEncoding () $ "HeLlo world" :: Either EncodeEx (Enc '["r-UTF8"] () B.ByteString)
 -- Right (MkEnc Proxy () "HeLlo world")
 -- 
--- We should be able to convert the ASCII version.
+-- We should be able to convert the ASCII version we already have.
 --
 -- This is done using 'Superset' typeclass.
 --
--- @inject@ method accepts proxy to specify superset to use.
+-- @injectInto@ method accepts proxy to specify superset to use.
 --
--- >>> displ $ inject @ "r-UTF8" helloAsciiB
+-- >>> displ $ injectInto @ "r-UTF8" helloAsciiB
 -- "MkEnc '[r-UTF8] () (ByteString HeLlo world)"
+--
+-- Superset is intended for @"r-"@ annotations only, should not be used
+-- with general encodings like @"enc-B64"@, it assumes that decoding in the superset
+-- can replace the decoding from injected subset.
 
 
 
@@ -81,42 +185,61 @@ helloUtf8B = inject helloAsciiB
 
 helloUtf8B64B :: Enc '["enc-B64", "r-UTF8"] () B.ByteString
 helloUtf8B64B = encodePart @'["enc-B64"] helloUtf8B 
--- ^ We put Base64 on the UFT8 ByteString
+-- ^ We put Base64 on a ByteString which adheres to UTF8 layout
 --
 -- >>> displ $ encodePart_ (Proxy :: Proxy '["enc-B64"]) helloUtf8B
 -- "MkEnc '[enc-B64,r-UTF8] () (ByteString SGVMbG8gd29ybGQ=)"
 
 helloUtf8B64T :: Enc '["enc-B64"] () T.Text
-helloUtf8B64T = EnB64.byteString2TextS helloUtf8B64B  
+helloUtf8B64T = EncT.utf8Demote . EncTe.decodeUtf8 $ helloUtf8B64B  
 -- ^ .. and copy it over to Text.
--- but UTF8 would be redundant in Text so the "r-UTF8" is dropped
 --
--- >>> :t EnB64.byteString2TextS helloUtf8B64B
--- EnB64.byteString2TextS helloUtf8B64B :: Enc '["enc-B64"] () T.Text
+-- >>> displ $ EncTe.decodeUtf8 helloUtf8B64B
+-- "MkEnc '[enc-B64,r-UTF8] () (Text SGVMbG8gd29ybGQ=)"
 --
--- Conversely moving back to ByteString recovers the annotation.
--- (there could be a choice of a UTF annotation to recover in the future)
+-- but UTF8 would be redundant in Text so the "r-UTF8" can be dropped:
+--
+-- >>> displ . EncT.utf8Demote . EncTe.decodeUtf8 $ helloUtf8B64B
+-- "MkEnc '[enc-B64] () (Text SGVMbG8gd29ybGQ=)"
+--
+-- Conversely moving back to ByteString we need to recover the annotation
 -- 
--- >>> :t EnB64.text2ByteStringS helloUtf8B64T
--- EnB64.text2ByteStringS helloUtf8B64T
--- ... :: Enc '["enc-B64", "r-UTF8"] () B.ByteString
+-- >>> :t EncTe.encodeUtf8 helloUtf8B64T
+-- ...
+-- ... Couldn't match type ‘IsSupersetOpen
+-- ... "r-UTF8" "enc-B64" ...
+-- ...
+--
+-- This is not allowed! We need to add the redundant "r-UTF8" back:
+--
+-- >>> displ .  EncTe.encodeUtf8 . EncT.utf8Promote $ helloUtf8B64T
+-- "MkEnc '[enc-B64,r-UTF8] () (ByteString SGVMbG8gd29ybGQ=)"
+--
+-- To achieve type safety, our @encodeUtf8@ and @decodeUtf8@ require "r-UTF8" annotation. 
+-- But since @Text@ values can always emit @UTF8@ layout, we can simply add and remove
+-- these annotations on @Text@ encodings.  This approach gives us type level safety over UTF8 encoding/decoding errors.
 
 notTextB :: Enc '["enc-B64"] () B.ByteString
 notTextB = encodeAll . toEncoding () $ "\195\177"
--- ^ 'notTextB' a binary, one that does not even represent valid UTF8.
+-- ^ 'notTextB' a binary, one that does not even represent a valid UTF8.
 -- 
 -- >>> encodeAll . toEncoding () $ "\195\177" :: Enc '["enc-B64"] () B.ByteString
 -- MkEnc Proxy () "w7E="
 --
--- 'EnB64.byteString2TextS'' is a fuction that allows to convert Base 64 ByteString that is not UTF8.
--- 
--- >>> :t EnB64.byteString2TextS' notTextB
--- EnB64.byteString2TextS' notTextB
--- ... :: Enc '["enc-B64-nontext"] () T.Text
+-- Decoding it to Text is prevented by the compiler
 --
--- The result is annotated as "enc-B64-nontext" which prevents decoding it within 'T.Text' type.
--- We can only move it back to ByteString as "enc-B64".
-
+-- >>> :t EncTe.decodeUtf8 notTextB
+-- ...
+-- ... error:
+-- ... Couldn't match type ...
+-- ... "r-UTF8" "enc-B64" ...
+-- ...
+--
+-- This is good because having the payload inside of @Enc '["enc-B64"] () Text@ would allow us
+-- to try to decode it to Text (causing runtime errors).
+-- 
+-- We can move it to Text but to do that we will need to forget the "enc-B64" annotation.
+-- This can be done, for example, using flattening (see below).
 
 
 -- * Lenient recovery

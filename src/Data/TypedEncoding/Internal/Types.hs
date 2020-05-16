@@ -28,7 +28,6 @@ import           Data.TypedEncoding.Internal.Types.CheckedEnc
 import           Data.TypedEncoding.Internal.Types.UncheckedEnc
 import           Data.TypedEncoding.Internal.Types.Common
 
-
 import           Data.Proxy
 -- import           Data.Functor.Identity
 import           GHC.TypeLits
@@ -63,7 +62,11 @@ data EncodeEx where
 instance Show EncodeEx where
     show (EncodeEx prxy a) = "(EncodeEx \"" ++ symbolVal prxy ++ "\" (" ++ show a ++ "))"
 
--- | usefull when manually recreating using recovery
+asEncodeEx :: (Show a, KnownSymbol x) => Proxy x -> Either a b -> Either EncodeEx b
+asEncodeEx p = either (Left . EncodeEx p) Right 
+
+
+-- | Useful when manually recreating using recovery
 encToRecrEx :: EncodeEx ->  RecreateEx
 encToRecrEx (EncodeEx p a) = RecreateEx p a
 

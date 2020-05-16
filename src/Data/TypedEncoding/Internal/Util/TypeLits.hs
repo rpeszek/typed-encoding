@@ -24,7 +24,7 @@
 -- * "Data.TypedEncoding.Internal.Class.Util"
 -- * "Data.TypedEncoding.Internal.Types.SomeAnnotation"
 --
--- TODO these will need to get consolidated here
+-- (TODO) these will need to get consolidated.
 module  Data.TypedEncoding.Internal.Util.TypeLits where
 
 import           GHC.TypeLits
@@ -66,7 +66,8 @@ type family Concat (s :: [Symbol]) :: Symbol where
 type family Drop (n :: Nat) (s :: Symbol) :: Symbol where
     Drop n s = Concat (LDrop n (ToList s))
 
--- TODO create TypeList.List
+-- TODO create TypeList.List module ?
+
 -- | :kind! LDrop 6 (ToList "bool: \"r-ban:ff-ff\" | \"r-ban:ffff\"")
 type family LDrop (n :: Nat) (s :: [k]) :: [k] where
     LDrop 0 s = s
@@ -85,7 +86,6 @@ type family LDrop (n :: Nat) (s :: [k]) :: [k] where
 type family Take (n :: Nat) (s :: Symbol) :: Symbol where
     Take n s = Concat (LTake n (ToList s))
 
--- TODO create TypeList.List
 -- | :kind! LTake 3 (ToList "123456")
 type family LTake (n :: Nat) (s :: [k]) :: [k] where
     LTake 0 s = '[]
@@ -113,3 +113,34 @@ type family Length (s :: Symbol) :: Nat where
 type family LLengh (s :: [k]) :: Nat where
     LLengh '[] = 0
     LLengh (x ': xs) = 1 + LLengh xs
+
+
+-- |
+-- >>> :kind! LLast '["1","2","3"]
+-- ...
+-- = "3"
+type family LLast (s :: [Symbol]) :: Symbol where
+    LLast '[] = TypeError ('Text "Empty Symbol list not allowed")
+    LLast '[x] = x
+    LLast (_ ': xs) = LLast xs
+
+
+-- |
+-- Concat (Snoc '["1","2","3"] "4") 
+-- ...
+-- = "1234"
+type family Snoc (s :: [k]) (t :: k) :: [k] where
+    Snoc '[] x = '[x]
+    Snoc (x ': xs) y = x ': Snoc xs y
+
+
+-- |
+-- :kind! UnSnoc '["1","2","3"]    
+type family UnSnoc (s :: [k]) :: ([k], k) where
+    UnSnoc '[] = TypeError ('Text "Empty list, no last element")     
+    UnSnoc '[x] = '(,) '[] x
+    UnSnoc (x ': xs) = UnSnocHelper x (UnSnoc xs)
+
+
+type family UnSnocHelper (s :: k) (t :: ([k], k)) :: ([k], k) where 
+   UnSnocHelper y ('(,) xs x) = '(,) (y ': xs) x   
