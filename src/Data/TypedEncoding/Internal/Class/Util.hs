@@ -50,9 +50,6 @@ symbolVals_ _ = symbolVals @xs
 class Displ x where 
     displ :: x -> String
 
--- | TODO 0.3 TO BE REMOVED
-instance Displ EncAnn where
-    displ = id 
 
 instance Displ [EncAnn] where 
     displ x = "[" ++ L.intercalate "," x ++ "]"
@@ -63,11 +60,9 @@ instance Displ TL.Text where
 instance Displ B.ByteString where
     displ x = "(ByteString " ++ B.unpack x ++ ")" 
 instance Displ BL.ByteString where
-    displ x = "(ByteString " ++ BL.unpack x ++ ")" 
-
--- TODO 0.3 replaces:  instance Displ EncAnn   
--- instance Displ String where
---     displ x = "(String " ++ x ++ ")" 
+    displ x = "(ByteString " ++ BL.unpack x ++ ")"   
+instance Displ String where
+    displ x = "(String " ++ x ++ ")" 
 
 
 

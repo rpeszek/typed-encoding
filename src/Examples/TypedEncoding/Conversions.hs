@@ -153,7 +153,7 @@ helloRestricted = fmap EncB8.pack . runEncoder @'["r-ban"] encodings $ toEncodin
 -- @unpack@, as expected will put us back in a String keeping the annotation
 --
 -- >>> fmap (displ . EncB8.unpack) helloRestricted
--- Right "MkEnc '[r-ban:zzzzz] () Hello"
+-- Right "MkEnc '[r-ban:zzzzz] () (String Hello)"
 -- 
 
 

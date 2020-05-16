@@ -2,17 +2,21 @@
 
 ## Anticipated future breaking changes
 
-- ByteString / Text conversion functions in `Data.TypedEncoding.Instances.Restriction.ASCII`, 
-  `Data.TypedEncoding.Instances.Restriction.ASCII` and `Data.TypedEncoding.Instances.Enc.Base64`
-  are now deprecated and will be removed.
 - `EncodeFAll`, `DecodeFAll`, `RecreateFAll`, `EncodeF`, etc do not work well with more open 
    encoding  annotation such as `"r-ban:soething"` they will be either changed or deprecated / replaced with constructions similar to `Encoder` in `Data.TypedEncoding.Internal.Class.Encoder`.
 - `Data.TypedEncoding.Internal.Class.IsStringR` expected to be be changed / replaced
 - functions used to create encoding instances or encoding combinators (e.g. `implEncodeP`) will get more constraints. 
 - (never ending) rework of internal module stucture to make it easier to navigate 
 - Instance and Combinator modules will be merged.
-- Displ String instance (used in examples, will be made consistent with Text and ByteString)
 - (post 0.3) "enc-B64" will be moved to a different package (more distant goal)
+
+## Unreleased changes
+
+- breaking
+  - deprecated ByteString / Text conversion functions in `Data.TypedEncoding.Instances.Restriction.ASCII`, 
+    `Data.TypedEncoding.Instances.Restriction.ASCII` and `Data.TypedEncoding.Instances.Enc.Base64`
+    have been removed.
+  - Displ String instance (used in examples, has been made consistent with Text and ByteString)
 
 ## 0.2.2 
 
