@@ -34,60 +34,6 @@ import qualified Data.ByteString.Base64.Lazy as BL64
 -- Conversions --
 -----------------
 
--- | 
--- DEPRECATED use 'Data.TypedEncoding.Conv.Text.Encoding.decodeUtf8'
--- and 'Data.TypedEncoding.Conv.Text.utf8Demote'
--- 
--- Will be removed in 0.3.x.x
---
--- See warning in 'Data.TypedEncoding.Instances.Restriction.ASCII.byteString2TextS'
-byteString2TextS :: Enc ("enc-B64" ': "r-UTF8" ': ys) c B.ByteString -> Enc ("enc-B64" ': ys) c T.Text 
-byteString2TextS = withUnsafeCoerce TE.decodeUtf8
-
--- | 
--- DEPRECATED use 'Data.TypedEncoding.Conv.Text.Lazy.Encoding.decodeUtf8'
--- and 'Data.TypedEncoding.Conv.Text.utf8Demote'
---
--- Will be removed in 0.3.x.x
---
--- See warning in 'Data.TypedEncoding.Instances.Restriction.ASCII.byteString2TextS'
-byteString2TextL :: Enc ("enc-B64" ': "r-UTF8" ': ys) c BL.ByteString -> Enc ("enc-B64" ': ys) c TL.Text 
-byteString2TextL = withUnsafeCoerce TEL.decodeUtf8
-
--- DEPRECATED use 'Data.TypedEncoding.Conv.Text.Encoding.encodeUtf8'
--- and 'Data.TypedEncoding.Conv.Text.utf8Promote'
--- 
--- Will be removed in 0.3.x.x
-text2ByteStringS :: Enc ("enc-B64" ': ys) c T.Text -> Enc ("enc-B64" ': "r-UTF8" ': ys) c B.ByteString 
-text2ByteStringS = withUnsafeCoerce TE.encodeUtf8
-
--- DEPRECATED use 'Data.TypedEncoding.Conv.Text.Lazy.Encoding.encodeUtf8'
--- and 'Data.TypedEncoding.Conv.Text.utf8Promote'
--- 
--- Will be removed in 0.3.x.x
-text2ByteStringL  :: Enc ("enc-B64" ': ys) c TL.Text -> Enc ("enc-B64" ': "r-UTF8" ': ys) c BL.ByteString 
-text2ByteStringL  = withUnsafeCoerce TEL.encodeUtf8
-
-
--- | B64 encoded bytestring can be converted to Text as "enc-B64-nontext" preventing it from 
--- being B64-decoded directly to Text
-byteString2TextS' :: Enc ("enc-B64" ': ys) c B.ByteString -> Enc ("enc-B64-nontext" ': ys) c T.Text 
-byteString2TextS' = withUnsafeCoerce TE.decodeUtf8
-
--- DEPRECATED 
-byteString2TextL' :: Enc ("enc-B64" ': ys) c BL.ByteString -> Enc ("enc-B64-nontext" ': ys) c TL.Text 
-byteString2TextL' = withUnsafeCoerce TEL.decodeUtf8
-
--- DEPRECATED 
-text2ByteStringS' :: Enc ("enc-B64-nontext" ': ys) c T.Text -> Enc ("enc-B64" ': ys) c B.ByteString 
-text2ByteStringS' = withUnsafeCoerce TE.encodeUtf8
-
--- DEPRECATED 
-text2ByteStringL'  :: Enc ("enc-B64-nontext" ': ys) c TL.Text -> Enc ("enc-B64" ': ys) c BL.ByteString 
-text2ByteStringL'  = withUnsafeCoerce TEL.encodeUtf8
-
-
-
 acceptLenientS :: Enc ("enc-B64-len" ': ys) c B.ByteString -> Enc ("enc-B64" ': ys) c B.ByteString 
 acceptLenientS = withUnsafeCoerce (B64.encode . B64.decodeLenient)
 
@@ -103,12 +49,6 @@ acceptLenientL = withUnsafeCoerce (BL64.encode . BL64.decodeLenient)
 instance FlattenAs "r-ASCII" "enc-B64-nontext" where
 instance FlattenAs "r-ASCII" "enc-B64" where
 
--- DEPRECATED will be removed
---
--- dangerous, with new approach.
--- Supersets are for "r-" types only
-instance Superset "r-ASCII" "enc-B64-nontext" where
-instance Superset "r-ASCII" "enc-B64" where
 
 -----------------
 -- Encodings   --

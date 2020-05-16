@@ -16,12 +16,12 @@ module Data.TypedEncoding.Instances.Restriction.UTF8 where
 import           Data.TypedEncoding.Instances.Support
 
 import           Data.Proxy
-import           GHC.TypeLits
+-- import           GHC.TypeLits
 
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Lazy as BL
-import qualified Data.Text as T
-import qualified Data.Text.Lazy as TL
+-- import qualified Data.Text as T
+-- import qualified Data.Text.Lazy as TL
 import qualified Data.Text.Encoding as TE 
 import qualified Data.Text.Lazy.Encoding as TEL 
 
@@ -36,62 +36,15 @@ import           Data.Either
 -- >>> import Test.QuickCheck.Instances.Text()
 -- >>> import Test.QuickCheck.Instances.ByteString()
 -- >>> import Data.TypedEncoding.Internal.Util (proxiedId)
--- >>> :{
--- >>> instance Arbitrary (Enc '["r-UTF8"] () B.ByteString) where 
---      arbitrary =  fmap (fromRight (emptyUTF8B ())) 
+-- >>> let emptyUTF8B = unsafeSetPayload () "" ::  Enc '["r-UTF8"] () B.ByteString 
+-- >>> :{  
+-- instance Arbitrary (Enc '["r-UTF8"] () B.ByteString) where 
+--      arbitrary =  fmap (fromRight emptyUTF8B) 
 --                   . flip suchThat isRight 
 --                   . fmap (encodeFAll @(Either EncodeEx) @'["r-UTF8"] @(). toEncoding ()) $ arbitrary 
 -- :}
 
--- | DEPRECATED will be removed in 0.3 
--- empty string is valid utf8
-emptyUTF8B :: c -> Enc '["r-UTF8"] c B.ByteString
-emptyUTF8B c = unsafeSetPayload c ""   
 
------------------
--- Conversions --
------------------
-
--- |
--- | DEPRECATED will be removed in 0.3 
--- 
--- use 'Data.TypedEncoding.Conv.Text.Lazy.Encoding.encodeUtf8'
--- and 'Data.TypedEncoding.Conv.Text.utf8Promote'
-text2ByteStringS :: Enc ys c T.Text -> Enc ("r-UTF8" ': ys) c B.ByteString
-text2ByteStringS = withUnsafeCoerce TE.encodeUtf8
-
--- | 
--- DEPRECATED
---
--- | DEPRECATED will be removed in 0.3 
--- 
--- use 'Data.TypedEncoding.Conv.Text.Lazy.Encoding.decodeUtf8'
--- and 'Data.TypedEncoding.Conv.Text.utf8Demote'
---
--- See warning in 'Data.TypedEncoding.Instances.Restriction.ASCII.byteString2TextS'
---
--- Type-safer version of Data.Text.Encoding.decodeUtf8
---
-byteString2TextS :: Enc ("r-UTF8" ': ys) c B.ByteString -> Enc ys c T.Text 
-byteString2TextS = withUnsafeCoerce TE.decodeUtf8
-
--- | To be removed
-txtBsSIdProp :: Proxy (ys :: [Symbol]) -> Enc ys c T.Text -> Enc ys c T.Text
-txtBsSIdProp _ = byteString2TextS . text2ByteStringS 
-
--- To be removed
-bsTxtIdProp :: Proxy (ys :: [Symbol]) -> Enc ("r-UTF8" ': ys) c B.ByteString -> Enc ("r-UTF8" ': ys) c B.ByteString
-bsTxtIdProp _ = text2ByteStringS . byteString2TextS
-
--- DEPRECATED see above
-text2ByteStringL :: Enc ys c TL.Text -> Enc ("r-UTF8" ': ys) c BL.ByteString
-text2ByteStringL = withUnsafeCoerce TEL.encodeUtf8
-
--- DEPRECATED
---
--- See warning in 'Data.TypedEncoding.Instances.Restriction.ASCII.byteString2TextS'
-byteString2TextL :: Enc ("r-UTF8" ': ys) c BL.ByteString -> Enc ys c TL.Text 
-byteString2TextL = withUnsafeCoerce TEL.decodeUtf8
 
 -----------------
 -- Encodings  --
