@@ -29,7 +29,7 @@ unpack = unsafeChangePayload T.unpack
 utf8Promote :: Enc xs c T.Text -> Enc (Snoc xs "r-UTF8") c T.Text
 utf8Promote = withUnsafeCoerce id
 
--- | For 'Text' @"r-UTF8"@ is redundant
+-- | For 'T.Text' @"r-UTF8"@ is redundant
 --
 -- >>> displ . utf8Demote $ (unsafeSetPayload () "Hello" :: Enc '["r-UTF8"] () T.Text)
 -- "MkEnc '[] () (Text Hello)"
