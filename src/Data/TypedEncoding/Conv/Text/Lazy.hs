@@ -20,6 +20,6 @@ unpack = unsafeChangePayload TL.unpack
 utf8Promote :: Enc xs c TL.Text -> Enc (Snoc xs "r-UTF8") c TL.Text
 utf8Promote = withUnsafeCoerce id
 
--- | For 'Text' @"r-UTF8"@ is redundant
+-- | For 'T.Text' @"r-UTF8"@ is redundant
 utf8Demote :: (UnSnoc xs ~ '(,) ys "r-UTF8") => Enc xs c TL.Text -> Enc ys c TL.Text
 utf8Demote = withUnsafeCoerce id

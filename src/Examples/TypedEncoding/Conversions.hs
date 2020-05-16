@@ -142,7 +142,7 @@ helloZero = toEncoding () "Hello"
 helloRestricted :: Either EncodeEx (Enc '["r-ban:zzzzz"] () B.ByteString)
 helloRestricted = fmap EncB8.pack . runEncoder @'["r-ban"] encodings $ toEncoding () "Hello"
 -- ^ more interstingly @EncB8.pack@ works fine on "r-" encodings that are subsets of "r-ASCII"
--- this example @"r-ban:zzzzz"@ restricts to 5 alapha-numeric charters all < 'z'
+-- this example @"r-ban:zzzzz"@ restricts to 5 alapha-numeric charters all < @'z'@
 -- 
 -- >>> displ <$> helloRestricted
 -- Right "MkEnc '[r-ban:zzzzz] () (ByteString Hello)"
