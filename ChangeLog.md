@@ -26,12 +26,12 @@
   - `Enc` versions for `pack`/ `unpack` for `Text` and `ByteString`. 
   - `Enc` versions of `decodeUtf8` / `encodeUtf8`
   - new and corrected approach to conversions (all old conversion functions have been deprecated)
-  - `IsSuperset` type family with basic combiators deprecates `Superset` typeclass.
+  - `IsSuperset` type family with basic combinators deprecates `Superset` typeclass.
   - more modules exported from `Data.TypedEncoding.Instances.Support` for instance and combinator creation
-  - more utility type famililes `Data.TypedEncoding.Internal.Util.TypeLits` 
+  - more utility type families `Data.TypedEncoding.Internal.Util.TypeLits` 
   - more utility combinators for creating encoding instances and combinators.
   - String instance added in number of places, including for "r-ASCII" encoding
-  - few more support conveniece functions.
+  - few more support convenience functions.
 - deprecation warnings (see above) 
 
 ## 0.2.1.0
@@ -40,8 +40,8 @@
   - bounded alpha-numeric restriction encodings (`r-ban`)
   - boolean algebra of encodings 
 - minor improvements
-  - dropped IsString contraint from instances in `Data.TypedEncoding.Instances.Restriction.Common`
-  - added forall annotation to ecodeAll and decodeAll
+  - dropped IsString constraint from instances in `Data.TypedEncoding.Instances.Restriction.Common`
+  - added forall annotation to encodeAll and decodeAll
 
 ## 0.2.0.0
 

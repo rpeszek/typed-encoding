@@ -53,7 +53,7 @@ import qualified Data.Text as T
 --
 -- There is currently an alternative polymorphic way (prototype) to create encodings by /running/ 'Encoder' on 'encodings'.
 -- This approach works better with more open / dynamic encoding setup it also provides first class @Encoder@. 
--- In future verions encodeAll will either be improved to provide similar flexibility or will be deprecated and removed.
+-- In future versions encodeAll will either be improved to provide similar flexibility or will be deprecated and removed.
 -- 
 -- >>> displ <$> (runEncoder @'["enc-B64"] encodings $ toEncoding () "Hello" :: Either EncodeEx (Enc '["enc-B64"] () B.ByteString))
 -- Right "MkEnc '[enc-B64] () (ByteString SGVsbG8=)"

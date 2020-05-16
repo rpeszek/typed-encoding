@@ -40,7 +40,7 @@ import           Data.Symbol.Ascii
 --
 -- This would be dangerous, it would, for example, permit converting encoded binary 
 -- @"Enc '["enc-"] c ByteString@ to @"Enc '["enc-"] c Text@, decoding which
--- could result in rutime errors.
+-- could result in runtime errors.
 --
 -- The requirement is that that the decoding in the superset
 -- can replace the decoding from injected subset.

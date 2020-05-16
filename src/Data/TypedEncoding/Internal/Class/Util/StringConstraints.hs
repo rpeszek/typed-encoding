@@ -123,7 +123,7 @@ instance Char7Find TL.Text where
 -- >>> B.length $ B8.pack "\160582"
 -- 1
 --
--- This instance allows to check elementes of ByteString interpreting them as Char.
+-- This instance allows to check elements of ByteString interpreting them as Char.
 -- 
 -- This may or may not work with UTF8 conversions.
 -- Safe if restricting to 7bit code points.s

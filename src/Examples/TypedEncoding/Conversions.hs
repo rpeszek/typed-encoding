@@ -18,7 +18,7 @@
 -- import           Data.Text.Encoding (decodeUtf8, encodeUtf8)
 -- @
 --
--- or correspoding @Lazy@ imports (not shown).
+-- or corresponding @Lazy@ imports (not shown).
 --
 -- Enc-specific equivalents can be found in:
 --
@@ -28,7 +28,7 @@
 -- import           Data.TypedEncoding.Conv.Text.Encoding (decodeUtf8, encodeUtf8)
 -- @    
 --
--- Conversions aim at provinding type safety when moving between encoded string-like types.
+-- Conversions aim at providing type safety when moving between encoded string-like types.
 --
 -- __The assumption__ made by `typed-encoding` is that encodings work in equivalent way independently of the payload type.
 -- For example, if the following instances exist:
@@ -129,25 +129,25 @@ helloZero = toEncoding () "Hello"
 --
 -- this does not compile.  And it should not. @pack@ from "Data.ByteString.Char8" is error prone.
 -- It is not an injection as it only considers first 7 bits of information from each 'Char'.  
--- I doubt that there are any code examples of its intential use on a String that is not ASCII. 
+-- I doubt that there are any code examples of its intentional use on a String that is not ASCII. 
 -- 
 -- @EncB8.pack@ will not compile unless the encoding is ASCII restricted, this works:
 -- 
 -- >>> fmap (displ . EncB8.pack) . encodeFAll @(Either EncodeEx) @'["r-ASCII"] $ helloZero
 -- Right "MkEnc '[r-ASCII] () (ByteString Hello)"
 --
--- And the result is a @ByteString@ with bonus annoation describing its content.
+-- And the result is a @ByteString@ with bonus annotation describing its content.
 
 
 helloRestricted :: Either EncodeEx (Enc '["r-ban:zzzzz"] () B.ByteString)
 helloRestricted = fmap EncB8.pack . runEncoder @'["r-ban"] encodings $ toEncoding () "Hello"
 -- ^ more interstingly @EncB8.pack@ works fine on "r-" encodings that are subsets of "r-ASCII"
--- this example @"r-ban:zzzzz"@ restricts to 5 alapha-numeric charaters all < 'z'
+-- this example @"r-ban:zzzzz"@ restricts to 5 alapha-numeric charters all < 'z'
 -- 
 -- >>> displ <$> helloRestricted
 -- Right "MkEnc '[r-ban:zzzzz] () (ByteString Hello)"
 --
--- Adding @"r-ASCII"@ annotation on this ByteString would have been redunant since @"r-ban:zzzzz"@ is more
+-- Adding @"r-ASCII"@ annotation on this ByteString would have been redundant since @"r-ban:zzzzz"@ is more
 -- restrictive (see Supersets below).
 --
 -- @unpack@, as expected will put us back in a String keeping the annotation

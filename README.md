@@ -45,9 +45,9 @@ Transformations can be
 - used with parameters
 - applied or undone partially (if encoding is reversible)
 
-One of more intersting uses of this library are encoding restrictions.   
+One of more interesting uses of this library are encoding restrictions.   
 (Arbitrary) bounded alpha-numeric (`r-ban`) restrictions 
-and a simple annotation boolean algebra are both provided.
+and a simple annotation Boolean algebra are both provided.
 
 ```Haskell
 phone :: Enc '["r-ban:999-999-9999"] () T.Text

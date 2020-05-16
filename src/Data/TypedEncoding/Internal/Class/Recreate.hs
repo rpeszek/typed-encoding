@@ -52,7 +52,7 @@ recreateAll :: forall xs c str . RecreateFAll Identity xs c str =>
 recreateAll = runIdentity . recreateFAll 
 
 
--- | Usefull for partially manual recreation
+-- | Useful for partially manual recreation
 recreateFPart_ :: forall f xs xsf c str . (Functor f, RecreateFAll f xs c str) => Proxy xs -> Enc xsf c str -> f (Enc (Append xs xsf) c str)
 recreateFPart_ p (MkEnc _ conf str) = 
     let re :: f (Enc xs c str) = recreateFAll $ MkEnc Proxy conf str

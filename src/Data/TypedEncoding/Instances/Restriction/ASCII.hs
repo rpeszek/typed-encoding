@@ -7,7 +7,7 @@
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 
--- | Strings can be encoded as 'Enc "r-ASCII"@ only if they contain only ascii characters (first 128 characters of the Unicode character set).
+-- | Strings can be encoded as 'Enc "r-ASCII"@ only if they contain only ASCII characters (first 128 characters of the Unicode character set).
 --
 -- This is sometimes referred to as ASCII-7 and future versions of @type-encoding@ may change @"r-ASCII"@ symbol annotation to reflect this.
 --  
@@ -113,7 +113,7 @@ instance Superset "r-UTF8" "r-ASCII" where
 -- type instance IsSuperset "r-ASCII" "r-ASCII" = True  
 
 -----------------
--- Encondings  --
+-- Encodings  --
 -----------------
 
 newtype NonAsciiChar = NonAsciiChar Char deriving (Eq, Show)

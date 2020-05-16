@@ -43,7 +43,7 @@ import           Data.Either
 --                   . fmap (encodeFAll @(Either EncodeEx) @'["r-UTF8"] @(). toEncoding ()) $ arbitrary 
 -- :}
 
--- | DEPRECTED will be removed in 0.3 
+-- | DEPRECATED will be removed in 0.3 
 -- empty string is valid utf8
 emptyUTF8B :: c -> Enc '["r-UTF8"] c B.ByteString
 emptyUTF8B c = unsafeSetPayload c ""   
@@ -53,7 +53,7 @@ emptyUTF8B c = unsafeSetPayload c ""
 -----------------
 
 -- |
--- | DEPRECTED will be removed in 0.3 
+-- | DEPRECATED will be removed in 0.3 
 -- 
 -- use 'Data.TypedEncoding.Conv.Text.Lazy.Encoding.encodeUtf8'
 -- and 'Data.TypedEncoding.Conv.Text.utf8Promote'
@@ -61,9 +61,9 @@ text2ByteStringS :: Enc ys c T.Text -> Enc ("r-UTF8" ': ys) c B.ByteString
 text2ByteStringS = withUnsafeCoerce TE.encodeUtf8
 
 -- | 
--- DEPRECTATED
+-- DEPRECATED
 --
--- | DEPRECTED will be removed in 0.3 
+-- | DEPRECATED will be removed in 0.3 
 -- 
 -- use 'Data.TypedEncoding.Conv.Text.Lazy.Encoding.decodeUtf8'
 -- and 'Data.TypedEncoding.Conv.Text.utf8Demote'
@@ -83,18 +83,18 @@ txtBsSIdProp _ = byteString2TextS . text2ByteStringS
 bsTxtIdProp :: Proxy (ys :: [Symbol]) -> Enc ("r-UTF8" ': ys) c B.ByteString -> Enc ("r-UTF8" ': ys) c B.ByteString
 bsTxtIdProp _ = text2ByteStringS . byteString2TextS
 
--- DEPRECTATED see above
+-- DEPRECATED see above
 text2ByteStringL :: Enc ys c TL.Text -> Enc ("r-UTF8" ': ys) c BL.ByteString
 text2ByteStringL = withUnsafeCoerce TEL.encodeUtf8
 
--- DEPRECTATED
+-- DEPRECATED
 --
 -- See warning in 'Data.TypedEncoding.Instances.Restriction.ASCII.byteString2TextS'
 byteString2TextL :: Enc ("r-UTF8" ': ys) c BL.ByteString -> Enc ys c TL.Text 
 byteString2TextL = withUnsafeCoerce TEL.decodeUtf8
 
 -----------------
--- Encondings  --
+-- Encodings  --
 -----------------
 
 prxyUtf8 = Proxy :: Proxy "r-UTF8"

@@ -73,7 +73,7 @@ decodeSign t =
 helloSigned :: Enc '["my-sign"] () T.Text
 helloSigned = encodeAll . toEncoding () $ "Hello World"
 
--- | property checks that 'T.Text' values are exected to decode 
+-- | property checks that 'T.Text' values are expected to decode 
 -- without error after encoding.
 --
 -- prop> \t -> propEncDec
