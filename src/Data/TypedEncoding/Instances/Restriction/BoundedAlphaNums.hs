@@ -26,13 +26,13 @@
 -- only with short length data.
 --
 -- Decoding function @decFR@ is located in
--- "Data.TypedEncoding.Combinators.Restriction.Common"
+-- "Data.TypedEncoding.Instances.Support"
 --
--- Use 'Data.TypedEncoding.Combinators.Restriction.Common.recWithEncR' 
+-- Use 'Data.TypedEncoding.Instances.Support.recWithEncR' 
 -- to create manual recovery step that can be combined with 'recreateFPart'.
 --
 -- @since 0.2.1.0
-module Data.TypedEncoding.Combinators.Restriction.BoundedAlphaNums where 
+module Data.TypedEncoding.Instances.Restriction.BoundedAlphaNums where 
 
 
 import           GHC.TypeLits
@@ -48,7 +48,6 @@ import           Data.TypedEncoding.Instances.Support
 -- $setup
 -- >>> :set -XOverloadedStrings -XMultiParamTypeClasses -XDataKinds -XTypeApplications
 -- >>> import qualified Data.Text as T
--- >>> import           Data.TypedEncoding.Combinators.Restriction.Common
 
 -- better compilation errors?
 type family IsBan (s :: Symbol) :: Bool where

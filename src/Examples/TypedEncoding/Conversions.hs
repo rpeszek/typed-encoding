@@ -70,7 +70,7 @@ import qualified Data.ByteString as B
 import           GHC.TypeLits
 
 import qualified Data.TypedEncoding.Conv.ByteString.Char8 as EncB8
-import           Data.TypedEncoding.Combinators.Restriction.BoundedAlphaNums ()
+import           Data.TypedEncoding.Instances.Restriction.BoundedAlphaNums ()
 
 -- $setup
 -- >>> :set -XDataKinds -XMultiParamTypeClasses -XKindSignatures -XFlexibleInstances -XFlexibleContexts -XOverloadedStrings -XTypeApplications -XScopedTypeVariables

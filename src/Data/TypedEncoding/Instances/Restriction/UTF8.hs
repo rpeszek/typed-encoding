@@ -52,7 +52,7 @@ import           Data.Either
 
 prxyUtf8 = Proxy :: Proxy "r-UTF8"
 
--- TODO these are quick and dirty
+-- TODO these may need rethinking (performance)
 
 -- | UTF8 encodings are defined for ByteString only as that would not make much sense for Text
 --
@@ -66,10 +66,17 @@ prxyUtf8 = Proxy :: Proxy "r-UTF8"
 --
 -- prop> \(b :: B.ByteString) -> verEncoding b (fmap (fromEncoding . decodeAll . proxiedId (Proxy :: Proxy (Enc '["r-UTF8"] _ _))) . (encFAll :: _ -> Either EncodeEx _). toEncoding () $ b)
 instance Encode (Either EncodeEx) "r-UTF8" "r-UTF8" c B.ByteString where
-    encoding = mkEncoding (implEncodeF_ prxyUtf8 (fmap TE.encodeUtf8 . TE.decodeUtf8'))
+    encoding = encUTF8B
 
 instance Encode (Either EncodeEx) "r-UTF8" "r-UTF8" c BL.ByteString where
-    encoding = mkEncoding (implEncodeF_ prxyUtf8 (fmap TEL.encodeUtf8 . TEL.decodeUtf8'))
+    encoding = encUTF8BL :: Encoding (Either EncodeEx) "r-UTF8" "r-UTF8" c BL.ByteString
+
+encUTF8B :: Encoding (Either EncodeEx) "r-UTF8" "r-UTF8" c B.ByteString
+encUTF8B = mkEncoding (implEncodeF @"r-UTF8"(fmap TE.encodeUtf8 . TE.decodeUtf8'))
+
+encUTF8BL :: Encoding (Either EncodeEx) "r-UTF8" "r-UTF8" c BL.ByteString
+encUTF8BL = mkEncoding (implEncodeF @"r-UTF8" (fmap TEL.encodeUtf8 . TEL.decodeUtf8'))
+
 
 -- OLD
 

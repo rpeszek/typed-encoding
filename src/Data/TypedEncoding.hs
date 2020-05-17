@@ -99,6 +99,8 @@
 -- * "Data.TypedEncoding.Instances.Restriction.Common" 
 -- * "Data.TypedEncoding.Instances.Restriction.ASCII" 
 -- * "Data.TypedEncoding.Instances.Restriction.UTF8" 
+-- * "Data.TypedEncoding.Instances.Restriction.Bool" (moved from @Combinators@ to @Instances@ in v0.3)
+-- * "Data.TypedEncoding.Instances.Restriction.BoundedAlphaNums" (moved from @Combinators@ to @Instances@ in v0.3)
 -- * "Data.TypedEncoding.Instances.Do.Sample" 
 -- * "Data.TypedEncoding.Instances.ToEncString.Common" 
 -- 
@@ -115,8 +117,6 @@
 --
 -- Included combinator modules:
 --
--- * "Data.TypedEncoding.Combinators.Restriction.Bool"
--- * "Data.TypedEncoding.Combinators.Restriction.BoundedAlphaNums"
 --
 -- Conversion combinator module structure is similar to one found in @text@ and @bytestring@ packages
 -- And can be found (since 0.2.2) in

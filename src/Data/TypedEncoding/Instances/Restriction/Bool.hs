@@ -28,11 +28,11 @@
 --
 -- Typeclass encoding is not used to avoid instance overlapping.
 -- 
--- Use 'Data.TypedEncoding.Combinators.Restriction.Common.recWithEncR' 
+-- Use 'Data.TypedEncoding.Instances.Support.recWithEncR' 
 -- to create manual recovery step that can be combined with 'recreateFPart'.
 
 -- This is very much in beta state.
-module Data.TypedEncoding.Combinators.Restriction.Bool where 
+module Data.TypedEncoding.Instances.Restriction.Bool where 
 
 
 import           GHC.TypeLits
@@ -42,7 +42,6 @@ import           Data.Symbol.Ascii
 import           Data.TypedEncoding
 import           Data.TypedEncoding.Instances.Support
 -- import           Data.TypedEncoding.Internal.Util.TypeLits
-import           Data.TypedEncoding.Combinators.Restriction.Common
 
 -- import qualified Data.Text as T
 -- import           Data.TypedEncoding.Instances.Restriction.Common()
