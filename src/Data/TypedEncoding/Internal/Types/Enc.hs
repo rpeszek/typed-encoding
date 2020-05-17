@@ -92,14 +92,24 @@ unsafeChangePayload f (MkEnc p conf str)  = MkEnc p conf (f str)
 -- implement 
 -- 'Data.TypedEncoding.Internal.Class.Encode.Encode'
 -- or (preferably) both.
-data Encoding f nm alg conf str where
-    MkEncoding :: Proxy nm -> (forall (xs :: [Symbol]) . Enc xs conf str -> f (Enc (nm ': xs) conf str)) -> Encoding f nm (AlgNm nm) conf str
-     
+data Encoding f (nm :: Symbol) (alg :: Symbol) conf str where
+    -- | Consider this constructor as private or use it with care
+    --
+    -- Using this constructor:
+    -- @
+    -- MkEncoding :: Proxy nm -> (forall (xs :: [Symbol]) . Enc xs conf str -> f (Enc (nm ': xs) conf str)) -> Encoding f nm (AlgNm nm) conf str
+    -- @
+    -- 
+    -- would make compilation much slower
+    UnsafeMkEncoding :: Proxy nm -> (forall (xs :: [Symbol]) . Enc xs conf str -> f (Enc (nm ': xs) conf str)) -> Encoding f nm alg conf str
+
+-- | Type safe smart constructor
+-- adding the type family @(AlgNm nm)@ restriction to UnsafeMkEncoding slows down compilation, especially in tests.      
 mkEncoding :: forall f (nm :: Symbol) conf str . (forall (xs :: [Symbol]) . Enc xs conf str -> f (Enc (nm ': xs) conf str)) -> Encoding f nm (AlgNm nm) conf str
-mkEncoding = MkEncoding Proxy
+mkEncoding = UnsafeMkEncoding Proxy
 
 runEncoding :: Encoding f nm alg conf str -> Enc xs conf str -> f (Enc (nm ': xs) conf str)
-runEncoding (MkEncoding _ fn) = fn
+runEncoding (UnsafeMkEncoding _ fn) = fn
 
 -- |
 -- Wraps a list of @Encoding@ elements.

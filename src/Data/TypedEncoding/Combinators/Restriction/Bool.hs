@@ -32,7 +32,6 @@
 -- to create manual recovery step that can be combined with 'recreateFPart'.
 
 -- This is very much in beta state.
---
 module Data.TypedEncoding.Combinators.Restriction.Bool where 
 
 
