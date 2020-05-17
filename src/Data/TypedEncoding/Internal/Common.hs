@@ -1,7 +1,7 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE PolyKinds #-}
 {-# LANGUAGE DataKinds #-}
--- {-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE TypeOperators #-}
 -- {-# LANGUAGE FlexibleInstances #-}
 -- {-# LANGUAGE FlexibleContexts #-}
 -- {-# LANGUAGE UndecidableInstances #-}
@@ -39,3 +39,8 @@ type EncAnn = String
 --
 type family AlgNm (encnm :: Symbol) :: Symbol where
     AlgNm encnm = TakeUntil encnm ":"
+
+
+type family AlgNmMap (nms :: [Symbol]) :: [Symbol] where
+    AlgNmMap '[] = '[]
+    AlgNmMap (x ': xs) = AlgNm x ': AlgNmMap xs

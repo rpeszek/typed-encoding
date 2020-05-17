@@ -5,7 +5,7 @@
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE ScopedTypeVariables #-}
--- {-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE AllowAmbiguousTypes #-}
 {-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE PartialTypeSignatures #-}
@@ -25,7 +25,7 @@ import           Data.TypedEncoding.Internal.Common
 -- >>> :set -XOverloadedStrings -XMultiParamTypeClasses -XDataKinds -XAllowAmbiguousTypes
 -- >>> import qualified Data.Text as T
 
--- Contains encoded data annotatated by 
+-- Contains encoded data annotated by 
 --
 -- * @nms@ list of encodings (encoding stack) typically has kind @[Symbol]@ 
 -- * @conf@ that can contain configuration / encoding information such as digest.
@@ -108,8 +108,14 @@ data Encoding f (nm :: Symbol) (alg :: Symbol) conf str where
 mkEncoding :: forall f (nm :: Symbol) conf str . (forall (xs :: [Symbol]) . Enc xs conf str -> f (Enc (nm ': xs) conf str)) -> Encoding f nm (AlgNm nm) conf str
 mkEncoding = UnsafeMkEncoding Proxy
 
-runEncoding :: Encoding f nm alg conf str -> Enc xs conf str -> f (Enc (nm ': xs) conf str)
+runEncoding :: forall alg nm f xs conf str . Encoding f nm alg conf str -> Enc xs conf str -> f (Enc (nm ': xs) conf str)
 runEncoding (UnsafeMkEncoding _ fn) = fn
+
+-- | Same as 'runEncoding" but compiler figures out algorithm name
+--
+-- Using it can slowdown compilation
+_runEncoding :: forall nm f xs conf str alg . (AlgNm nm ~ alg) => Encoding f nm alg conf str -> Enc xs conf str -> f (Enc (nm ': xs) conf str)
+_runEncoding = runEncoding @(AlgNm nm)
 
 -- |
 -- Wraps a list of @Encoding@ elements.
@@ -122,8 +128,13 @@ data Encodings f (nms :: [Symbol]) (algs :: [Symbol]) conf str where
     ZeroE :: Encodings f '[] '[] conf str
     AppendE ::  Encoding f nm alg conf str -> Encodings f nms algs conf str -> Encodings f (nm ': nms) (alg ': algs) conf str
 
-runEncodings :: forall grps enc f c str . (Monad f) => Encodings f enc grps c str -> Enc ('[]::[Symbol]) c str -> f (Enc enc c str)
+runEncodings :: forall algs nms f c str . (Monad f) => Encodings f nms algs c str -> Enc ('[]::[Symbol]) c str -> f (Enc nms c str)
 runEncodings ZeroE enc0 = pure enc0
 runEncodings (AppendE fn enc) enc0 = 
         let re :: f (Enc _ c str) = runEncodings enc enc0
         in re >>= runEncoding fn
+
+
+-- | At possibly big compilation cost, have compiler figure out algorithm names.
+_runEncodings :: forall nms f c str algs . (Monad f, algs ~ AlgNmMap nms) => Encodings f nms algs c str -> Enc ('[]::[Symbol]) c str -> f (Enc nms c str)
+_runEncodings = runEncodings @(AlgNmMap nms)
