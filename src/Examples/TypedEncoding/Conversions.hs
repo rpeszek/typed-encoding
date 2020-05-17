@@ -89,10 +89,10 @@ import           Data.TypedEncoding.Combinators.Restriction.BoundedAlphaNums ()
 -- * Moving between Text and ByteString
 
 eHelloAsciiB :: Either EncodeEx (Enc '["r-ASCII"] () B.ByteString)
-eHelloAsciiB = encodeFAll . toEncoding () $ "HeLlo world" 
+eHelloAsciiB = encFAll . toEncoding () $ "HeLlo world" 
 -- ^ Example value to play with
 --
--- >>>  encodeFAll . toEncoding () $ "HeLlo world" :: Either EncodeEx (Enc '["r-ASCII"] () B.ByteString) 
+-- >>>  encFAll . toEncoding () $ "HeLlo world" :: Either EncodeEx (Enc '["r-ASCII"] () B.ByteString) 
 -- Right (MkEnc Proxy () "HeLlo world")
 
 Right helloAsciiB = eHelloAsciiB
@@ -133,15 +133,15 @@ helloZero = toEncoding () "Hello"
 -- 
 -- @EncB8.pack@ will not compile unless the encoding is ASCII restricted, this works:
 -- 
--- >>> fmap (displ . EncB8.pack) . encodeFAll @(Either EncodeEx) @'["r-ASCII"] $ helloZero
+-- >>> fmap (displ . EncB8.pack) . encFAll @'["r-ASCII"] @(Either EncodeEx) $ helloZero
 -- Right "MkEnc '[r-ASCII] () (ByteString Hello)"
 --
 -- And the result is a @ByteString@ with bonus annotation describing its content.
 
 
 helloRestricted :: Either EncodeEx (Enc '["r-ban:zzzzz"] () B.ByteString)
-helloRestricted = fmap EncB8.pack . runEncoder @'["r-ban"] encodings $ toEncoding () "Hello"
--- ^ more interstingly @EncB8.pack@ works fine on "r-" encodings that are subsets of "r-ASCII"
+helloRestricted = fmap EncB8.pack . runEncodings @ '["r-ban"] encodings $ toEncoding () "Hello"
+-- ^ more interestingly @EncB8.pack@ works fine on "r-" encodings that are subsets of "r-ASCII"
 -- this example @"r-ban:zzzzz"@ restricts to 5 alapha-numeric charters all < @'z'@
 -- 
 -- >>> displ <$> helloRestricted
@@ -163,7 +163,7 @@ helloUtf8B :: Enc '["r-UTF8"] () B.ByteString
 helloUtf8B = injectInto helloAsciiB
 -- ^ To get UTF8 annotation, instead of doing this: 
 --
--- >>> encodeFAll . toEncoding () $ "HeLlo world" :: Either EncodeEx (Enc '["r-UTF8"] () B.ByteString)
+-- >>> encFAll . toEncoding () $ "HeLlo world" :: Either EncodeEx (Enc '["r-UTF8"] () B.ByteString)
 -- Right (MkEnc Proxy () "HeLlo world")
 -- 
 -- We should be able to convert the ASCII version we already have.
@@ -184,10 +184,10 @@ helloUtf8B = injectInto helloAsciiB
 -- * More complex rules
 
 helloUtf8B64B :: Enc '["enc-B64", "r-UTF8"] () B.ByteString
-helloUtf8B64B = encodePart @'["enc-B64"] helloUtf8B 
+helloUtf8B64B = encPart @'["enc-B64"] helloUtf8B 
 -- ^ We put Base64 on a ByteString which adheres to UTF8 layout
 --
--- >>> displ $ encodePart_ (Proxy :: Proxy '["enc-B64"]) helloUtf8B
+-- >>> displ $ encPart @'["enc-B64"] helloUtf8B
 -- "MkEnc '[enc-B64,r-UTF8] () (ByteString SGVMbG8gd29ybGQ=)"
 
 helloUtf8B64T :: Enc '["enc-B64"] () T.Text
@@ -220,10 +220,10 @@ helloUtf8B64T = EncT.utf8Demote . EncTe.decodeUtf8 $ helloUtf8B64B
 -- these annotations on @Text@ encodings.  This approach gives us type level safety over UTF8 encoding/decoding errors.
 
 notTextB :: Enc '["enc-B64"] () B.ByteString
-notTextB = encodeAll . toEncoding () $ "\195\177"
+notTextB = encAll . toEncoding () $ "\195\177"
 -- ^ 'notTextB' a binary, one that does not even represent a valid UTF8.
 -- 
--- >>> encodeAll . toEncoding () $ "\195\177" :: Enc '["enc-B64"] () B.ByteString
+-- >>> encAll . toEncoding () $ "\195\177" :: Enc '["enc-B64"] () B.ByteString
 -- MkEnc Proxy () "w7E="
 --
 -- Decoding it to Text is prevented by the compiler

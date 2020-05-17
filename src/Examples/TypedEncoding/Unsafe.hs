@@ -27,7 +27,7 @@ import qualified Data.TypedEncoding.Instances.Restriction.ASCII()
 
 -- | Starting example
 exAsciiTE :: Either EncodeEx (Enc '["r-ASCII"] () T.Text)
-exAsciiTE = encodeFAll . toEncoding () $ "HELLO" 
+exAsciiTE = encFAll . toEncoding () $ "HELLO" 
 
 -- | with either removed
 exAsciiT :: Enc '["r-ASCII"] () T.Text

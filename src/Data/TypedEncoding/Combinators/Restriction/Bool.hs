@@ -8,6 +8,7 @@
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE UndecidableInstances #-}
+{-# LANGUAGE AllowAmbiguousTypes #-}
 
 -- |
 -- Boolean algebra on encodings
@@ -71,9 +72,18 @@ encBoolOrLeft' :: forall f s t xs c str . (
     -- IsBoolOr s ~ 'True
     , Functor f
     , LeftTerm s ~ t
-    , EncodeF f (Enc xs c str) (Enc (t ': xs) c str) 
+    , Encode f t t c str
     ) => Enc xs c str -> f (Enc (s ': xs) c str)  
-encBoolOrLeft' = encBoolOrLeft (encodeF @f @(Enc xs c str) @(Enc (t ': xs) c str)) 
+encBoolOrLeft' = encBoolOrLeft'' @t
+
+encBoolOrLeft'' :: forall alg f s t xs c str . (
+    BoolOpIs s "or" ~ 'True
+    -- IsBoolOr s ~ 'True
+    , Functor f
+    , LeftTerm s ~ t
+    , Encode f t alg c str
+    ) => Enc xs c str -> f (Enc (s ': xs) c str)  
+encBoolOrLeft'' = encBoolOrLeft (encF' @alg @t @xs @f)
 
 -- |
 -- 
@@ -106,9 +116,18 @@ encBoolOrRight' :: forall f s t xs c str . (
     -- IsBoolOr s ~ 'True
     , Functor f
     , RightTerm s ~ t
-    , EncodeF f (Enc xs c str) (Enc (t ': xs) c str) 
+    , Encode f t t c str
     ) => Enc xs c str -> f (Enc (s ': xs) c str)  
-encBoolOrRight' = encBoolOrRight (encodeF @f @(Enc xs c str) @(Enc (t ': xs) c str)) 
+encBoolOrRight' = encBoolOrRight'' @t
+
+encBoolOrRight'' :: forall alg f s t xs c str . (
+    BoolOpIs s "or" ~ 'True
+    -- IsBoolOr s ~ 'True
+    , Functor f
+    , RightTerm s ~ t
+    , Encode f t alg c str
+    ) => Enc xs c str -> f (Enc (s ': xs) c str)  
+encBoolOrRight'' = encBoolOrRight (encF' @alg @t @xs @f) 
 
 encBoolAnd :: forall f s t1 t2 xs c str . (
     BoolOpIs s "and" ~ 'True 
@@ -149,32 +168,42 @@ encBoolAnd fnl fnr en0 =
 -- Right (MkEnc Proxy () "234")
 -- >>> tst2
 -- Left (EncodeEx "r-Word8-decimal" ("Payload does not satisfy format Word8-decimal: 100000"))
-encBoolAnd' :: forall f s t1 t2 xs c str . (
+encBoolAnd' :: forall s t1 t2 xs c str . (
     BoolOpIs s "and" ~ 'True 
     , KnownSymbol s
     -- IsBoolAnd s ~ 'True
-    , f ~ Either EncodeEx
     , Eq str
     , LeftTerm s ~ t1
     , RightTerm s ~ t2
-    , EncodeF f (Enc xs c str) (Enc (t1 ': xs) c str) 
-    , EncodeF f (Enc xs c str) (Enc (t2 ': xs) c str) 
-    ) => Enc xs c str -> f (Enc (s ': xs) c str)  
-encBoolAnd'  = encBoolAnd (encodeF @f @(Enc xs c str) @(Enc (t1 ': xs) c str)) (encodeF @f @(Enc xs c str) @(Enc (t2 ': xs) c str)) 
+    , Encode (Either EncodeEx) t1 t1 c str
+    , Encode (Either EncodeEx) t2 t2 c str
+    ) => Enc xs c str -> Either EncodeEx (Enc (s ': xs) c str)  
+encBoolAnd'  = encBoolAnd'' @t1 @t2
+
+encBoolAnd'' :: forall al1 al2 s t1 t2 xs c str . (
+    BoolOpIs s "and" ~ 'True 
+    , KnownSymbol s
+    -- IsBoolAnd s ~ 'True
+    , Eq str
+    , LeftTerm s ~ t1
+    , RightTerm s ~ t2
+    , Encode (Either EncodeEx) t1 al1 c str
+    , Encode (Either EncodeEx) t2 al2 c str
+    ) => Enc xs c str -> Either EncodeEx (Enc (s ': xs) c str)  
+encBoolAnd''  = encBoolAnd (encF' @al1 @t1 @xs) (encF' @al2 @t2 @xs) 
 
 
 -- tst1, tst2 :: Either EncodeEx (Enc '["boolNot:(r-Word8-decimal)"] () T.Text)
 -- tst1 = encBoolNot' . toEncoding () $ "334"
 -- tst2 = encBoolNot' . toEncoding () $ "127"
 
-encBoolNot :: forall f s t xs c str . (
+encBoolNot :: forall s t xs c str . (
     BoolOpIs s "not" ~ 'True
     , KnownSymbol s
-    , f ~ Either EncodeEx
     , FirstTerm s ~ t
     , KnownSymbol t
     , IsR t ~ 'True
-    ) => (Enc xs c str -> f (Enc (t ': xs) c str)) -> Enc xs c str -> f (Enc (s ': xs) c str)  
+    ) => (Enc xs c str -> Either EncodeEx (Enc (t ': xs) c str)) -> Enc xs c str -> Either EncodeEx (Enc (s ': xs) c str)  
 encBoolNot fn en0 = 
         let 
            een = fn en0
@@ -197,16 +226,25 @@ encBoolNot fn en0 =
 -- Right (MkEnc Proxy () "334")
 -- >>> tst2
 -- Left (EncodeEx "boolNot:(r-Word8-decimal)" ("Encoding r-Word8-decimal succeeded"))
-encBoolNot' :: forall f s t xs c str . (
+encBoolNot' :: forall s t xs c str . (
     BoolOpIs s "not" ~ 'True
     , KnownSymbol s
-    , f ~ Either EncodeEx
     , FirstTerm s ~ t
     , KnownSymbol t
     , IsR t ~ 'True
-    , EncodeF f (Enc xs c str) (Enc (t ': xs) c str) 
-    ) => Enc xs c str -> f (Enc (s ': xs) c str)  
-encBoolNot' = encBoolNot (encodeF :: Enc xs c str -> f (Enc (t ': xs) c str))
+    , Encode (Either EncodeEx) t t c str
+    ) => Enc xs c str -> Either EncodeEx (Enc (s ': xs) c str)  
+encBoolNot' = encBoolNot'' @t
+
+encBoolNot'' :: forall alg s t xs c str . (
+    BoolOpIs s "not" ~ 'True
+    , KnownSymbol s
+    , FirstTerm s ~ t
+    , KnownSymbol t
+    , IsR t ~ 'True
+    , Encode (Either EncodeEx) t alg c str
+    ) => Enc xs c str -> Either EncodeEx (Enc (s ': xs) c str)  
+encBoolNot'' = encBoolNot (encF' @alg @t @xs)
 
 -- | 
 -- Decodes boolean expression if all leaves are @"r-"@

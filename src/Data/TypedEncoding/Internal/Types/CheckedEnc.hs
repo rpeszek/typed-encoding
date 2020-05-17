@@ -15,7 +15,7 @@
 module Data.TypedEncoding.Internal.Types.CheckedEnc where
 
 import           Data.TypedEncoding.Internal.Types.Enc
-import           Data.TypedEncoding.Internal.Types.Common
+import           Data.TypedEncoding.Internal.Common
 import           Data.TypedEncoding.Internal.Class.Util
 import           Data.Proxy
 

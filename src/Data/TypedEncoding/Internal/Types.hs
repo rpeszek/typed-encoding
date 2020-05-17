@@ -20,13 +20,13 @@ module Data.TypedEncoding.Internal.Types (
         -- * Not verified encoded data
         , module Data.TypedEncoding.Internal.Types.UncheckedEnc
         -- * Commmon types
-        , module Data.TypedEncoding.Internal.Types.Common
+        , module Data.TypedEncoding.Internal.Common
     ) where
 
 import           Data.TypedEncoding.Internal.Types.Enc
 import           Data.TypedEncoding.Internal.Types.CheckedEnc
 import           Data.TypedEncoding.Internal.Types.UncheckedEnc
-import           Data.TypedEncoding.Internal.Types.Common
+import           Data.TypedEncoding.Internal.Common
 
 import           Data.Proxy
 -- import           Data.Functor.Identity
@@ -89,17 +89,6 @@ instance Show UnexpectedDecodeEx where
 
 -- * Base combinators that rely on types defined here
 
--- TODO could this type be more precise?
-implEncodeF_ :: (Show err, KnownSymbol x) => Proxy x -> (str -> Either err str) ->  Enc enc1 conf str -> Either EncodeEx (Enc enc2 conf str) 
-implEncodeF_ p f = implTranF (either (Left . EncodeEx p) Right . f) 
-
-implEncodeF :: forall x enc1 enc2 err conf str . 
-              (Show err, KnownSymbol x) 
-              => (str -> Either err str) ->  Enc enc1 conf str -> Either EncodeEx (Enc enc2 conf str) 
-implEncodeF = implEncodeF_ (Proxy :: Proxy x)
-
-implEncodeF_' :: (Show err, KnownSymbol x) => Proxy x -> (conf -> str -> Either err str) ->  Enc enc1 conf str -> Either EncodeEx (Enc enc2 conf str) 
-implEncodeF_' p f = implTranF' (\c -> either (Left . EncodeEx p) Right . f c) 
 
 
 mergeErrs :: err -> (err -> Maybe err -> err) -> Either err a -> Either err b -> Either err c

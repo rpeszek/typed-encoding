@@ -21,7 +21,7 @@ module Data.TypedEncoding.Internal.Class.Encoder where
 
 import           Data.TypedEncoding.Internal.Types.Enc
 -- import           Data.TypedEncoding.Internal.Class.Util
-import           Data.TypedEncoding.Internal.Class.Encode
+import           Data.TypedEncoding.Internal.Deprecated.Encode
 import           Data.TypedEncoding.Internal.Util.TypeLits
 import           GHC.TypeLits
 -- import           Data.Symbol.Ascii
@@ -39,11 +39,11 @@ runEncoder (AppendEnc fn enc) enc0 =
         let re :: f (Enc _ c str) = runEncoder enc enc0
         in re >>= fn
 
-encodeFEncoder :: forall f t tg xs gxs c str . (tg ~ TakeUntil t ":", Encodings f xs gxs c str, EncodeF f (Enc xs c str) (Enc (t ': xs) c str)) => Encoder f (t ': xs) (tg ': gxs) c str
-encodeFEncoder = AppendEnc (encodeF @f @(Enc xs c str) @(Enc (t ': xs) c str)) encodings
+encodeFEncoder :: forall f t tg xs gxs c str . (tg ~ TakeUntil t ":", WhichEncoder f xs gxs c str, EncodeF f (Enc xs c str) (Enc (t ': xs) c str)) => Encoder f (t ': xs) (tg ': gxs) c str
+encodeFEncoder = AppendEnc (encodeF @f @(Enc xs c str) @(Enc (t ': xs) c str)) encoder
 
-class Encodings f (enc :: [Symbol]) (grps :: [Symbol]) c str where
-    encodings :: Encoder f enc grps c str
+class WhichEncoder f (enc :: [Symbol]) (grps :: [Symbol]) c str where
+    encoder :: Encoder f enc grps c str
 
-instance Encodings f '[] '[] c str where
-    encodings = ZeroEnc 
+instance WhichEncoder f '[] '[] c str where
+    encoder = ZeroEnc 

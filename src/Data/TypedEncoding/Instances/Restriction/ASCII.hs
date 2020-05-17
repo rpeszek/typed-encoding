@@ -14,14 +14,15 @@
 -- prop> B8.all ((< 128) . ord) . getPayload @ '["r-ASCII"] @() @B.ByteString
 -- 
 -- >>> :set -XOverloadedStrings -XMultiParamTypeClasses -XDataKinds
--- >>> encodeFAll . toEncoding () $ "Hello World" :: Either EncodeEx (Enc '["r-ASCII"] () T.Text)
+-- >>> encFAll . toEncoding () $ "Hello World" :: Either EncodeEx (Enc '["r-ASCII"] () T.Text)
 -- Right (MkEnc Proxy () "Hello World")
 --
--- >>> encodeFAll . toEncoding () $ "\194\160" :: Either EncodeEx (Enc '["r-ASCII"] () T.Text)
+-- >>> encFAll . toEncoding () $ "\194\160" :: Either EncodeEx (Enc '["r-ASCII"] () T.Text)
 -- Left (EncodeEx "r-ASCII" (NonAsciiChar '\194'))
 module Data.TypedEncoding.Instances.Restriction.ASCII where
 
 import           Data.TypedEncoding.Instances.Support
+import           Data.TypedEncoding.Internal.Class.Util.StringConstraints
 
 import           Data.Proxy
 
@@ -40,6 +41,8 @@ import           Data.Char
 import           Data.TypedEncoding.Internal.Util (explainBool)
 -- import           Data.TypedEncoding.Unsafe (withUnsafe)
 import           Control.Arrow
+
+
 
 -- $setup
 -- >>> :set -XDataKinds -XTypeApplications
@@ -65,7 +68,7 @@ import           Control.Arrow
 -- 
 -- Payload does not change when @ASCII@ only strings are encoded to @UTF8@ in types like @ByteString@.
 --
--- >>> let Right tstAscii = encodeFAll . toEncoding () $ "Hello World" :: Either EncodeEx (Enc '["r-ASCII"] () T.Text)
+-- >>> let Right tstAscii = encFAll . toEncoding () $ "Hello World" :: Either EncodeEx (Enc '["r-ASCII"] () T.Text)
 -- >>> displ (inject @ "r-UTF8" tstAscii)
 -- "MkEnc '[r-UTF8] () (Text Hello World)"
 instance Superset "r-UTF8" "r-ASCII" where
@@ -79,58 +82,83 @@ instance Superset "r-UTF8" "r-ASCII" where
 
 newtype NonAsciiChar = NonAsciiChar Char deriving (Eq, Show)
 
+
+-- encAscii :: Encoding (Either EncodeEx) "r-ASCII" "r-ASCII" 
+-- encAscii = undefined
+
+
 prxyAscii = Proxy :: Proxy "r-ASCII"
 
-instance EncodeF (Either EncodeEx) (Enc xs c Char) (Enc ("r-ASCII" ': xs) c Char) where
-    encodeF = implEncodeF_ prxyAscii (\c -> explainBool NonAsciiChar (c, isAscii c))    
+instance Encode (Either EncodeEx) "r-ASCII" "r-ASCII" c String where
+    encoding = mkEncoding (implEncodeF_ prxyAscii (encodeImpl L.partition L.head L.null))
+
+instance Encode (Either EncodeEx) "r-ASCII" "r-ASCII" c T.Text where
+    encoding = mkEncoding (implEncodeF_ prxyAscii (encodeImpl T.partition T.head T.null))
+
+instance Encode (Either EncodeEx) "r-ASCII" "r-ASCII" c TL.Text where
+    encoding = mkEncoding (implEncodeF_ prxyAscii (encodeImpl TL.partition TL.head TL.null))
+
+instance Encode (Either EncodeEx) "r-ASCII" "r-ASCII" c B.ByteString where
+    encoding = mkEncoding (implEncodeF_ prxyAscii (encodeImpl (\p -> B8.filter p &&& B8.filter (not . p)) B8.head B8.null))
+
+instance Encode (Either EncodeEx) "r-ASCII" "r-ASCII" c BL.ByteString where
+    encoding = mkEncoding (implEncodeF_ prxyAscii (encodeImpl (\p -> BL8.filter p &&& BL8.filter (not . p)) BL8.head BL8.null))
+
+--- OLD 
+
+-- instance EncodeF (Either EncodeEx) (Enc xs c Char) (Enc ("r-ASCII" ': xs) c Char) where
+--     encodeF = implEncodeF_ prxyAscii (\c -> explainBool NonAsciiChar (c, isAscii c))    
 instance Applicative f => DecodeF f (Enc ("r-ASCII" ': xs) c Char) (Enc xs c Char) where
     decodeF = implTranP id 
 
-instance Encodings (Either EncodeEx) xs grps c String => Encodings (Either EncodeEx) ("r-ASCII" ': xs) ("r-ASCII" ': grps) c String where
-    encodings = encodeFEncoder @(Either EncodeEx) @"r-ASCII" @"r-ASCII"
+-- instance WhichEncoder (Either EncodeEx) xs grps c String => WhichEncoder (Either EncodeEx) ("r-ASCII" ': xs) ("r-ASCII" ': grps) c String where
+--     encoder = encodeFEncoder @(Either EncodeEx) @"r-ASCII" @"r-ASCII"
 
-instance EncodeF (Either EncodeEx) (Enc xs c String) (Enc ("r-ASCII" ': xs) c String) where
-    encodeF = implEncodeF_ prxyAscii (encodeImpl L.partition L.head L.null)
+
+-- instance EncodeF (Either EncodeEx) (Enc xs c String) (Enc ("r-ASCII" ': xs) c String) where
+--     encodeF = implEncodeF_ prxyAscii (encodeImpl L.partition L.head L.null)
 instance (RecreateErr f, Applicative f) => RecreateF f (Enc xs c String) (Enc ("r-ASCII" ': xs) c String) where
     checkPrevF = implCheckPrevF (asRecreateErr @"r-ASCII" . encodeImpl L.partition L.head L.null)
 instance Applicative f => DecodeF f (Enc ("r-ASCII" ': xs) c String) (Enc xs c String) where
     decodeF = implTranP id 
 
-instance Encodings (Either EncodeEx) xs grps c T.Text => Encodings (Either EncodeEx) ("r-ASCII" ': xs) ("r-ASCII" ': grps) c T.Text where
-    encodings = encodeFEncoder @(Either EncodeEx) @"r-ASCII" @"r-ASCII"
+-- instance WhichEncoder (Either EncodeEx) xs grps c T.Text => WhichEncoder (Either EncodeEx) ("r-ASCII" ': xs) ("r-ASCII" ': grps) c T.Text where
+--     encoder = encodeFEncoder @(Either EncodeEx) @"r-ASCII" @"r-ASCII"
 
-instance EncodeF (Either EncodeEx) (Enc xs c T.Text) (Enc ("r-ASCII" ': xs) c T.Text) where
-    encodeF = implEncodeF_ prxyAscii (encodeImpl T.partition T.head T.null)
+
+
+-- instance EncodeF (Either EncodeEx) (Enc xs c T.Text) (Enc ("r-ASCII" ': xs) c T.Text) where
+--     encodeF = implEncodeF_ prxyAscii (encodeImpl T.partition T.head T.null)
 instance (RecreateErr f, Applicative f) => RecreateF f (Enc xs c T.Text) (Enc ("r-ASCII" ': xs) c T.Text) where
     checkPrevF = implCheckPrevF (asRecreateErr @"r-ASCII" . encodeImpl T.partition T.head T.null)
 instance Applicative f => DecodeF f (Enc ("r-ASCII" ': xs) c T.Text) (Enc xs c T.Text) where
     decodeF = implTranP id 
 
-instance Encodings (Either EncodeEx) xs grps c TL.Text => Encodings (Either EncodeEx) ("r-ASCII" ': xs) ("r-ASCII" ': grps) c TL.Text where
-    encodings = encodeFEncoder @(Either EncodeEx) @"r-ASCII" @"r-ASCII"
+-- instance WhichEncoder (Either EncodeEx) xs grps c TL.Text => WhichEncoder (Either EncodeEx) ("r-ASCII" ': xs) ("r-ASCII" ': grps) c TL.Text where
+--     encoder = encodeFEncoder @(Either EncodeEx) @"r-ASCII" @"r-ASCII"
 
-instance EncodeF (Either EncodeEx) (Enc xs c TL.Text) (Enc ("r-ASCII" ': xs) c TL.Text) where
-    encodeF = implEncodeF_ prxyAscii (encodeImpl TL.partition TL.head TL.null)
+-- instance EncodeF (Either EncodeEx) (Enc xs c TL.Text) (Enc ("r-ASCII" ': xs) c TL.Text) where
+--     encodeF = implEncodeF_ prxyAscii (encodeImpl TL.partition TL.head TL.null)
 instance (RecreateErr f, Applicative f) => RecreateF f (Enc xs c TL.Text) (Enc ("r-ASCII" ': xs) c TL.Text) where 
     checkPrevF = implCheckPrevF (asRecreateErr @"r-ASCII" . encodeImpl TL.partition TL.head TL.null)
 instance Applicative f => DecodeF f (Enc ("r-ASCII" ': xs) c TL.Text) (Enc xs c TL.Text) where
     decodeF = implTranP id 
 
-instance Encodings (Either EncodeEx) xs grps c B.ByteString => Encodings (Either EncodeEx) ("r-ASCII" ': xs) ("r-ASCII" ': grps) c B.ByteString where
-    encodings = encodeFEncoder @(Either EncodeEx) @"r-ASCII" @"r-ASCII"
+-- instance WhichEncoder (Either EncodeEx) xs grps c B.ByteString => WhichEncoder (Either EncodeEx) ("r-ASCII" ': xs) ("r-ASCII" ': grps) c B.ByteString where
+--     encoder = encodeFEncoder @(Either EncodeEx) @"r-ASCII" @"r-ASCII"
 
-instance EncodeF (Either EncodeEx) (Enc xs c B.ByteString) (Enc ("r-ASCII" ': xs) c B.ByteString) where
-    encodeF = implEncodeF_ prxyAscii (encodeImpl (\p -> B8.filter p &&& B8.filter (not . p)) B8.head B8.null)
+-- instance EncodeF (Either EncodeEx) (Enc xs c B.ByteString) (Enc ("r-ASCII" ': xs) c B.ByteString) where
+--     encodeF = implEncodeF_ prxyAscii (encodeImpl (\p -> B8.filter p &&& B8.filter (not . p)) B8.head B8.null)
 instance (RecreateErr f, Applicative f) => RecreateF f (Enc xs c B.ByteString) (Enc ("r-ASCII" ': xs) c B.ByteString) where
     checkPrevF = implCheckPrevF (asRecreateErr @"r-ASCII" . encodeImpl (\p -> B8.filter p &&& B8.filter (not . p)) B8.head B8.null)
 instance Applicative f => DecodeF f (Enc ("r-ASCII" ': xs) c B.ByteString) (Enc xs c B.ByteString) where
     decodeF = implTranP id 
 
-instance Encodings (Either EncodeEx) xs grps c BL.ByteString => Encodings (Either EncodeEx) ("r-ASCII" ': xs) ("r-ASCII" ': grps) c BL.ByteString where
-    encodings = encodeFEncoder @(Either EncodeEx) @"r-ASCII" @"r-ASCII"
+-- instance WhichEncoder (Either EncodeEx) xs grps c BL.ByteString => WhichEncoder (Either EncodeEx) ("r-ASCII" ': xs) ("r-ASCII" ': grps) c BL.ByteString where
+--     encoder = encodeFEncoder @(Either EncodeEx) @"r-ASCII" @"r-ASCII"
 
-instance EncodeF (Either EncodeEx) (Enc xs c BL.ByteString) (Enc ("r-ASCII" ': xs) c BL.ByteString) where
-    encodeF = implEncodeF_ prxyAscii (encodeImpl (\p -> BL8.filter p &&& BL8.filter (not . p)) BL8.head BL8.null)
+-- instance EncodeF (Either EncodeEx) (Enc xs c BL.ByteString) (Enc ("r-ASCII" ': xs) c BL.ByteString) where
+--     encodeF = implEncodeF_ prxyAscii (encodeImpl (\p -> BL8.filter p &&& BL8.filter (not . p)) BL8.head BL8.null)
 instance (RecreateErr f, Applicative f) => RecreateF f (Enc xs c BL.ByteString) (Enc ("r-ASCII" ': xs) c BL.ByteString) where
     checkPrevF = implCheckPrevF (asRecreateErr @"r-ASCII" . encodeImpl (\p -> BL8.filter p &&& BL8.filter (not . p)) BL8.head BL8.null)
 instance Applicative f => DecodeF f (Enc ("r-ASCII" ': xs) c BL.ByteString) (Enc xs c BL.ByteString) where
@@ -149,6 +177,6 @@ encodeImpl partitionf headf nullf t =
                     then Right tascii
                     else Left . NonAsciiChar $ headf nonascii 
 
--- tst = encodeFAll . toEncoding () $ "Hello World" :: Either EncodeEx (Enc '["r-ASCII"] () T.Text)
--- tst2 = encodeFAll . toEncoding () $ "\194\160" :: Either EncodeEx (Enc '["r-ASCII"] () T.Text)
--- tst3 = encodeFAll . toEncoding () $ "\194\160" :: Either EncodeEx (Enc '["r-ASCII"] () B.ByteString)
+-- tst = encFAll . toEncoding () $ "Hello World" :: Either EncodeEx (Enc '["r-ASCII"] () T.Text)
+-- tst2 = encFAll . toEncoding () $ "\194\160" :: Either EncodeEx (Enc '["r-ASCII"] () T.Text)
+-- tst3 = encFAll . toEncoding () $ "\194\160" :: Either EncodeEx (Enc '["r-ASCII"] () B.ByteString)

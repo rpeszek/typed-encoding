@@ -7,27 +7,39 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 -- {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE AllowAmbiguousTypes #-}
--- {-# LANGUAGE RankNTypes #-}
-
+{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE PartialTypeSignatures #-}
+{-# OPTIONS_GHC -Wno-partial-type-signatures #-}
 -- |
 -- Internal definition of types
 
 module Data.TypedEncoding.Internal.Types.Enc where
 
 import           Data.Proxy
+import           GHC.TypeLits
 
 import           Data.TypedEncoding.Internal.Class.Util
+import           Data.TypedEncoding.Internal.Common
 
 -- $setup
 -- >>> :set -XOverloadedStrings -XMultiParamTypeClasses -XDataKinds -XAllowAmbiguousTypes
 -- >>> import qualified Data.Text as T
 
--- This type contains type level encoding information as well as
--- configuration and payload.
-data Enc enc conf str where
+-- Contains encoded data annotatated by 
+--
+-- * @nms@ list of encodings (encoding stack) typically has kind @[Symbol]@ 
+-- * @conf@ that can contain configuration / encoding information such as digest.
+-- * @str@ the encoded data
+--
+--  Example: 
+--
+-- @
+-- Enc ["r-ASCII"] () ByteString
+-- @
+data Enc nms conf str where
     -- | constructor is to be treated as Unsafe to Encode and Decode instance implementations
     -- particular encoding instances may expose smart constructors for limited data types
-    MkEnc :: Proxy enc -> conf -> str -> Enc enc conf str
+    MkEnc :: Proxy nms -> conf -> str -> Enc nms conf str
     deriving (Show, Eq) 
 
 -- |
@@ -45,44 +57,6 @@ toEncoding = MkEnc Proxy
 fromEncoding :: Enc '[] conf str -> str
 fromEncoding = getPayload
 
--- TODO make all implTran functions module-private
--- TODO disambiguate implEncode from implDecode, from implCheckPrevF for type safety
--- especially since these are always used in combo with asRecreateErr_ or asUnexpected 
-
-implTranF :: Functor f => (str -> f str) -> Enc enc1 conf str -> f (Enc enc2 conf str)
-implTranF f  = implTranF' (const f)
-
-
-implDecodeF :: Functor f => (str -> f str) -> Enc enc1 conf str -> f (Enc enc2 conf str)
-implDecodeF = implTranF
-
-implCheckPrevF :: Functor f => (str -> f str) -> Enc enc1 conf str -> f (Enc enc2 conf str)
-implCheckPrevF = implTranF
-
-
-implTranF' :: Functor f =>  (conf -> str -> f str) -> Enc enc1 conf str -> f (Enc enc2 conf str)
-implTranF' f (MkEnc _ conf str) = MkEnc Proxy conf <$> f conf str
-
-
-implDecodeF' :: Functor f =>  (conf -> str -> f str) -> Enc enc1 conf str -> f (Enc enc2 conf str)
-implDecodeF' = implTranF'
-
-implTranP :: Applicative f => (str -> str) -> Enc enc1 conf str -> f (Enc enc2 conf str)
-implTranP f  = implTranF' (\c -> pure . f)
-
-implEncodeP :: Applicative f => (str -> str) -> Enc enc1 conf str -> f (Enc enc2 conf str)
-implEncodeP = implTranP
-
-implTranP' :: Applicative f => (conf -> str -> str) -> Enc enc1 conf str -> f (Enc enc2 conf str)
-implTranP' f  = implTranF' (\c -> pure . f c)
-
-implEncodeP' :: Applicative f => (conf -> str -> str) -> Enc enc1 conf str -> f (Enc enc2 conf str)
-implEncodeP' = implTranP'
-
-implChangeAnn :: Functor f => (Enc enc1 conf str -> f (Enc enc2a conf str)) -> Enc enc1 conf str -> f (Enc enc2b conf str)
-implChangeAnn fn = fmap (withUnsafeCoerce id) . fn
-
-
 
 getPayload :: Enc enc conf str -> str  
 getPayload (MkEnc _ _ str) = str
@@ -95,3 +69,51 @@ withUnsafeCoerce f (MkEnc _ conf str)  = MkEnc Proxy conf (f str)
 
 unsafeChangePayload ::  (s1 -> s2) -> Enc e c s1 -> Enc e c s2
 unsafeChangePayload f (MkEnc p conf str)  = MkEnc p conf (f str) 
+
+-- |
+-- Wraps encoding function that adds encoding to existing stack.
+-- Contains type level information about algorithm used. 
+--
+-- Example:
+--
+-- @
+-- Encoding Identity "enc-B64" "enc-B64" () ByteString
+-- @
+--
+-- Contains function that applies base 64 encoding (encoding name and algorithm name are "enc-B64") 
+-- to ByteString with no additional configuration @()@ and runs in @Identity@ Functor.
+-- 
+-- @
+-- Encoding (Either EncodeEx) "r-ban:9" "r-ban" () String
+-- @
+-- encodes a single character <= @'Z'@
+--
+-- Encoding instance needs to either define a function that return this type or 
+-- implement 
+-- 'Data.TypedEncoding.Internal.Class.Encode.Encode'
+-- or (preferably) both.
+data Encoding f nm alg conf str where
+    MkEncoding :: Proxy nm -> (forall (xs :: [Symbol]) . Enc xs conf str -> f (Enc (nm ': xs) conf str)) -> Encoding f nm (AlgNm nm) conf str
+     
+mkEncoding :: forall f (nm :: Symbol) conf str . (forall (xs :: [Symbol]) . Enc xs conf str -> f (Enc (nm ': xs) conf str)) -> Encoding f nm (AlgNm nm) conf str
+mkEncoding = MkEncoding Proxy
+
+runEncoding :: Encoding f nm alg conf str -> Enc xs conf str -> f (Enc (nm ': xs) conf str)
+runEncoding (MkEncoding _ fn) = fn
+
+-- |
+-- Wraps a list of @Encoding@ elements.
+--
+-- Similarly to 'Encoding' it can be used with a typeclass
+-- 'Data.TypedEncoding.Internal.Class.Encode.EncodeAll'
+data Encodings f (nms :: [Symbol]) (algs :: [Symbol]) conf str where
+    -- | constructor is to be treated as Unsafe to Encode and Decode instance implementations
+    -- particular encoding instances may expose smart constructors for limited data types
+    ZeroE :: Encodings f '[] '[] conf str
+    AppendE ::  Encoding f nm alg conf str -> Encodings f nms algs conf str -> Encodings f (nm ': nms) (alg ': algs) conf str
+
+runEncodings :: forall grps enc f c str . (Monad f) => Encodings f enc grps c str -> Enc ('[]::[Symbol]) c str -> f (Enc enc c str)
+runEncodings ZeroE enc0 = pure enc0
+runEncodings (AppendE fn enc) enc0 = 
+        let re :: f (Enc _ c str) = runEncodings enc enc0
+        in re >>= runEncoding fn

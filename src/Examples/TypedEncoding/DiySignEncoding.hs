@@ -71,7 +71,7 @@ decodeSign t =
 -- >>> fromEncoding . decodeAll $ helloSigned 
 -- "Hello World"
 helloSigned :: Enc '["my-sign"] () T.Text
-helloSigned = encodeAll . toEncoding () $ "Hello World"
+helloSigned = encAll . toEncoding () $ "Hello World"
 
 -- | property checks that 'T.Text' values are expected to decode 
 -- without error after encoding.
@@ -79,7 +79,7 @@ helloSigned = encodeAll . toEncoding () $ "Hello World"
 -- prop> \t -> propEncDec
 propEncDec :: T.Text -> Bool
 propEncDec t = 
-    let enc = encodeAll . toEncoding () $ t :: Enc '["my-sign"] () T.Text
+    let enc = encAll . toEncoding () $ t :: Enc '["my-sign"] () T.Text
     in t == (fromEncoding . decodeAll $ enc)
 
 hacker :: Either RecreateEx (Enc '["my-sign"] () T.Text)
@@ -104,8 +104,8 @@ hacker =
 
 -- | Because encoding function is pure we can create instance of EncodeF 
 -- that is polymorphic in effect @f@. This is done using 'EnT.implTranP' combinator.
-instance Applicative f => EncodeF f (Enc xs c T.Text) (Enc ("my-sign" ': xs) c T.Text) where
-    encodeF = EnT.implEncodeP encodeSign    
+instance Applicative f => Encode f "my-sign" "my-sign" c T.Text where
+   encoding = EnT.mkEncoding $ EnT.implEncodeP encodeSign    
 
 -- | Decoding allows effectful @f@ to allow for troubleshooting and unsafe payload changes.
 --

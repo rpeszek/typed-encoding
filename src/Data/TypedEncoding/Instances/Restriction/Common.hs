@@ -26,15 +26,15 @@ import           Data.TypedEncoding.Instances.Support
 -- >>> import qualified Data.Text as T
 
 
-instance (IsStringR str) =>  EncodeF (Either EncodeEx) (Enc xs c str) (Enc ("r-Word8-decimal" ': xs) c str) where
-    encodeF = implEncodeF @"r-Word8-decimal" (verifyWithRead @Word8 "Word8-decimal")
+instance (IsStringR str) =>  Encode (Either EncodeEx) "r-Word8-decimal" "r-Word8-decimal" c str where
+    encoding = mkEncoding $ implEncodeF @"r-Word8-decimal" (verifyWithRead @Word8 "Word8-decimal")
 instance (IsStringR str, RecreateErr f, Applicative f) => RecreateF f (Enc xs c str) (Enc ("r-Word8-decimal" ': xs) c str) where
     checkPrevF = implCheckPrevF (asRecreateErr @"r-Word8-decimal" . verifyWithRead @Word8 "Word8-decimal")
 instance (IsStringR str, Applicative f) => DecodeF f (Enc ("r-Word8-decimal" ': xs) c str) (Enc xs c str) where
     decodeF = implTranP id 
 
-instance (IsStringR str) =>  EncodeF (Either EncodeEx) (Enc xs c str) (Enc ("r-Int-decimal" ': xs) c str) where
-    encodeF = implEncodeF @"r-Int-decimal" (verifyWithRead @Int "Int-decimal")
+instance (IsStringR str) =>  Encode (Either EncodeEx) "r-Int-decimal" "r-Int-decimal" c str where
+    encoding = mkEncoding $ implEncodeF @"r-Int-decimal" (verifyWithRead @Int "Int-decimal")
 instance (IsStringR str, RecreateErr f, Applicative f) => RecreateF f (Enc xs c str) (Enc ("r-Int-decimal" ': xs) c str) where
     checkPrevF = implCheckPrevF (asRecreateErr @"r-Int-decimal" . verifyWithRead @Int "Int-decimal")
 instance (IsStringR str, Applicative f) => DecodeF f (Enc ("r-Int-decimal" ': xs) c str) (Enc xs c str) where

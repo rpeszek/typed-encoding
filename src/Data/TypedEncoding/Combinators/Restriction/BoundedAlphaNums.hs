@@ -25,8 +25,6 @@
 -- This is a simple implementation that converts to @String@, should be used
 -- only with short length data.
 --
--- This module does not create instances of @EncodeF@ typeclass to avoid duplicate instance issues.
---
 -- Decoding function @decFR@ is located in
 -- "Data.TypedEncoding.Combinators.Restriction.Common"
 --
@@ -58,8 +56,14 @@ type family IsBan (s :: Symbol) :: Bool where
 
 type instance IsSupersetOpen "r-ASCII" "r-ban" xs = 'True
 
-instance  (KnownSymbol s, "r-ban" ~ TakeUntil s ":" , IsStringR str, Encodings (Either EncodeEx) xs grps c str) => Encodings (Either EncodeEx) (s ': xs) ("r-ban" ': grps) c str where
-    encodings = AppendEnc encFBan encodings
+
+instance (KnownSymbol s, AlgNm s ~ "r-ban", IsStringR str) => Encode (Either EncodeEx) s "r-ban" c str where
+    encoding = mkEncoding encFBan
+
+-- TODO remove 
+
+-- instance  (KnownSymbol s, "r-ban" ~ TakeUntil s ":" , IsStringR str, WhichEncoder (Either EncodeEx) xs grps c str) => WhichEncoder (Either EncodeEx) (s ': xs) ("r-ban" ': grps) c str where
+--     encoder = AppendEnc encFBan encoder
 
 -- |
 -- >>> encFBan . toEncoding () $ "C59F9FB7-4621-44D9-9020-CE37BF6E2BD1" :: Either EncodeEx (Enc '["r-ban:FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF"] () T.Text)

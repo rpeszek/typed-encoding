@@ -11,7 +11,7 @@
 {-# LANGUAGE AllowAmbiguousTypes #-}
 
 -- | Future replacement for "Data.TypedEncoding.Internal.Class.IsStringR"
-module Data.TypedEncoding.Internal.Class.Util.StringConstraints () where
+module Data.TypedEncoding.Internal.Class.Util.StringConstraints where
 
 import qualified Data.Text as T
 import qualified Data.Text.Lazy as TL
@@ -101,14 +101,14 @@ instance ToStrIso String String where
 -- |
 -- Used to find exceptions that violated "r-" encoding
 -- Expected to be used to check encoding of ASCII-7 so Text and ByteString are compatible.
-class Char7Find str where
+class Char8Find str where
     find :: (Char -> Bool) -> str -> Maybe Char
 
 
-instance Char7Find T.Text where
+instance Char8Find T.Text where
     find = T.find
 
-instance Char7Find TL.Text where
+instance Char8Find TL.Text where
     find = TL.find    
 
 -- |
@@ -125,10 +125,9 @@ instance Char7Find TL.Text where
 --
 -- This instance allows to check elements of ByteString interpreting them as Char.
 -- 
--- This may or may not work with UTF8 conversions.
--- Safe if restricting to 7bit code points.s
-instance Char7Find B.ByteString where
+-- Safe if restricting to 7bit code points.
+instance Char8Find B.ByteString where
     find = B8.find   
 
-instance Char7Find BL.ByteString where
+instance Char8Find BL.ByteString where
     find = BL8.find         

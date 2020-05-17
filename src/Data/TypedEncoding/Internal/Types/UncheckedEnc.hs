@@ -15,7 +15,7 @@ module Data.TypedEncoding.Internal.Types.UncheckedEnc where
 
 import           Data.Proxy
 import           Data.TypedEncoding.Internal.Class.Util
-import           Data.TypedEncoding.Internal.Types.Common
+import           Data.TypedEncoding.Internal.Common
 
 -- $setup
 -- >>> :set -XOverloadedStrings -XMultiParamTypeClasses -XDataKinds -XAllowAmbiguousTypes

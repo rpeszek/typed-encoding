@@ -1,71 +1,79 @@
-
 {-# LANGUAGE MultiParamTypeClasses #-}
-{-# LANGUAGE PolyKinds #-}
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE PolyKinds #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE UndecidableInstances #-}
 {-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE TypeFamilies #-}
--- {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE AllowAmbiguousTypes #-}
+{-# LANGUAGE TypeApplications #-}
 
 module Data.TypedEncoding.Internal.Class.Encode where
 
-import           Data.TypedEncoding.Internal.Class.Util
-
-import           Data.TypedEncoding.Internal.Types (Enc(..) 
-                                              , toEncoding
-                                              , getPayload
-                                             )
-import           Data.Proxy
-import           Data.Functor.Identity
+import           Data.TypedEncoding.Internal.Types.Enc
+import           Data.TypedEncoding.Internal.Class.Util -- Append
 import           GHC.TypeLits
+import           Data.Functor.Identity
+import           Data.Proxy
+
+class Encode f nm alg conf str where
+    encoding :: Encoding f nm alg conf str
+
+class EncodeAll f nms algs conf str where
+    encodings :: Encodings f nms algs conf str
+
+instance EncodeAll f '[] '[] conf str where  
+    encodings = ZeroE  
+
+instance (EncodeAll f nms algs conf str, Encode f nm alg conf str) => EncodeAll f (nm ': nms) (alg ': algs) conf str where  
+    encodings = AppendE encoding encodings      
 
 
-class EncodeF f instr outstr where    
-    encodeF :: instr -> f outstr
+-- * Convenience combinators which mimic pre-v0.3 type signatures. These assume that @algs@ are the same as @nms@
 
-class EncodeFAll f (xs :: [Symbol]) c str where
-    encodeFAll :: Enc '[] c str -> f (Enc xs c str)
+encF :: forall nm xs f c str . Encode f nm nm c str => Enc xs c str -> f (Enc (nm ': xs) c str)
+encF = encF' @nm @nm
 
-instance Applicative f => EncodeFAll f '[] c str where
-    encodeFAll (MkEnc _ c str) = pure $ toEncoding c str 
+encFAll :: forall nms f c str . (Monad f,  EncodeAll f nms nms c str) =>  
+               Enc ('[]::[Symbol]) c str 
+               -> f (Enc nms c str)  
+encFAll = encFAll' @nms @nms
 
-instance (Monad f, EncodeFAll f xs c str, EncodeF f (Enc xs c str) (Enc (x ': xs) c str)) => EncodeFAll f (x ': xs) c str where
-    encodeFAll str = 
-        let re :: f (Enc xs c str) = encodeFAll str
-        in re >>= encodeF
+encAll :: forall nms c str . (EncodeAll Identity nms nms c str) =>
+               Enc ('[]::[Symbol]) c str 
+               -> Enc nms c str 
+encAll = encAll' @nms @nms 
 
+encFPart :: forall xs xsf f c str . (Monad f, EncodeAll f xs xs c str) => Enc xsf c str -> f (Enc (Append xs xsf) c str)
+encFPart = encFPart' @xs @xs
 
-encodeAll :: forall xs c str . EncodeFAll Identity (xs :: [Symbol]) c str => 
-              Enc '[] c str 
-              -> Enc xs c str
-encodeAll = runIdentity . encodeFAll             
-
-
-
-encodeFPart_ :: forall f xs xsf c str . (Functor f, EncodeFAll f xs c str) => Proxy xs -> Enc xsf c str -> f (Enc (Append xs xsf) c str)
-encodeFPart_ p (MkEnc _ conf str) = 
-    let re :: f (Enc xs c str) = encodeFAll $ MkEnc Proxy conf str
-    in  MkEnc Proxy conf . getPayload <$> re 
+encPart :: forall xs xsf c str . (EncodeAll Identity xs xs c str) => Enc xsf c str -> Enc (Append xs xsf) c str   
+encPart = encPart' @xs @xs
 
 
-encodeFPart :: forall (xs :: [Symbol]) xsf f c str . (Functor f, EncodeFAll f xs c str) => Enc xsf c str -> f (Enc (Append xs xsf) c str)
-encodeFPart = encodeFPart_ (Proxy :: Proxy xs) 
+-- * Convenience combinators which mimic pre-v0.3 type signatures. These do not assume that @algs@ are the same as @nms@ 
 
+encF' :: forall alg nm xs f c str . (Encode f nm alg c str) => Enc xs c str -> f (Enc (nm ': xs) c str)
+encF' = runEncoding (encoding @f @nm @alg)
 
-encodePart_ :: EncodeFAll Identity (xs :: [Symbol]) c str => 
-              Proxy xs 
-              -> Enc xsf c str
-              -> Enc (Append xs xsf) c str 
-encodePart_ p = runIdentity . encodeFPart_ p
+encFAll' :: forall algs nms f c str . (Monad f,  EncodeAll f nms algs c str) =>  
+               Enc ('[]::[Symbol]) c str 
+               -> f (Enc nms c str)  
+encFAll' = runEncodings @algs @nms @f encodings 
 
--- | for some reason ApplyTypes syntax does not want to work if xs is specified with 
--- polymorphic [Symbol]
-encodePart :: forall (xs :: [Symbol]) xsf c str . EncodeFAll Identity xs c str => 
-               Enc xsf c str
-              -> Enc (Append xs xsf) c str 
-encodePart = encodePart_ (Proxy :: Proxy xs)              
+-- | 
+-- 
+encAll' :: forall algs nms c str . (EncodeAll Identity nms algs c str) =>
+               Enc ('[]::[Symbol]) c str 
+               -> Enc nms c str 
+encAll' = runIdentity . encFAll' @algs 
+
+encFPart' :: forall algs xs xsf f c str . (Monad f, EncodeAll f xs algs c str) => Enc xsf c str -> f (Enc (Append xs xsf) c str)
+encFPart' (MkEnc _ conf str) =   
+    let re :: f (Enc xs c str) = encFAll' @algs $ MkEnc Proxy conf str
+    in  MkEnc Proxy conf . getPayload <$> re
+
+encPart' :: forall algs xs xsf c str . (EncodeAll Identity xs algs c str) => Enc xsf c str -> Enc (Append xs xsf) c str   
+encPart' = runIdentity . encFPart' @algs @xs
+
 

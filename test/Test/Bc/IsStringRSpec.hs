@@ -63,9 +63,9 @@ spec =
         it "Word8 fromEncString err works" $   
            fromEncStringTestErr `shouldSatisfy` isLeft
         it "EncodeF works" $
-          (encodeFAll @(Either EncodeEx) @'["r-Word8-decimal"] . toEncoding () $ tstWord8) `shouldSatisfy` isRight   
+          (encFAll @'["r-Word8-decimal"] @(Either EncodeEx) . toEncoding () $ tstWord8) `shouldSatisfy` isRight   
         it "EncodeF err works" $
-          (encodeFAll @(Either EncodeEx) @'["r-Word8-decimal"] . toEncoding () $ tstNotWord8') `shouldSatisfy` isLeft
+          (encFAll @'["r-Word8-decimal"] @(Either EncodeEx). toEncoding () $ tstNotWord8') `shouldSatisfy` isLeft
         it "RecreateF works" $
           (recreateFAll @(Either RecreateEx) @'["r-Word8-decimal"] . toEncoding () $ tstWord8) `shouldSatisfy` isRight   
         it "RecreateF err works" $

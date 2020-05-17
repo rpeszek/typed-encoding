@@ -143,7 +143,7 @@ module Data.TypedEncoding (
     -- * Combinators
     , module Data.TypedEncoding.Internal.Combinators
     -- * Types
-    , Enc
+    , module Data.TypedEncoding.Internal.Types.Enc
     , CheckedEnc
     , EncodeEx(..)
     , RecreateEx(..)
@@ -154,10 +154,11 @@ module Data.TypedEncoding (
     -- * Types and combinators for not verfied encoding 
     , module Data.TypedEncoding.Internal.Types.UncheckedEnc
     -- * Basic @Enc@ Combinators
-    , getPayload 
-    , unsafeSetPayload
-    , fromEncoding
-    , toEncoding
+    
+    --, getPayload 
+    --, unsafeSetPayload
+    --, fromEncoding
+    --, toEncoding
     -- * Basic @CheckedEnc@ Combinators  
     , unsafeCheckedEnc
     , getCheckedPayload
@@ -169,6 +170,7 @@ module Data.TypedEncoding (
  ) where
 
 import           Data.TypedEncoding.Internal.Types
+import           Data.TypedEncoding.Internal.Types.Enc
 import           Data.TypedEncoding.Internal.Types.SomeEnc
 import           Data.TypedEncoding.Internal.Types.UncheckedEnc
 import           Data.TypedEncoding.Internal.Class

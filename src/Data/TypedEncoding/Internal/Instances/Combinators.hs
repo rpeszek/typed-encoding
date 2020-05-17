@@ -105,3 +105,53 @@ verifyDynEnc p findenc decoder str =
     case decoder enc str of
       Left err -> Left $ EncodeEx p err
       Right r -> Right str
+
+
+-- TODO make all implTran functions module-private
+-- TODO disambiguate implEncode from implDecode, from implCheckPrevF for type safety
+-- especially since these are always used in combo with asRecreateErr_ or asUnexpected 
+
+implTranF :: Functor f => (str -> f str) -> Enc enc1 conf str -> f (Enc enc2 conf str)
+implTranF f  = implTranF' (const f)
+
+
+implDecodeF :: Functor f => (str -> f str) -> Enc enc1 conf str -> f (Enc enc2 conf str)
+implDecodeF = implTranF
+
+implCheckPrevF :: Functor f => (str -> f str) -> Enc enc1 conf str -> f (Enc enc2 conf str)
+implCheckPrevF = implTranF
+
+
+implTranF' :: Functor f =>  (conf -> str -> f str) -> Enc enc1 conf str -> f (Enc enc2 conf str)
+implTranF' f (MkEnc _ conf str) = MkEnc Proxy conf <$> f conf str
+
+
+implDecodeF' :: Functor f =>  (conf -> str -> f str) -> Enc enc1 conf str -> f (Enc enc2 conf str)
+implDecodeF' = implTranF'
+
+implTranP :: Applicative f => (str -> str) -> Enc enc1 conf str -> f (Enc enc2 conf str)
+implTranP f  = implTranF' (\c -> pure . f)
+
+implEncodeP :: Applicative f => (str -> str) -> Enc enc1 conf str -> f (Enc enc2 conf str)
+implEncodeP = implTranP
+
+implTranP' :: Applicative f => (conf -> str -> str) -> Enc enc1 conf str -> f (Enc enc2 conf str)
+implTranP' f  = implTranF' (\c -> pure . f c)
+
+implEncodeP' :: Applicative f => (conf -> str -> str) -> Enc enc1 conf str -> f (Enc enc2 conf str)
+implEncodeP' = implTranP'
+
+implChangeAnn :: Functor f => (Enc enc1 conf str -> f (Enc enc2a conf str)) -> Enc enc1 conf str -> f (Enc enc2b conf str)
+implChangeAnn fn = fmap (withUnsafeCoerce id) . fn
+
+-- TODO could this type be more precise?
+implEncodeF_ :: (Show err, KnownSymbol x) => Proxy x -> (str -> Either err str) ->  Enc enc1 conf str -> Either EncodeEx (Enc enc2 conf str) 
+implEncodeF_ p f = implTranF (either (Left . EncodeEx p) Right . f) 
+
+implEncodeF :: forall x enc1 enc2 err conf str . 
+              (Show err, KnownSymbol x) 
+              => (str -> Either err str) ->  Enc enc1 conf str -> Either EncodeEx (Enc enc2 conf str) 
+implEncodeF = implEncodeF_ (Proxy :: Proxy x)
+
+implEncodeF_' :: (Show err, KnownSymbol x) => Proxy x -> (conf -> str -> Either err str) ->  Enc enc1 conf str -> Either EncodeEx (Enc enc2 conf str) 
+implEncodeF_' p f = implTranF' (\c -> either (Left . EncodeEx p) Right . f c) 

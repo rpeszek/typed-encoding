@@ -13,7 +13,7 @@
 
 module Data.TypedEncoding.Internal.Class.Util where
 
-import           Data.TypedEncoding.Internal.Types.Common
+import           Data.TypedEncoding.Internal.Common
 
 import qualified Data.ByteString.Char8 as B
 import qualified Data.ByteString.Lazy.Char8 as BL

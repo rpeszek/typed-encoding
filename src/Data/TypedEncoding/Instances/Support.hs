@@ -16,4 +16,4 @@ module Data.TypedEncoding.Instances.Support (
 import           Data.TypedEncoding.Internal.Types
 import           Data.TypedEncoding.Internal.Class 
 import           Data.TypedEncoding.Internal.Instances.Combinators 
-import           Data.TypedEncoding.Internal.Util.TypeLits 
+import           Data.TypedEncoding.Internal.Util.TypeLits
