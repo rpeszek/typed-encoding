@@ -13,6 +13,7 @@
 -- | Future replacement for "Data.TypedEncoding.Internal.Class.IsStringR"
 module Data.TypedEncoding.Internal.Class.Util.StringConstraints where
 
+import qualified Data.List as L
 import qualified Data.Text as T
 import qualified Data.Text.Lazy as TL
 import           Data.String
@@ -104,6 +105,8 @@ instance ToStrIso String String where
 class Char8Find str where
     find :: (Char -> Bool) -> str -> Maybe Char
 
+instance Char8Find String where
+    find = L.find
 
 instance Char8Find T.Text where
     find = T.find

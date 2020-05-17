@@ -21,7 +21,7 @@ import           Data.Functor.Identity
 import           GHC.TypeLits
 
 -- * Combinators equivalent to "Data.TypedEncoding.Internal.Class.Encode" that automatically figure out algorithm name.
--- Cause slow compilation time when used
+-- Cause slow compilation when used
 
 _encF :: forall nm xs f c str alg . (Encode f nm alg c str, alg ~ AlgNm nm) => Enc xs c str -> f (Enc (nm ': xs) c str)
 _encF = encF' @(AlgNm nm) @nm
