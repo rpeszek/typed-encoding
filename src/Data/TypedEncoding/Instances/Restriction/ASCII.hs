@@ -70,6 +70,7 @@ instance Superset "r-UTF8" "r-ASCII" where
 
 newtype NonAsciiChar = NonAsciiChar Char deriving (Eq, Show)
 
+-- * Encoding 
 
 instance Encode (Either EncodeEx) "r-ASCII" "r-ASCII" c Char where
     encoding = encASCIIChar    
@@ -88,6 +89,11 @@ encImpl str = case find (not . isAscii) str of
     Nothing -> Right str
     Just ch -> Left $ NonAsciiChar ch
 
+-- * Decoding
+
+instance (Applicative f) => Decode f "r-ASCII" "r-ASCII" c str where
+    decoding = decAnyR
+    
 
 --- OLD 
 
@@ -95,8 +101,6 @@ encImpl str = case find (not . isAscii) str of
 instance (Char8Find str, RecreateErr f, Applicative f) => RecreateF f (Enc xs c str) (Enc ("r-ASCII" ': xs) c str) where
     checkPrevF = implCheckPrevF (asRecreateErr @"r-ASCII" . encImpl)
 
-instance Applicative f => DecodeF f (Enc ("r-ASCII" ': xs) c str) (Enc xs c str) where
-    decodeF = implTranP id 
 
 -- tst = encFAll . toEncoding () $ "Hello World" :: Either EncodeEx (Enc '["r-ASCII"] () T.Text)
 -- tst2 = encFAll . toEncoding () $ "\194\160" :: Either EncodeEx (Enc '["r-ASCII"] () T.Text)

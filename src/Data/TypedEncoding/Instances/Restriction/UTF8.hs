@@ -64,7 +64,7 @@ prxyUtf8 = Proxy :: Proxy "r-UTF8"
 --
 -- Following test uses 'verEncoding' helper that checks that bytes are encoded as Right iff they are valid UTF8 bytes
 --
--- prop> \(b :: B.ByteString) -> verEncoding b (fmap (fromEncoding . decodeAll . proxiedId (Proxy :: Proxy (Enc '["r-UTF8"] _ _))) . (encFAll :: _ -> Either EncodeEx _). toEncoding () $ b)
+-- prop> \(b :: B.ByteString) -> verEncoding b (fmap (fromEncoding . decAll . proxiedId (Proxy :: Proxy (Enc '["r-UTF8"] _ _))) . (encFAll :: _ -> Either EncodeEx _). toEncoding () $ b)
 instance Encode (Either EncodeEx) "r-UTF8" "r-UTF8" c B.ByteString where
     encoding = encUTF8B
 
@@ -77,6 +77,11 @@ encUTF8B = mkEncoding (implEncodeF @"r-UTF8"(fmap TE.encodeUtf8 . TE.decodeUtf8'
 encUTF8BL :: Encoding (Either EncodeEx) "r-UTF8" "r-UTF8" c BL.ByteString
 encUTF8BL = mkEncoding (implEncodeF @"r-UTF8" (fmap TEL.encodeUtf8 . TEL.decodeUtf8'))
 
+-- * Decoding
+
+instance (Applicative f) => Decode f "r-UTF8" "r-UTF8" c str where
+    decoding = decAnyR
+    
 
 -- OLD
 
@@ -88,8 +93,6 @@ encUTF8BL = mkEncoding (implEncodeF @"r-UTF8" (fmap TEL.encodeUtf8 . TEL.decodeU
 --     encodeF = implEncodeF_ prxyUtf8 (fmap TE.encodeUtf8 . TE.decodeUtf8')
 instance (RecreateErr f, Applicative f) => RecreateF f (Enc xs c B.ByteString) (Enc ("r-UTF8" ': xs) c B.ByteString) where
     checkPrevF = implCheckPrevF (asRecreateErr @"r-UTF8" . fmap TE.encodeUtf8 . TE.decodeUtf8')
-instance Applicative f => DecodeF f (Enc ("r-UTF8" ': xs) c B.ByteString) (Enc xs c B.ByteString) where
-    decodeF = implTranP id 
 
 
 -- instance WhichEncoder (Either EncodeEx) xs grps c BL.ByteString => WhichEncoder (Either EncodeEx) ("r-UTF8" ': xs) ("r-UTF8" ': grps) c BL.ByteString where
@@ -99,8 +102,6 @@ instance Applicative f => DecodeF f (Enc ("r-UTF8" ': xs) c B.ByteString) (Enc x
 --     encodeF = implEncodeF_ prxyUtf8 (fmap TEL.encodeUtf8 . TEL.decodeUtf8')
 instance (RecreateErr f, Applicative f) => RecreateF f (Enc xs c BL.ByteString) (Enc ("r-UTF8" ': xs) c BL.ByteString) where
     checkPrevF = implCheckPrevF (asRecreateErr @"r-UTF8" . fmap TEL.encodeUtf8 . TEL.decodeUtf8')
-instance Applicative f => DecodeF f (Enc ("r-UTF8" ': xs) c BL.ByteString) (Enc xs c BL.ByteString) where
-    decodeF = implTranP id 
 
 --- Utilities ---
 

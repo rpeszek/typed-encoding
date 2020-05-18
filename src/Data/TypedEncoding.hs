@@ -143,7 +143,9 @@ module Data.TypedEncoding (
     -- * Combinators
     , module Data.TypedEncoding.Internal.Combinators
     -- * Types
+    -- TODO v0.3 move back to selective imports?
     , module Data.TypedEncoding.Internal.Types.Enc
+    , module Data.TypedEncoding.Internal.Types.Decoding
     , CheckedEnc
     , EncodeEx(..)
     , RecreateEx(..)
@@ -171,6 +173,8 @@ module Data.TypedEncoding (
 
 import           Data.TypedEncoding.Internal.Types
 import           Data.TypedEncoding.Internal.Types.Enc
+import           Data.TypedEncoding.Internal.Types.Decoding
+ 
 import           Data.TypedEncoding.Internal.Types.SomeEnc
 import           Data.TypedEncoding.Internal.Types.UncheckedEnc
 import           Data.TypedEncoding.Internal.Class

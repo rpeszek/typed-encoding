@@ -1,66 +1,88 @@
-
 {-# LANGUAGE MultiParamTypeClasses #-}
-{-# LANGUAGE PolyKinds #-}
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE PolyKinds #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE UndecidableInstances #-}
 {-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE AllowAmbiguousTypes #-}
+{-# LANGUAGE TypeApplications #-}
 
 module Data.TypedEncoding.Internal.Class.Decode where
 
-import           Data.TypedEncoding.Internal.Class.Util
+import           Data.TypedEncoding.Internal.Types (UnexpectedDecodeEx(..))
+import           Data.TypedEncoding.Internal.Types.Enc
+import           Data.TypedEncoding.Internal.Types.Decoding
 
-import           Data.TypedEncoding.Internal.Types (Enc(..) 
-                                              , toEncoding
-                                              , getPayload
-                                              , UnexpectedDecodeEx(..))
+import           Data.TypedEncoding.Internal.Class.Util
 import           Data.Proxy
 import           Data.Functor.Identity
 import           GHC.TypeLits
 
 
-class DecodeF f instr outstr where    
-    decodeF :: instr -> f outstr
+class Decode f nm alg conf str where
+    decoding :: Decoding f nm alg conf str
 
-class DecodeFAll f (xs :: [Symbol]) c str where
-    decodeFAll :: Enc xs c str ->  f (Enc '[] c str)
+class DecodeAll f nms algs conf str where
+    decodings :: Decodings f nms algs conf str
 
-instance Applicative f => DecodeFAll f '[] c str where
-    decodeFAll (MkEnc _ c str) = pure $ toEncoding c str 
+instance DecodeAll f '[] '[] conf str where  
+    decodings = ZeroD 
 
-instance (Monad f, DecodeFAll f xs c str, DecodeF f (Enc (x ': xs) c str) (Enc xs c str)) => DecodeFAll f (x ': xs) c str where
-    decodeFAll str = 
-        let re :: f (Enc xs c str) = decodeF str
-        in re >>= decodeFAll
+instance (DecodeAll f nms algs conf str, Decode f nm alg conf str) => DecodeAll f (nm ': nms) (alg ': algs) conf str where  
+    decodings = AppendD decoding decodings      
 
-decodeAll :: forall xs c str . DecodeFAll Identity (xs :: [Symbol]) c str => 
-              Enc xs c str
-              -> Enc '[] c str
-decodeAll = runIdentity . decodeFAll 
+-- * Convenience combinators which mimic pre-v0.3 type signatures. These assume that @algs@ are the same as @nms@
+
+decF :: forall nm xs f c str . (Decode f nm nm c str) => Enc (nm ': xs) c str -> f (Enc xs c str)
+decF = decF' @nm @nm
+
+decFAll :: forall nms f c str . (Monad f,  DecodeAll f nms nms c str) => 
+               Enc nms c str
+               -> f (Enc ('[]::[Symbol]) c str)  
+decFAll = decFAll' @nms @nms 
+
+-- | 
+-- 
+decAll :: forall nms c str . (DecodeAll Identity nms nms c str) =>
+               Enc nms c str 
+               -> Enc ('[]::[Symbol]) c str 
+decAll = decAll' @nms @nms  
+
+decFPart :: forall xs xsf f c str . (Monad f, DecodeAll f xs xs c str) => Enc (Append xs xsf) c str -> f (Enc xsf c str)
+decFPart = decFPart' @xs @xs 
+
+decPart :: forall xs xsf c str . (DecodeAll Identity xs xs c str) => Enc (Append xs xsf) c str -> Enc xsf c str   
+decPart = decPart' @xs @xs  
 
 
-decodeFPart_ :: forall f xs xsf c str . (Functor f, DecodeFAll f xs c str) => Proxy xs -> Enc (Append xs xsf) c str -> f (Enc xsf c str)
-decodeFPart_ p (MkEnc _ conf str) = 
-    let re :: f (Enc '[] c str) = decodeFAll $ MkEnc (Proxy :: Proxy xs) conf str
-    in  MkEnc Proxy conf . getPayload <$> re 
 
-decodeFPart :: forall (xs :: [Symbol]) xsf f c str . (Functor f, DecodeFAll f xs c str) =>  Enc (Append xs xsf) c str -> f (Enc xsf c str)
-decodeFPart = decodeFPart_ (Proxy :: Proxy xs) 
+-- * Convenience combinators which mimic pre-v0.3 type signatures. These do not try to figure out @algs@ or assume much about them
 
-decodePart_ :: DecodeFAll Identity (xs :: [Symbol]) c str => 
-              Proxy xs 
-              -> Enc (Append xs xsf) c str 
-              -> Enc xsf c str 
-decodePart_ p = runIdentity . decodeFPart_ p
+decF' :: forall alg nm xs f c str . (Decode f nm alg c str) => Enc (nm ': xs) c str -> f (Enc xs c str)
+decF' = runDecoding (decoding @f @nm @alg)
 
-decodePart :: forall (xs :: [Symbol]) xsf c str .  DecodeFAll Identity xs c str => 
-              Enc (Append xs xsf) c str 
-              -> Enc xsf c str
-decodePart = decodePart_ (Proxy :: Proxy xs)              
+decFAll' :: forall algs nms f c str . (Monad f,  DecodeAll f nms algs c str) => 
+               Enc nms c str
+               -> f (Enc ('[]::[Symbol]) c str)  
+decFAll' = runDecodings @algs @nms @f decodings 
+
+-- | 
+-- 
+decAll' :: forall algs nms c str . (DecodeAll Identity nms algs c str) =>
+               Enc nms c str 
+               -> Enc ('[]::[Symbol]) c str 
+decAll' = runIdentity . decFAll' @algs 
+
+decFPart' :: forall algs xs xsf f c str . (Monad f, DecodeAll f xs algs c str) => Enc (Append xs xsf) c str -> f (Enc xsf c str)
+decFPart' (MkEnc _ conf str) =   
+    let re :: f (Enc '[] c str) = decFAll' @algs @xs $ MkEnc Proxy conf str
+    in  MkEnc Proxy conf . getPayload <$> re
+
+decPart' :: forall algs xs xsf c str . (DecodeAll Identity xs algs c str) => Enc (Append xs xsf) c str -> Enc xsf c str   
+decPart' = runIdentity . decFPart' @algs @xs
+
+
 
 -- | With type safety in place decoding errors should be unexpected.
 -- This class can be used to provide extra info if decoding could fail

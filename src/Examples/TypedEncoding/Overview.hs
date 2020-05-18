@@ -63,10 +63,10 @@ helloB64 = encAll . toEncoding () $ "Hello World"
 
 -- | Previous text decoded from Base64
 --
--- >>> fromEncoding . decodeAll $ helloB64 
+-- >>> fromEncoding . decAll $ helloB64 
 -- "Hello World"
 helloB64Decoded :: B.ByteString
-helloB64Decoded = fromEncoding . decodeAll $ helloB64
+helloB64Decoded = fromEncoding . decAll $ helloB64
 
 -- | 'recreateFAll' allows for recovering data at program boundaries (for example, when parsing JSON input).
 -- It makes sure that the content satisfies specified encodings.
@@ -105,27 +105,27 @@ helloB64B64 = encAll . toEncoding () $ "Hello World"
 
 -- | Double Base64 encoded "Hello World" with one layer of encoding removed
 --
--- >>> decodePart @'["enc-B64"] $ helloB64B64 :: Enc '["enc-B64"] () B.ByteString
+-- >>> decPart @'["enc-B64"] $ helloB64B64 :: Enc '["enc-B64"] () B.ByteString
 -- MkEnc Proxy () "SGVsbG8gV29ybGQ="
 --
 -- >>> helloB64B64PartDecode == helloB64
 -- True
 helloB64B64PartDecode :: Enc '["enc-B64"] () B.ByteString
-helloB64B64PartDecode = decodePart @'["enc-B64"] helloB64B64
+helloB64B64PartDecode = decPart @'["enc-B64"] helloB64B64
 
 -- | 'helloB64B64' all the way to 'B.ByteString'
 --
 -- Notice a similar polymorphism in decoding.
 --
--- >>> fromEncoding . decodeAll $ helloB64B64 :: B.ByteString 
+-- >>> fromEncoding . decAll $ helloB64B64 :: B.ByteString 
 -- "Hello World"
 -- 
 -- We can also decode all the parts: 
 --
--- >>> fromEncoding . decodePart @'["enc-B64","enc-B64"] $ helloB64B64
+-- >>> fromEncoding . decPart @'["enc-B64","enc-B64"] $ helloB64B64
 -- "Hello World"
 helloB64B64Decoded :: B.ByteString
-helloB64B64Decoded = fromEncoding . decodeAll $ helloB64B64
+helloB64B64Decoded = fromEncoding . decAll $ helloB64B64
 
 -- | what happens when we try to recover encoded once text to @Enc '["enc-B64", "enc-B64"]@. 
 --
@@ -204,10 +204,10 @@ helloLimitB64 = encAll . toEncoding exampleConf $ "HeLlo world"
 
 -- | ... and we unwrap the B64 part only
 -- 
--- >>> decodePart @'["enc-B64"] $ helloLimitB64
+-- >>> decPart @'["enc-B64"] $ helloLimitB64
 -- MkEnc Proxy (Config {sizeLimit = SizeLimit {unSizeLimit = 8}}) "HeLlo wo"
 helloRevLimitParDec :: Enc '["do-size-limit"] Config B.ByteString
-helloRevLimitParDec =  decodePart @'["enc-B64"] helloLimitB64
+helloRevLimitParDec =  decPart @'["enc-B64"] helloLimitB64
 
 
 
@@ -238,7 +238,7 @@ helloAsciiB64 :: Either EncodeEx (Enc '["enc-B64", "r-ASCII"] () B.ByteString)
 helloAsciiB64 = encFAll . toEncoding () $ "Hello World"
 
 -- |
--- >>> decodePart @'["enc-B64"] <$> helloAsciiB64
+-- >>> decPart @'["enc-B64"] <$> helloAsciiB64
 -- Right (MkEnc Proxy () "Hello World")
 helloAsciiB64PartDec :: Either EncodeEx (Enc '["r-ASCII"] () B.ByteString)
-helloAsciiB64PartDec = decodePart @'["enc-B64"] <$> helloAsciiB64 
+helloAsciiB64PartDec = decPart @'["enc-B64"] <$> helloAsciiB64 

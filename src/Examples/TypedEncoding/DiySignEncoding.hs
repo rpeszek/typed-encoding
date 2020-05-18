@@ -68,7 +68,7 @@ decodeSign t =
 -- >>> helloSigned
 -- MkEnc Proxy () "11:Hello World"
 --
--- >>> fromEncoding . decodeAll $ helloSigned 
+-- >>> fromEncoding . decAll $ helloSigned 
 -- "Hello World"
 helloSigned :: Enc '["my-sign"] () T.Text
 helloSigned = encAll . toEncoding () $ "Hello World"
@@ -80,7 +80,7 @@ helloSigned = encAll . toEncoding () $ "Hello World"
 propEncDec :: T.Text -> Bool
 propEncDec t = 
     let enc = encAll . toEncoding () $ t :: Enc '["my-sign"] () T.Text
-    in t == (fromEncoding . decodeAll $ enc)
+    in t == (fromEncoding . decAll $ enc)
 
 hacker :: Either RecreateEx (Enc '["my-sign"] () T.Text)
 hacker = 
@@ -112,8 +112,9 @@ instance Applicative f => Encode f "my-sign" "my-sign" c T.Text where
 -- Implementation simply uses 'EnT.implDecodeF' combinator on the 'asUnexpected' composed with decoding function.
 -- 'UnexpectedDecodeErr' has Identity instance allowing for decoding that assumes errors are not possible.
 -- For debugging purposes or when unsafe changes to "my-sign" @Error UnexpectedDecodeEx@ instance can be used.
-instance (UnexpectedDecodeErr f, Applicative f) => DecodeF f (Enc ("my-sign" ': xs) c T.Text) (Enc xs c T.Text) where
-    decodeF = EnT.implDecodeF (asUnexpected @"my-sign" . decodeSign) 
+-- | DEPRECATED
+instance (UnexpectedDecodeErr f, Applicative f) => Decode f "my-sign" "my-sign" c T.Text where
+    decoding = mkDecoding $ EnT.implDecodeF (asUnexpected @"my-sign" . decodeSign) 
 
 -- | Recreation allows effectful @f@ to check for tampering with data.
 -- Implementation simply uses 'EnT.implCheckPrevF' combinator on the recovery function.

@@ -80,6 +80,15 @@ encFBan :: forall f s t xs c str .
               Enc xs c str -> f (Enc (s ': xs) c str)  
 encFBan = implEncodeF @s (verifyBoundedAlphaNum (Proxy :: Proxy s))              
 
+
+
+-- * Decoding
+
+instance (KnownSymbol s, IsR s ~ 'True, AlgNm s ~ "r-ban", Applicative f) => Decode f s "r-ban" c str where
+    decoding = decAnyR
+
+
+
 -- TODO v0.3 remove f from forall in encFBan (slightly breaking chanage)
 
 

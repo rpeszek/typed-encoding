@@ -71,7 +71,7 @@ spec =
         it "RecreateF err works" $
           (recreateFAll @(Either RecreateEx) @'["r-Word8-decimal"] . toEncoding () $ tstNotWord8) `shouldSatisfy` isLeft
         it "DecodeF works" $
-          (fromEncoding . decodeAll $ tstWord8Enc) `shouldBe` tstWord8   
+          (fromEncoding . decAll $ tstWord8Enc) `shouldBe` tstWord8   
    
 runSpec :: IO ()
 runSpec = hspec spec           

@@ -15,8 +15,9 @@ module Data.TypedEncoding.Internal.Class (
     module Data.TypedEncoding.Internal.Class
     , module Data.TypedEncoding.Internal.Class.Util
     , module Data.TypedEncoding.Internal.Class.Encode
-    , module Data.TypedEncoding.Internal.Deprecated.Encode
     , module Data.TypedEncoding.Internal.Class.Decode
+    , module Data.TypedEncoding.Internal.Deprecated.Encode
+    , module Data.TypedEncoding.Internal.Deprecated.Decode
     , module Data.TypedEncoding.Internal.Class.Recreate 
     , module Data.TypedEncoding.Internal.Class.Superset 
     -- * Encoder and Encoding replace EncodeFAll
@@ -25,8 +26,9 @@ module Data.TypedEncoding.Internal.Class (
 
 import           Data.TypedEncoding.Internal.Class.Util
 import           Data.TypedEncoding.Internal.Class.Encode
-import           Data.TypedEncoding.Internal.Deprecated.Encode
 import           Data.TypedEncoding.Internal.Class.Decode
+import           Data.TypedEncoding.Internal.Deprecated.Encode
+import           Data.TypedEncoding.Internal.Deprecated.Decode
 import           Data.TypedEncoding.Internal.Class.Recreate
 import           Data.TypedEncoding.Internal.Class.Superset
 import           Data.TypedEncoding.Internal.Class.Encoder 
@@ -38,6 +40,8 @@ import           Data.TypedEncoding.Internal.Types (Enc(..)
 import           Data.Functor.Identity
 import           GHC.TypeLits
 
+
+-- TODO v0.3 change to @ToEncString nm alg str f a@ ? Maybe not?
 
 -- | 
 -- Generalized Java @toString@ or a type safe version of Haskell's 'Show'.

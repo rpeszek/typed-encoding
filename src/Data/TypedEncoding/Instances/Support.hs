@@ -33,6 +33,9 @@ import           GHC.TypeLits
 -- >>> :set -XOverloadedStrings -XMultiParamTypeClasses -XDataKinds -XTypeApplications
 
 
+decAnyR :: (IsR s ~ 'True, AlgNm s ~ x, Applicative f) => Decoding f s x c str
+decAnyR  = mkDecoding $ implTranP id 
+
 -- | Universal decode for all "r-" types
 decFR :: (IsR s ~ 'True, Applicative f) => 
             Enc (s ': xs) c str -> f (Enc xs c str) 

@@ -18,6 +18,7 @@ encB64B = mkEncoding (implEncodeP B64.encode)
 
 ```
 
+TODO
 ```
 -- v0.2:
 instance Encodings (Either EncodeEx) xs grps c B.ByteString => Encodings (Either EncodeEx) ("enc-B64" ': xs) ("enc-B64" ': grps) c B.ByteString where
@@ -46,6 +47,21 @@ encFAll
        c
        str
      -> f (Enc [Symbol] nms c str)     
+```
+
+### Decoding
+
+```
+instance (UnexpectedDecodeErr f, Applicative f) => DecodeF f (Enc ("enc-B64" ': xs) c B.ByteString) (Enc xs c B.ByteString) where
+    decodeF = implDecodeF (asUnexpected @"enc-B64" . B64.decode) 
+
+
+instance (UnexpectedDecodeErr f, Applicative f) => Decode f "enc-B64" "enc-B64" c B.ByteString where
+    decoding = decB64B
+
+decB64B :: (UnexpectedDecodeErr f, Applicative f) => Decoding f "enc-B64" "enc-B64" c B.ByteString
+decB64B = mkDecoding $ implDecodeF (asUnexpected @"enc-B64" . B64.decode)
+
 ```
 
 Other notes:

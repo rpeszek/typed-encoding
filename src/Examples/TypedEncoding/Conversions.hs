@@ -270,7 +270,7 @@ lenientSomething = recreateAll . toEncoding () $ "abc==CB"
 --
 -- Except the content could be surprising
 --
--- >>> decodeAll $ EnB64.acceptLenientS lenientSomething
+-- >>> decAll $ EnB64.acceptLenientS lenientSomething
 -- MkEnc Proxy () "i\183"
 
 

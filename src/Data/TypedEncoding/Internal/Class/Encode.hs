@@ -16,6 +16,16 @@ import           GHC.TypeLits
 import           Data.Functor.Identity
 import           Data.Proxy
 
+-- | 
+-- Using 2 Symbol type variables (@nm@ and @alg@) creates what seems like redundant typing
+-- in statically defined instances such as @"r-ASCII"@, however it 
+-- provides future flexibility to 
+-- constrain @nm@ in some interesting way, different than @AlgNm nm ~ alg@. 
+--
+-- It also seems to be easier to understand as type variables used in the definition of 'Encoding'
+-- match with what is on the typeclass.
+--
+-- @alg@ is expected to be very statically defined and is needed to support more open instances such as @"r-ban"@.
 class Encode f nm alg conf str where
     encoding :: Encoding f nm alg conf str
 
@@ -51,7 +61,7 @@ encPart :: forall xs xsf c str . (EncodeAll Identity xs xs c str) => Enc xsf c s
 encPart = encPart' @xs @xs
 
 
--- * Convenience combinators which mimic pre-v0.3 type signatures. These do not assume that @algs@ are the same as @nms@ 
+-- * Convenience combinators which mimic pre-v0.3 type signatures. These do not try to figure out @algs@ or assume much about them
 
 encF' :: forall alg nm xs f c str . (Encode f nm alg c str) => Enc xs c str -> f (Enc (nm ': xs) c str)
 encF' = runEncoding (encoding @f @nm @alg)

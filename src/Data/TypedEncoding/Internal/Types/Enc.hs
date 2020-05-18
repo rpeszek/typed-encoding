@@ -92,6 +92,8 @@ unsafeChangePayload f (MkEnc p conf str)  = MkEnc p conf (f str)
 -- implement 
 -- 'Data.TypedEncoding.Internal.Class.Encode.Encode'
 -- or (preferably) both.
+--
+-- Similar boilerplate for Decoding and Validation is specified in separate modules.
 data Encoding f (nm :: Symbol) (alg :: Symbol) conf str where
     -- | Consider this constructor as private or use it with care
     --
