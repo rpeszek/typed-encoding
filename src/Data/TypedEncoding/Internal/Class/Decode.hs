@@ -13,6 +13,7 @@ module Data.TypedEncoding.Internal.Class.Decode where
 import           Data.TypedEncoding.Internal.Types (UnexpectedDecodeEx(..))
 import           Data.TypedEncoding.Internal.Types.Enc
 import           Data.TypedEncoding.Internal.Types.Decoding
+import           Data.TypedEncoding.Internal.Combinators
 
 import           Data.TypedEncoding.Internal.Class.Util
 import           Data.Proxy
@@ -75,9 +76,10 @@ decAll' :: forall algs nms c str . (DecodeAll Identity nms algs c str) =>
 decAll' = runIdentity . decFAll' @algs 
 
 decFPart' :: forall algs xs xsf f c str . (Monad f, DecodeAll f xs algs c str) => Enc (Append xs xsf) c str -> f (Enc xsf c str)
-decFPart' (MkEnc _ conf str) =   
-    let re :: f (Enc '[] c str) = decFAll' @algs @xs $ MkEnc Proxy conf str
-    in  MkEnc Proxy conf . getPayload <$> re
+decFPart' = aboveF @xsf @xs @'[] (decFAll' @algs)  
+-- decFPart' (MkEnc _ conf str) =   
+--     let re :: f (Enc '[] c str) = decFAll' @algs @xs $ MkEnc Proxy conf str
+--     in  MkEnc Proxy conf . getPayload <$> re
 
 decPart' :: forall algs xs xsf c str . (DecodeAll Identity xs algs c str) => Enc (Append xs xsf) c str -> Enc xsf c str   
 decPart' = runIdentity . decFPart' @algs @xs

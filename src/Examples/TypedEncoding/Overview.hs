@@ -110,6 +110,11 @@ helloB64B64 = encAll . toEncoding () $ "Hello World"
 --
 -- >>> helloB64B64PartDecode == helloB64
 -- True
+--
+-- @decPart@ is a convenience function that simply replies decoding 'above' first "enc-B64"
+--
+-- >>> above @'["enc-B64"] @'["enc-B64"] @'[] decAll $ helloB64B64 
+-- MkEnc Proxy () "SGVsbG8gV29ybGQ="
 helloB64B64PartDecode :: Enc '["enc-B64"] () B.ByteString
 helloB64B64PartDecode = decPart @'["enc-B64"] helloB64B64
 
@@ -193,6 +198,11 @@ helloTitle = encAll . toEncoding exampleConf $ "hello wOrld"
 -- Instead, encode previously defined 'helloTitle' by reversing it and adding size limit
 --
 -- >>> encPart @'["do-size-limit", "do-reverse"] helloTitle :: Enc '["do-size-limit", "do-reverse", "do-Title"] Config T.Text
+-- MkEnc Proxy (Config {sizeLimit = SizeLimit {unSizeLimit = 8}}) "dlroW ol"
+--
+-- @encPart@ is simply encAll played above "do-Title" encoding:
+--
+-- >>> above @'["do-Title"] @'[] @'["do-size-limit", "do-reverse"] encAll helloTitle
 -- MkEnc Proxy (Config {sizeLimit = SizeLimit {unSizeLimit = 8}}) "dlroW ol"
 helloRevLimit :: Enc '["do-size-limit", "do-reverse", "do-Title"] Config T.Text
 helloRevLimit = encPart @'["do-size-limit", "do-reverse"] helloTitle

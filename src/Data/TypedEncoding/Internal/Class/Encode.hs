@@ -12,6 +12,7 @@ module Data.TypedEncoding.Internal.Class.Encode where
 
 import           Data.TypedEncoding.Internal.Types.Enc
 import           Data.TypedEncoding.Internal.Class.Util -- Append
+import           Data.TypedEncoding.Internal.Combinators
 import           GHC.TypeLits
 import           Data.Functor.Identity
 import           Data.Proxy
@@ -79,9 +80,10 @@ encAll' :: forall algs nms c str . (EncodeAll Identity nms algs c str) =>
 encAll' = runIdentity . encFAll' @algs 
 
 encFPart' :: forall algs xs xsf f c str . (Monad f, EncodeAll f xs algs c str) => Enc xsf c str -> f (Enc (Append xs xsf) c str)
-encFPart' (MkEnc _ conf str) =   
-    let re :: f (Enc xs c str) = encFAll' @algs $ MkEnc Proxy conf str
-    in  MkEnc Proxy conf . getPayload <$> re
+encFPart' = aboveF @xsf @'[] @xs (encFAll' @algs) 
+-- encFPart' (MkEnc _ conf str) =  
+--     let re :: f (Enc xs c str) = encFAll' @algs $ MkEnc Proxy conf str
+--     in  MkEnc Proxy conf . getPayload <$> re
 
 encPart' :: forall algs xs xsf c str . (EncodeAll Identity xs algs c str) => Enc xsf c str -> Enc (Append xs xsf) c str   
 encPart' = runIdentity . encFPart' @algs @xs

@@ -18,6 +18,8 @@ import           Data.TypedEncoding.Internal.Types
 import           Data.TypedEncoding.Internal.Class.IsStringR 
 import           GHC.TypeLits
 
+-- TODO v0.3 some of this needs to move to call side exported combinators
+
 -- $setup
 -- >>> :set -XTypeApplications
 -- >>> import qualified Data.Text as T
