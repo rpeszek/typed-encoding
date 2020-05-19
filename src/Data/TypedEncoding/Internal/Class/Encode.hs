@@ -12,7 +12,7 @@ module Data.TypedEncoding.Internal.Class.Encode where
 
 import           Data.TypedEncoding.Internal.Types.Enc
 import           Data.TypedEncoding.Internal.Class.Util -- Append
-import           Data.TypedEncoding.Internal.Combinators
+import           Data.TypedEncoding.Internal.Combinators.Common
 import           GHC.TypeLits
 import           Data.Functor.Identity
 import           Data.Proxy

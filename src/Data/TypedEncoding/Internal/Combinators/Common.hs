@@ -8,11 +8,10 @@
 {-# LANGUAGE FlexibleContexts #-}
 
 -- | Combinators reexported in Data.TypedEncoding
-module Data.TypedEncoding.Internal.Combinators where
+module Data.TypedEncoding.Internal.Combinators.Common where
 
 import           Data.TypedEncoding.Internal.Types
-import           Data.TypedEncoding.Internal.Class.Recreate
-import           Data.TypedEncoding.Internal.Class.Util (SymbolList, Append)
+import           Data.TypedEncoding.Internal.Class.Util (Append)
 import           GHC.TypeLits
 import           Data.Proxy
 
@@ -44,33 +43,4 @@ above fn (MkEnc _ conf str) =
     in  MkEnc Proxy conf . getPayload $ re
 
 -- * Converting 'UncheckedEnc' to 'Enc'
-
--- | Maybe signals annotation mismatch, effect @f@ is not evaluated unless there is match
-verifyUncheckedEnc :: forall (xs :: [Symbol]) f c str . (
-                     RecreateFAll f xs c str
-                     , RecreateErr f
-                     , Applicative f
-                     , SymbolList xs
-                   ) 
-                   =>
-                   UncheckedEnc c str
-                   ->  Maybe (f (Enc xs c str))
-
-verifyUncheckedEnc x = 
-    -- let perr = Proxy :: Proxy "e-mismatch"
-    --in  
-      case verifyAnn @xs x of
-            Left err -> Nothing -- asRecreateErr_ perr $ Left err
-            Right (MkUncheckedEnc _ c str) -> Just $ recreateFAll . toEncoding c $ str
-
-
-verifyUncheckedEnc' :: forall (xs :: [Symbol]) c str . (
-                     RecreateFAll (Either RecreateEx) xs c str
-                     , SymbolList xs
-                   ) 
-                   =>
-                   UncheckedEnc c str
-                   ->  Maybe (Either RecreateEx (Enc xs c str))
-verifyUncheckedEnc' = verifyUncheckedEnc
-
 

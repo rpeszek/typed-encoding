@@ -26,11 +26,6 @@
 --
 -- Expected behavior is described next to corresponding combinator.
 --
--- Typeclass encoding is not used to avoid instance overlapping.
--- 
--- Use 'Data.TypedEncoding.Instances.Support.recWithEncR' 
--- to create manual recovery step that can be combined with 'recreateFPart'.
-
 -- This is very much in beta state.
 module Data.TypedEncoding.Instances.Restriction.Bool where 
 

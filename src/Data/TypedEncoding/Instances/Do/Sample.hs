@@ -24,14 +24,16 @@ import           Data.TypedEncoding.Instances.Support
 
 instance Applicative f => Encode f "do-UPPER" "do-UPPER" c T.Text where
     encoding = mkEncoding (implEncodeP T.toUpper)
-    
-instance (RecreateErr f, Applicative f) => RecreateF f (Enc xs c T.Text) (Enc ("do-UPPER" ': xs) c T.Text) where
-    checkPrevF = implCheckPrevF (asRecreateErr @"do-UPPER" . (\t -> 
+
+instance (RecreateErr f, Applicative f) => Validate f "do-UPPER" "do-UPPER" c T.Text where
+    validation = mkValidation $
+                          implCheckPrevF (asRecreateErr @"do-UPPER" . (\t -> 
                                  let (g,b) = T.partition isUpper t
                                  in if T.null b
                                     then Right t
                                     else Left $ "Found not upper case chars " ++ T.unpack b)
                            )
+
 
 instance Applicative f => Encode f "do-UPPER" "do-UPPER" c TL.Text where
     encoding = mkEncoding (implEncodeP TL.toUpper)

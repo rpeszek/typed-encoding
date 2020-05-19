@@ -28,9 +28,6 @@
 -- Decoding function @decFR@ is located in
 -- "Data.TypedEncoding.Instances.Support"
 --
--- Use 'Data.TypedEncoding.Instances.Support.recWithEncR' 
--- to create manual recovery step that can be combined with 'recreateFPart'.
---
 -- @since 0.2.1.0
 module Data.TypedEncoding.Instances.Restriction.BoundedAlphaNums where 
 
@@ -48,6 +45,7 @@ import           Data.TypedEncoding.Instances.Support
 -- $setup
 -- >>> :set -XOverloadedStrings -XMultiParamTypeClasses -XDataKinds -XTypeApplications
 -- >>> import qualified Data.Text as T
+-- >>> import           Data.TypedEncoding
 
 -- better compilation errors?
 type family IsBan (s :: Symbol) :: Bool where
@@ -56,8 +54,8 @@ type family IsBan (s :: Symbol) :: Bool where
 type instance IsSupersetOpen "r-ASCII" "r-ban" xs = 'True
 
 
-instance (KnownSymbol s, AlgNm s ~ "r-ban", IsStringR str) => Encode (Either EncodeEx) s "r-ban" c str where
-    encoding = mkEncoding encFBan
+instance (KnownSymbol s , IsBan s ~ 'True, AlgNm s ~ "r-ban", IsStringR str) => Encode (Either EncodeEx) s "r-ban" c str where
+    encoding = encFBan
 
 -- TODO remove 
 
@@ -65,20 +63,20 @@ instance (KnownSymbol s, AlgNm s ~ "r-ban", IsStringR str) => Encode (Either Enc
 --     encoder = AppendEnc encFBan encoder
 
 -- |
--- >>> encFBan . toEncoding () $ "C59F9FB7-4621-44D9-9020-CE37BF6E2BD1" :: Either EncodeEx (Enc '["r-ban:FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF"] () T.Text)
+-- >>> runEncoding encFBan . toEncoding () $ "C59F9FB7-4621-44D9-9020-CE37BF6E2BD1" :: Either EncodeEx (Enc '["r-ban:FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF"] () T.Text)
 -- Right (MkEnc Proxy () "C59F9FB7-4621-44D9-9020-CE37BF6E2BD1")
 -- 
--- >>> recWithEncR encFBan . toEncoding () $ "211-22-9934" :: Either RecreateEx (Enc '["r-ban:999-99-9999"] () T.Text)
+-- >>> recrFAll' @'["r-ban"] . toEncoding () $ "211-22-9934" :: Either RecreateEx (Enc '["r-ban:999-99-9999"] () T.Text)
 -- Right (MkEnc Proxy () "211-22-9934")
-encFBan :: forall f s t xs c str .
+encFBan :: forall s t xs c str .
               (
                 IsStringR str
               , KnownSymbol s
               , IsBan s ~ 'True
-              , f ~ Either EncodeEx
+              , AlgNm s ~ "r-ban"
               ) => 
-              Enc xs c str -> f (Enc (s ': xs) c str)  
-encFBan = implEncodeF @s (verifyBoundedAlphaNum (Proxy :: Proxy s))              
+              Encoding (Either EncodeEx) s "r-ban" c str
+encFBan = mkEncoding $ implEncodeF @s (verifyBoundedAlphaNum (Proxy :: Proxy s))              
 
 
 
@@ -87,6 +85,11 @@ encFBan = implEncodeF @s (verifyBoundedAlphaNum (Proxy :: Proxy s))
 instance (KnownSymbol s, IsR s ~ 'True, AlgNm s ~ "r-ban", Applicative f) => Decode f s "r-ban" c str where
     decoding = decAnyR
 
+
+-- * Validation
+
+instance (KnownSymbol s , IsBan s ~ 'True, AlgNm s ~ "r-ban", IsStringR str, RecreateErr f, Applicative f) => Validate f s "r-ban" c str where
+    validation = validFromEnc' @"r-ban" encFBan
 
 
 -- TODO v0.3 remove f from forall in encFBan (slightly breaking chanage)

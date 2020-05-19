@@ -88,17 +88,17 @@ hacker =
         -- | payload is sent over network and get corrupted
         newpay = payload <> " corruption" 
         -- | boundary check recovers the data
-        newdata = recreateFAll . toEncoding () $ newpay :: Either RecreateEx (Enc '["my-sign"] () T.Text)
+        newdata = recrFAll . toEncoding () $ newpay :: Either RecreateEx (Enc '["my-sign"] () T.Text)
     in newdata    
 -- ^ Hacker example
 -- The data was transmitted over a network and got corrupted.
 --
 -- >>> let payload = getPayload $ helloSigned :: T.Text
 -- >>> let newpay = payload <> " corruption" 
--- >>> recreateFAll . toEncoding () $ newpay :: Either RecreateEx (Enc '["my-sign"] () T.Text)
+-- >>> recrFAll . toEncoding () $ newpay :: Either RecreateEx (Enc '["my-sign"] () T.Text)
 -- Left (RecreateEx "my-sign" ("Corrupted Signature"))
 --
--- >>> recreateFAll . toEncoding () $ payload :: Either RecreateEx (Enc '["my-sign"] () T.Text)
+-- >>> recrFAll . toEncoding () $ payload :: Either RecreateEx (Enc '["my-sign"] () T.Text)
 -- Right (MkEnc Proxy () "11:Hello World")
 
 
@@ -114,9 +114,13 @@ instance Applicative f => Encode f "my-sign" "my-sign" c T.Text where
 -- For debugging purposes or when unsafe changes to "my-sign" @Error UnexpectedDecodeEx@ instance can be used.
 -- | DEPRECATED
 instance (UnexpectedDecodeErr f, Applicative f) => Decode f "my-sign" "my-sign" c T.Text where
-    decoding = mkDecoding $ EnT.implDecodeF (asUnexpected @"my-sign" . decodeSign) 
+    decoding = decMySign 
+
+decMySign :: (UnexpectedDecodeErr f, Applicative f) => Decoding f "my-sign" "my-sign" c T.Text
+decMySign = mkDecoding $ EnT.implDecodeF (asUnexpected @"my-sign" . decodeSign) 
 
 -- | Recreation allows effectful @f@ to check for tampering with data.
--- Implementation simply uses 'EnT.implCheckPrevF' combinator on the recovery function.
-instance (RecreateErr f, Applicative f) => RecreateF f (Enc xs c T.Text) (Enc ("my-sign" ': xs) c T.Text) where   
-    checkPrevF = EnT.implCheckPrevF (asRecreateErr @"my-sign" . decodeSign) 
+-- Implementation simply uses 'EnT.validFromDec' combinator on the recovery function.
+instance (RecreateErr f, Applicative f) => Validate f "my-sign" "my-sign" c T.Text where
+    validation = EnT.validFromDec decMySign
+

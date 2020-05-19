@@ -245,15 +245,15 @@ notTextB = encAll . toEncoding () $ "\195\177"
 -- * Lenient recovery
 
 lenientSomething :: Enc '["enc-B64-len"] () B.ByteString
-lenientSomething = recreateAll . toEncoding () $ "abc==CB"
+lenientSomething = recrAll . toEncoding () $ "abc==CB"
 -- ^ 
--- >>> recreateAll . toEncoding () $ "abc==CB" :: Enc '["enc-B64-len"] () B.ByteString
+-- >>> recrAll . toEncoding () $ "abc==CB" :: Enc '["enc-B64-len"] () B.ByteString
 -- MkEnc Proxy () "abc==CB"
 --
 -- The rest of Haskell does lenient decoding, type safety allows this library to use it for recovery.
 -- lenient algorithms are not partial and automatically fix invalid input:
 --
--- >>> recreateFAll . toEncoding () $ "abc==CB" :: Either RecreateEx (Enc '["enc-B64"] () B.ByteString)
+-- >>> recrFAll . toEncoding () $ "abc==CB" :: Either RecreateEx (Enc '["enc-B64"] () B.ByteString)
 -- Left (RecreateEx "enc-B64" ("invalid padding"))
 --
 -- This library allows to recover to "enc-B64-len" which is different than "enc-B64"
@@ -265,7 +265,7 @@ lenientSomething = recreateAll . toEncoding () $ "abc==CB"
 --
 -- This is now properly encoded data
 --
--- >>> recreateFAll . toEncoding () $ "abc=" :: Either RecreateEx (Enc '["enc-B64"] () B.ByteString)
+-- >>> recrFAll . toEncoding () $ "abc=" :: Either RecreateEx (Enc '["enc-B64"] () B.ByteString)
 -- Right (MkEnc Proxy () "abc=")
 --
 -- Except the content could be surprising

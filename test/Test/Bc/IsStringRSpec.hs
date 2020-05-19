@@ -67,9 +67,9 @@ spec =
         it "EncodeF err works" $
           (encFAll @'["r-Word8-decimal"] @(Either EncodeEx). toEncoding () $ tstNotWord8') `shouldSatisfy` isLeft
         it "RecreateF works" $
-          (recreateFAll @(Either RecreateEx) @'["r-Word8-decimal"] . toEncoding () $ tstWord8) `shouldSatisfy` isRight   
+          (recrFAll @'["r-Word8-decimal"] @(Either RecreateEx) . toEncoding () $ tstWord8) `shouldSatisfy` isRight   
         it "RecreateF err works" $
-          (recreateFAll @(Either RecreateEx) @'["r-Word8-decimal"] . toEncoding () $ tstNotWord8) `shouldSatisfy` isLeft
+          (recrFAll @'["r-Word8-decimal"] @(Either RecreateEx) . toEncoding () $ tstNotWord8) `shouldSatisfy` isLeft
         it "DecodeF works" $
           (fromEncoding . decAll $ tstWord8Enc) `shouldBe` tstWord8   
    

@@ -205,9 +205,9 @@ tstEmail = SimplifiedEmailF {
 --
 -- We can play 'Alternative' ('<|>') game (we acually use @Maybe@) with final option being a 'RecreateEx' error:
 --
--- >>> verifyUncheckedEnc' @'["enc-B64","r-ASCII"] $ unchecked
+-- >>> check @'["enc-B64","r-ASCII"] @(Either RecreateEx) $ unchecked
 -- Nothing
--- >>> verifyUncheckedEnc' @'["enc-B64","r-UTF8"] $ unchecked
+-- >>> check @'["enc-B64","r-UTF8"] @(Either RecreateEx) $ unchecked
 -- Just (Right (MkEnc Proxy () "U29tZSBVVEY4IFRleHQ="))
 --
 -- Since the data is heterogeneous (each piece has a different encoding annotation), we need wrap the result in another plain ADT: 'CheckedEnc'.
@@ -236,11 +236,11 @@ recreateEncoding = mapM encodefn
           runAlternatives' (fromMaybe def) [try1, try2, try3, try4, try5] body
           where
               unchecked = toUncheckedEnc (parseHeader parth) () 
-              try1 = fmap (fmap toCheckedEnc) . verifyUncheckedEnc' @'["enc-B64","r-UTF8"] . unchecked
-              try2 = fmap (fmap toCheckedEnc) . verifyUncheckedEnc' @'["enc-B64","r-ASCII"] . unchecked
-              try3 = fmap (fmap toCheckedEnc) . verifyUncheckedEnc' @'["r-ASCII"] . unchecked
-              try4 = fmap (fmap toCheckedEnc) . verifyUncheckedEnc' @'["r-UTF8"] . unchecked
-              try5 = fmap (fmap toCheckedEnc) . verifyUncheckedEnc' @'["enc-B64"] . unchecked
+              try1 = fmap (fmap toCheckedEnc) . check @'["enc-B64","r-UTF8"] . unchecked
+              try2 = fmap (fmap toCheckedEnc) . check @'["enc-B64","r-ASCII"] . unchecked
+              try3 = fmap (fmap toCheckedEnc) . check @'["r-ASCII"] . unchecked
+              try4 = fmap (fmap toCheckedEnc) . check @'["r-UTF8"] . unchecked
+              try5 = fmap (fmap toCheckedEnc) . check @'["enc-B64"] . unchecked
               def =  Left $ recreateErrUnknown ("Invalid Header " ++ show parth) 
 
 

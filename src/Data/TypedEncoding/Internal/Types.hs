@@ -16,6 +16,7 @@ module Data.TypedEncoding.Internal.Types (
         -- * Main encoding type and basic combinators.
         , module Data.TypedEncoding.Internal.Types.Enc
         , module Data.TypedEncoding.Internal.Types.Decoding
+        , module Data.TypedEncoding.Internal.Types.Validation
         -- * Untyped version and existentially quantified versions of Enc
         , module Data.TypedEncoding.Internal.Types.CheckedEnc
         -- * Not verified encoded data
@@ -26,6 +27,7 @@ module Data.TypedEncoding.Internal.Types (
 
 import           Data.TypedEncoding.Internal.Types.Enc
 import           Data.TypedEncoding.Internal.Types.Decoding
+import           Data.TypedEncoding.Internal.Types.Validation
 import           Data.TypedEncoding.Internal.Types.CheckedEnc
 import           Data.TypedEncoding.Internal.Types.UncheckedEnc
 import           Data.TypedEncoding.Internal.Common
@@ -90,8 +92,6 @@ instance Show UnexpectedDecodeEx where
 
 
 -- * Base combinators that rely on types defined here
-
-
 
 mergeErrs :: err -> (err -> Maybe err -> err) -> Either err a -> Either err b -> Either err c
 mergeErrs _ fn (Left er1) (Left er2) = Left (fn er1 $ Just er2)

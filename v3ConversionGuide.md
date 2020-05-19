@@ -64,6 +64,43 @@ decB64B = mkDecoding $ implDecodeF (asUnexpected @"enc-B64" . B64.decode)
 
 ```
 
+decodeF -> decF
+decodeAll -> decAll 
+decodeFAll -> decFAll (forall order changed, first to type variables flipped to nms f c str from f nms)
+
+
+### Validation
+```
+instance (UnexpectedDecodeErr f, Applicative f) => DecodeF f (Enc ("enc-B64" ': xs) c B.ByteString) (Enc xs c B.ByteString) where
+    decodeF = implDecodeF (asUnexpected @"enc-B64" . B64.decode) 
+
+
+instance (UnexpectedDecodeErr f, Applicative f) => Decode f "enc-B64" "enc-B64" c B.ByteString where
+    decoding = decB64B
+
+decB64B :: (UnexpectedDecodeErr f, Applicative f) => Decoding f "enc-B64" "enc-B64" c B.ByteString
+decB64B = mkDecoding $ implDecodeF (asUnexpected @"enc-B64" . B64.decode)
+
+```
+instance (RecreateErr f, Applicative f) => RecreateF f (Enc xs c B.ByteString) (Enc ("enc-B64" ': xs) c B.ByteString) where
+    checkPrevF = implCheckPrevF (asRecreateErr @"enc-B64" .  B64.decode) 
+
+
+-- specify validFromDec or validFromEnc combinator and use corresponding encoding or decoding function
+instance (RecreateErr f, Applicative f) => Validate f "enc-B64" "enc-B64" c B.ByteString where
+    validation = validFromDec decB64B
+```
+
+
+```
+recreateAll -> recrAll 
+recreateFAll -> recrFAll (forall order changed, first to type variables flipped to nms f c str from f nms)
+```
+
+
+
 Other notes:
 
 - Minor changes in forall variable order in combinators for "r-bool:" encodings.
+
+- checkWithValidationsEnc -> check

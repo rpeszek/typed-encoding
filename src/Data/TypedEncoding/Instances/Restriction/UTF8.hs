@@ -81,27 +81,13 @@ encUTF8BL = mkEncoding (implEncodeF @"r-UTF8" (fmap TEL.encodeUtf8 . TEL.decodeU
 
 instance (Applicative f) => Decode f "r-UTF8" "r-UTF8" c str where
     decoding = decAnyR
-    
 
--- OLD
+instance (RecreateErr f, Applicative f) =>  Validate f "r-UTF8" "r-UTF8" c B.ByteString  where
+    validation = validR encUTF8B
 
--- instance WhichEncoder (Either EncodeEx) xs grps c B.ByteString => WhichEncoder (Either EncodeEx) ("r-UTF8" ': xs) ("r-UTF8" ': grps) c B.ByteString where
---     encoder = encodeFEncoder @(Either EncodeEx) @"r-UTF8" @"r-UTF8"
+instance (RecreateErr f, Applicative f) =>  Validate f "r-UTF8" "r-UTF8" c BL.ByteString  where
+    validation = validR encUTF8BL
 
-
--- instance EncodeF (Either EncodeEx) (Enc xs c B.ByteString) (Enc ("r-UTF8" ': xs) c B.ByteString) where
---     encodeF = implEncodeF_ prxyUtf8 (fmap TE.encodeUtf8 . TE.decodeUtf8')
-instance (RecreateErr f, Applicative f) => RecreateF f (Enc xs c B.ByteString) (Enc ("r-UTF8" ': xs) c B.ByteString) where
-    checkPrevF = implCheckPrevF (asRecreateErr @"r-UTF8" . fmap TE.encodeUtf8 . TE.decodeUtf8')
-
-
--- instance WhichEncoder (Either EncodeEx) xs grps c BL.ByteString => WhichEncoder (Either EncodeEx) ("r-UTF8" ': xs) ("r-UTF8" ': grps) c BL.ByteString where
---     encoder = encodeFEncoder @(Either EncodeEx) @"r-UTF8" @"r-UTF8"
-
--- instance EncodeF (Either EncodeEx) (Enc xs c BL.ByteString) (Enc ("r-UTF8" ': xs) c BL.ByteString) where
---     encodeF = implEncodeF_ prxyUtf8 (fmap TEL.encodeUtf8 . TEL.decodeUtf8')
-instance (RecreateErr f, Applicative f) => RecreateF f (Enc xs c BL.ByteString) (Enc ("r-UTF8" ': xs) c BL.ByteString) where
-    checkPrevF = implCheckPrevF (asRecreateErr @"r-UTF8" . fmap TEL.encodeUtf8 . TEL.decodeUtf8')
 
 --- Utilities ---
 

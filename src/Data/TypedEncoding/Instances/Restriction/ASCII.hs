@@ -94,12 +94,8 @@ encImpl str = case find (not . isAscii) str of
 instance (Applicative f) => Decode f "r-ASCII" "r-ASCII" c str where
     decoding = decAnyR
     
-
---- OLD 
-
-
-instance (Char8Find str, RecreateErr f, Applicative f) => RecreateF f (Enc xs c str) (Enc ("r-ASCII" ': xs) c str) where
-    checkPrevF = implCheckPrevF (asRecreateErr @"r-ASCII" . encImpl)
+instance (Char8Find str, RecreateErr f, Applicative f) => Validate f "r-ASCII" "r-ASCII" () str where
+    validation = validR encASCII
 
 
 -- tst = encFAll . toEncoding () $ "Hello World" :: Either EncodeEx (Enc '["r-ASCII"] () T.Text)

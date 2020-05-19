@@ -11,8 +11,9 @@
 -- {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE AllowAmbiguousTypes #-}
 
-module Data.TypedEncoding.Internal.Class.Recreate where
+module Data.TypedEncoding.Internal.Deprecated.Recreate where
 
+import           Data.TypedEncoding.Internal.Class.Validate
 import           Data.TypedEncoding.Internal.Types (Enc(..) 
                                               , toEncoding
                                               , withUnsafeCoerce
@@ -25,7 +26,7 @@ import           Data.Functor.Identity
 import           GHC.TypeLits
 
 
--- | Used to safely recover encoded data validating all encodingss
+-- | Used to safely recover encoded data validating all encodings
 class RecreateF f instr outstr where    
     checkPrevF :: outstr -> f instr
 
@@ -74,17 +75,3 @@ recreatePart :: forall (xs :: [Symbol]) xsf c str . RecreateFAll Identity xs c s
               -> Enc (Append xs xsf) c str 
 recreatePart = recreatePart_ (Proxy :: Proxy xs)   
 
--- | Recovery errors are expected unless Recovery allows Identity instance
-class RecreateErr f where 
-    recoveryErr :: RecreateEx -> f a
-
-instance RecreateErr (Either RecreateEx) where
-    recoveryErr = Left  
-
-asRecreateErr_ :: (RecreateErr f, Applicative f, Show err, KnownSymbol x) => Proxy x -> Either err a -> f a
-asRecreateErr_ p (Left err) = recoveryErr $ RecreateEx p err
-asRecreateErr_ _ (Right r) = pure r
-
-
-asRecreateErr :: forall x f err a . (RecreateErr f, Applicative f, Show err, KnownSymbol x) => Either err a -> f a
-asRecreateErr = asRecreateErr_ (Proxy :: Proxy x)

@@ -13,7 +13,7 @@ module Data.TypedEncoding.Internal.Class.Decode where
 import           Data.TypedEncoding.Internal.Types (UnexpectedDecodeEx(..))
 import           Data.TypedEncoding.Internal.Types.Enc
 import           Data.TypedEncoding.Internal.Types.Decoding
-import           Data.TypedEncoding.Internal.Combinators
+import           Data.TypedEncoding.Internal.Combinators.Common
 
 import           Data.TypedEncoding.Internal.Class.Util
 import           Data.Proxy

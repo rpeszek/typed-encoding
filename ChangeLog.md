@@ -19,6 +19,8 @@
   - `Displ String` instance (used in examples, has been made consistent with Text and ByteString)
   - Modules moved: `Data.TypedEncoding.Combinators` merged into `Data.TypedEncoding.Instances`.
 
+- new
+  - `above` combinator subsumes partial encoding / decoding combinators. 
 
 ## 0.2.2 
 

@@ -64,6 +64,8 @@ instance Applicative f => Encode f "enc-B64" "enc-B64" c BL.ByteString where
 encB64BL :: Applicative f => Encoding f "enc-B64" "enc-B64" c BL.ByteString
 encB64BL = mkEncoding (implEncodeP BL64.encode)
 
+
+-- TODO v0.3 remove?
 instance Applicative f => Encode f "enc-B64" "enc-B64" c T.Text where
     encoding = endB64T
 
@@ -90,24 +92,46 @@ decB64BL :: (UnexpectedDecodeErr f, Applicative f) => Decoding f "enc-B64" "enc-
 decB64BL = mkDecoding $ implDecodeF (asUnexpected @"enc-B64" . BL64.decode)
 
 
--- TODO v0.3 should we keep it?
+-- Kept for now but performance issues
 
--- | DEPRECATED
+-- | DEPRECATED (performance)
 instance (UnexpectedDecodeErr f, Applicative f) => Decode f "enc-B64" "enc-B64" c T.Text where
     decoding = decB64T
 
--- | DEPRECATED
+-- | DEPRECATED (performance)
 decB64T :: (UnexpectedDecodeErr f, Applicative f) => Decoding f "enc-B64" "enc-B64" c T.Text
 decB64T = mkDecoding $ implDecodeF (asUnexpected @"enc-B64"  . fmap TE.decodeUtf8 . B64.decode . TE.encodeUtf8) 
 
--- | DEPRECATED
+-- | DEPRECATED (performance)
 instance (UnexpectedDecodeErr f, Applicative f) => Decode f "enc-B64" "enc-B64" c TL.Text where
     decoding = decB64TL
 
--- | DEPRECATED
+-- | DEPRECATED (performance)
 decB64TL :: (UnexpectedDecodeErr f, Applicative f) => Decoding f "enc-B64" "enc-B64" c TL.Text
 decB64TL = mkDecoding $ implDecodeF (asUnexpected @"enc-B64"  . fmap TEL.decodeUtf8 . BL64.decode . TEL.encodeUtf8) 
 
+
+-- * Validation
+
+instance (RecreateErr f, Applicative f) => Validate f "enc-B64" "enc-B64" c B.ByteString where
+    validation = validFromDec decB64B
+
+instance (RecreateErr f, Applicative f) => Validate f "enc-B64" "enc-B64" c BL.ByteString where
+    validation = validFromDec decB64BL
+
+instance (RecreateErr f, Applicative f) => Validate f "enc-B64" "enc-B64" c T.Text where
+    validation = validFromDec decB64T
+
+instance (RecreateErr f, Applicative f) => Validate f "enc-B64" "enc-B64" c TL.Text where
+    validation = validFromDec decB64TL
+
+-- | Lenient decoding does not fail
+instance Applicative f => Validate f "enc-B64-len" "enc-B64-len" c B.ByteString where
+    validation = mkValidation $ implTranP id
+
+-- | Lenient decoding does not fail
+instance Applicative f => Validate f "enc-B64-len" "enc-B64-len" c BL.ByteString where
+    validation = mkValidation $ implTranP id
 
 ---------------------------
 -- TODO OLD
@@ -119,30 +143,15 @@ decB64TL = mkDecoding $ implDecodeF (asUnexpected @"enc-B64"  . fmap TEL.decodeU
 --     encodeF = implEncodeP B64.encode 
         
 
-instance (RecreateErr f, Applicative f) => RecreateF f (Enc xs c B.ByteString) (Enc ("enc-B64" ': xs) c B.ByteString) where
-    checkPrevF = implCheckPrevF (asRecreateErr @"enc-B64" .  B64.decode) 
-
-instance Applicative f => RecreateF f (Enc xs c B.ByteString) (Enc ("enc-B64-len" ': xs) c B.ByteString) where
-    checkPrevF = implTranP id
 
 -- instance Applicative f => EncodeF f  (Enc xs c BL.ByteString) (Enc ("enc-B64" ': xs) c BL.ByteString) where
 --     encodeF = implEncodeP BL64.encode 
 
 
-instance (RecreateErr f, Applicative f) => RecreateF f (Enc xs c BL.ByteString) (Enc ("enc-B64" ': xs) c BL.ByteString) where
-    checkPrevF = implCheckPrevF (asRecreateErr @"enc-B64" .  BL64.decode) 
-
-instance Applicative f => RecreateF f (Enc xs c BL.ByteString) (Enc ("enc-B64-len" ': xs) c BL.ByteString) where
-    checkPrevF = implTranP id
 
 
-
-instance (RecreateErr f, Applicative f) => RecreateF f (Enc xs c T.Text) (Enc ("enc-B64" ': xs) c T.Text) where
-    checkPrevF = implCheckPrevF (asRecreateErr @"enc-B64" . fmap TE.decodeUtf8 .  B64.decode . TE.encodeUtf8) 
 
 -- instance Applicative f => EncodeF f (Enc xs c TL.Text) (Enc ("enc-B64" ': xs) c TL.Text) where
 --     encodeF = implEncodeP (TEL.decodeUtf8 . BL64.encode . TEL.encodeUtf8)   
 
 
-instance (RecreateErr f, Applicative f) => RecreateF f (Enc xs c TL.Text) (Enc ("enc-B64" ': xs) c TL.Text) where
-    checkPrevF = implCheckPrevF (asRecreateErr @"enc-B64" . fmap TEL.decodeUtf8 .  BL64.decode . TEL.encodeUtf8) 

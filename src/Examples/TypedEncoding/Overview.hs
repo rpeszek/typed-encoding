@@ -68,16 +68,16 @@ helloB64 = encAll . toEncoding () $ "Hello World"
 helloB64Decoded :: B.ByteString
 helloB64Decoded = fromEncoding . decAll $ helloB64
 
--- | 'recreateFAll' allows for recovering data at program boundaries (for example, when parsing JSON input).
+-- | 'recrFAll' allows for recovering data at program boundaries (for example, when parsing JSON input).
 -- It makes sure that the content satisfies specified encodings.
 -- 
--- >>> recreateFAll . toEncoding () $ "SGVsbG8gV29ybGQ=" :: Either RecreateEx (Enc '["enc-B64"] () B.ByteString)
+-- >>> recrFAll . toEncoding () $ "SGVsbG8gV29ybGQ=" :: Either RecreateEx (Enc '["enc-B64"] () B.ByteString)
 -- Right (MkEnc Proxy () "SGVsbG8gV29ybGQ=")
 --
--- >>> recreateFAll . toEncoding () $ "SGVsbG8gV29ybGQ" :: Either RecreateEx (Enc '["enc-B64"] () B.ByteString)
+-- >>> recrFAll . toEncoding () $ "SGVsbG8gV29ybGQ" :: Either RecreateEx (Enc '["enc-B64"] () B.ByteString)
 -- Left (RecreateEx "enc-B64" ("invalid padding"))
 --
--- The above example start by placing payload in zero-encoded @Enc '[] ()@ type and then apply 'recreateFAll'
+-- The above example start by placing payload in zero-encoded @Enc '[] ()@ type and then apply 'recrFAll'
 -- this is a good way to recreate encoded type if encoding is known. 
 --
 -- If is it not, 'UncheckedEnc' type can be used. 
@@ -87,10 +87,10 @@ helloB64Decoded = fromEncoding . decAll $ helloB64
 -- This module is concerned only with the first approach. 
 --
 -- >>> let unchecked = toUncheckedEnc ["enc-B64"] () ("SGVsbG8gV29ybGQ=" :: T.Text)
--- >>> verifyUncheckedEnc' @'["enc-B64"] unchecked
+-- >>> check @'["enc-B64"] @(Either RecreateEx) unchecked
 -- Just (Right (MkEnc Proxy () "SGVsbG8gV29ybGQ="))
 helloB64Recovered :: Either RecreateEx (Enc '["enc-B64"] () B.ByteString)
-helloB64Recovered = recreateFAll . toEncoding () $ "SGVsbG8gV29ybGQ="
+helloB64Recovered = recrFAll . toEncoding () $ "SGVsbG8gV29ybGQ="
 
 -- | "Hello World" double-Base64 encoded.
 -- Notice the same code used as in single encoding, the game is played at type level.
@@ -136,10 +136,10 @@ helloB64B64Decoded = fromEncoding . decAll $ helloB64B64
 --
 -- Again, notice the same expression is used as in previous recovery. 
 --
--- >>> recreateFAll . toEncoding () $ "SGVsbG8gV29ybGQ=" :: Either RecreateEx (Enc '["enc-B64", "enc-B64"] () B.ByteString)
+-- >>> recrFAll . toEncoding () $ "SGVsbG8gV29ybGQ=" :: Either RecreateEx (Enc '["enc-B64", "enc-B64"] () B.ByteString)
 -- Left (RecreateEx "enc-B64" ("invalid padding"))
 helloB64B64RecoveredErr :: Either RecreateEx (Enc '["enc-B64", "enc-B64"] () B.ByteString)
-helloB64B64RecoveredErr = recreateFAll . toEncoding () $ "SGVsbG8gV29ybGQ="
+helloB64B64RecoveredErr = recrFAll . toEncoding () $ "SGVsbG8gV29ybGQ="
 
 
 

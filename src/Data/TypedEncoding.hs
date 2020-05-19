@@ -138,14 +138,17 @@ module Data.TypedEncoding (
     module Data.TypedEncoding
     -- * Classes
     , module Data.TypedEncoding.Internal.Class
+    -- TODO v0.3
     -- * Encoding class and Encoder (replaces EncodeFAll)
     , module Data.TypedEncoding.Internal.Class.Encoder
     -- * Combinators
-    , module Data.TypedEncoding.Internal.Combinators
+    , module Data.TypedEncoding.Internal.Combinators.Common
+    , module Data.TypedEncoding.Internal.Combinators.Validate
     -- * Types
     -- TODO v0.3 move back to selective imports?
     , module Data.TypedEncoding.Internal.Types.Enc
     , module Data.TypedEncoding.Internal.Types.Decoding
+    , module Data.TypedEncoding.Internal.Types.Validation
     , CheckedEnc
     , EncodeEx(..)
     , RecreateEx(..)
@@ -174,9 +177,11 @@ module Data.TypedEncoding (
 import           Data.TypedEncoding.Internal.Types
 import           Data.TypedEncoding.Internal.Types.Enc
 import           Data.TypedEncoding.Internal.Types.Decoding
- 
+import           Data.TypedEncoding.Internal.Types.Validation
+
 import           Data.TypedEncoding.Internal.Types.SomeEnc
 import           Data.TypedEncoding.Internal.Types.UncheckedEnc
 import           Data.TypedEncoding.Internal.Class
-import           Data.TypedEncoding.Internal.Combinators
+import           Data.TypedEncoding.Internal.Combinators.Common
+import           Data.TypedEncoding.Internal.Combinators.Validate
 import           Data.TypedEncoding.Internal.Class.Encoder
