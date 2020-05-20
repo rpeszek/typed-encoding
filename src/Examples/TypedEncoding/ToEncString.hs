@@ -250,7 +250,7 @@ recreateEncoding = mapM encodefn
 -- (like trying to decode base 64 on a plain text part).
 --
 -- >>> decodeB64ForTextOnly <$> recreateEncoding tstEmail
--- Right (SimplifiedEmailF {emailHeader = "Some Header", parts = [MkCheckedEnc ["enc-B64"] () "U29tZSBBU0NJSSBUZXh0",MkCheckedEnc ["r-ASCII"] () "Some ASCII Text",MkCheckedEnc ["r-UTF8"] () "Some UTF8 Text",MkCheckedEnc ["r-ASCII"] () "Some ASCII plain text"]})
+-- Right (SimplifiedEmailF {emailHeader = "Some Header", parts = [UnsafeMkCheckedEnc ["enc-B64"] () "U29tZSBBU0NJSSBUZXh0",UnsafeMkCheckedEnc ["r-ASCII"] () "Some ASCII Text",UnsafeMkCheckedEnc ["r-UTF8"] () "Some UTF8 Text",UnsafeMkCheckedEnc ["r-ASCII"] () "Some ASCII plain text"]})
 --
 -- Combinator @fromCheckedEnc \@'["enc-B64", "r-UTF8"]@ acts as a selector and picks only the
 -- @["enc-B64", "r-UTF8"]@ values from our 'Traversable' type. 
@@ -261,7 +261,7 @@ recreateEncoding = mapM encodefn
 --
 -- >>> let piece = unsafeCheckedEnc ["enc-B64","r-ASCII"] () ("U29tZSBBU0NJSSBUZXh0" :: B.ByteString)
 -- >>> displ piece
--- "MkCheckedEnc [enc-B64,r-ASCII] () (ByteString U29tZSBBU0NJSSBUZXh0)"
+-- "UnsafeMkCheckedEnc [enc-B64,r-ASCII] () (ByteString U29tZSBBU0NJSSBUZXh0)"
 --
 -- This code will not pick it up:
 --
@@ -276,7 +276,7 @@ recreateEncoding = mapM encodefn
 -- so we can apply the decoding on the selected piece 
 --
 -- >>> fmap (toCheckedEnc . decPart @'["enc-B64"]) . fromCheckedEnc @ '["enc-B64", "r-ASCII"] $ piece
--- Just (MkCheckedEnc ["r-ASCII"] () "Some ASCII Text")
+-- Just (UnsafeMkCheckedEnc ["r-ASCII"] () "Some ASCII Text")
 
 decodeB64ForTextOnly :: SimplifiedEmailEncB -> SimplifiedEmailEncB
 decodeB64ForTextOnly = fmap (runAlternatives fromMaybe [tryUtf8, tryAscii]) 

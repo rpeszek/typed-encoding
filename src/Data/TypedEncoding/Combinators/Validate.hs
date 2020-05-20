@@ -11,6 +11,7 @@
 module Data.TypedEncoding.Combinators.Validate where
 
 import           Data.TypedEncoding.Combinators.Common
+import           Data.TypedEncoding.Combinators.Unsafe
 import           Data.TypedEncoding.Common.Types
 import           Data.TypedEncoding.Common.Class.Validate
 import           Data.TypedEncoding.Common.Class.Util (SymbolList, Append)

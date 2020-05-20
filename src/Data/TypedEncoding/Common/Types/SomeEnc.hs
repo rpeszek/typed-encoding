@@ -23,10 +23,11 @@ import           Data.TypedEncoding.Common.Types.CheckedEnc
 -- $setup
 -- >>> :set -XOverloadedStrings -XMultiParamTypeClasses -XDataKinds -XAllowAmbiguousTypes
 -- >>> import qualified Data.Text as T
+-- >>> import Data.TypedEncoding.Combinators.Unsafe
 
 
 
--- | Existentially quantified quanitified @Enc@
+-- | Existentially quantified quantified @Enc@
 -- effectively isomorphic to 'CheckedEnc'
 data SomeEnc conf str where
     MkSomeEnc :: SymbolList xs => Enc xs conf str -> SomeEnc conf str
@@ -40,7 +41,7 @@ toSome = MkSomeEnc
 -- | 
 -- >>> let enctest = unsafeSetPayload () "hello" :: Enc '["TEST"] () T.Text
 -- >>> someToChecked . MkSomeEnc $ enctest
--- MkCheckedEnc ["TEST"] () "hello"
+-- UnsafeMkCheckedEnc ["TEST"] () "hello"
 someToChecked :: SomeEnc conf str -> CheckedEnc conf str
 someToChecked se = withSomeEnc se toCheckedEnc
 
@@ -49,7 +50,7 @@ someToChecked se = withSomeEnc se toCheckedEnc
 -- >>> displ $ checkedToSome tst
 -- "Some (MkEnc '[TEST] () (String test))"
 checkedToSome :: CheckedEnc conf str -> SomeEnc conf str
-checkedToSome (MkCheckedEnc xs c s) = withSomeAnnotation (someAnnValue xs) (\p -> MkSomeEnc (MkEnc p c s))
+checkedToSome (UnsafeMkCheckedEnc xs c s) = withSomeAnnotation (someAnnValue xs) (\p -> MkSomeEnc (MkEnc p c s))
 
 
 -- |

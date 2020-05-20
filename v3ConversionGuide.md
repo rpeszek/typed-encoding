@@ -142,3 +142,5 @@ Other notes:
 
 -  `Data.TypedEncoding.Instances.ToEncString.Common` and `Data.TypedEncoding.Instances.Restriction.Common`
    merged into Data.TypedEncoding.Instances.Restriction.Misc
+
+- private `MkCheckedEnc` constructor became `UnsafeMkCheckedEnc`

@@ -26,10 +26,9 @@ import           Data.TypedEncoding.Common.Class.Decode
 import           Data.TypedEncoding.Common.Class.Validate
 import           Data.TypedEncoding.Common.Class.Superset
 
-import           Data.TypedEncoding.Common.Types (Enc(..) 
-                                                   , withUnsafeCoerce
-                                                   -- , getPayload
-                                                   )
+import           Data.TypedEncoding.Common.Types (Enc(..) )
+import           Data.TypedEncoding.Combinators.Unsafe (withUnsafeCoerce)
+
 import           Data.Functor.Identity
 import           GHC.TypeLits
 

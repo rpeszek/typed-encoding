@@ -17,6 +17,7 @@ import           Data.String
 import           Data.Proxy
 import           Text.Read
 import           Data.TypedEncoding.Common.Types
+import           Data.TypedEncoding.Combinators.Unsafe
 import           Data.TypedEncoding.Common.Class.IsStringR 
 import           GHC.TypeLits
 
@@ -69,7 +70,7 @@ splitSomePayload :: forall c s1 s2 .
              ([EncAnn] -> s1 -> [([EncAnn], s2)]) 
              -> CheckedEnc c s1 
              -> [CheckedEnc c s2]
-splitSomePayload f (MkCheckedEnc ann1 c s1) = map (\(ann2, s2) -> MkCheckedEnc ann2 c s2) (f ann1 s1)
+splitSomePayload f (UnsafeMkCheckedEnc ann1 c s1) = map (\(ann2, s2) -> UnsafeMkCheckedEnc ann2 c s2) (f ann1 s1)
 
 
 -- * Utility combinators 

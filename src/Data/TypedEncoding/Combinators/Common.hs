@@ -11,6 +11,7 @@
 module Data.TypedEncoding.Combinators.Common where
 
 import           Data.TypedEncoding.Common.Types
+import           Data.TypedEncoding.Combinators.Unsafe
 import           Data.TypedEncoding.Common.Class.Util (Append)
 import           GHC.TypeLits
 import           Data.Proxy
@@ -42,5 +43,10 @@ above fn (MkEnc _ conf str) =
     let re ::Enc ys c str = fn $ MkEnc Proxy conf str
     in  MkEnc Proxy conf . getPayload $ re
 
--- * Converting 'UncheckedEnc' to 'Enc'
+
+-- * Other 
+
+getTransformF :: forall e1 e2 f c s1 s2 . Functor f => (Enc e1 c s1 -> f (Enc e2 c s2)) -> c -> s1 -> f s2
+getTransformF fn c str = getPayload <$> fn (unsafeSetPayload c str)
+
 

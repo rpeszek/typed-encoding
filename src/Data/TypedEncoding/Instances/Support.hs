@@ -22,12 +22,13 @@ module Data.TypedEncoding.Instances.Support (
     , module Data.TypedEncoding.Instances.Support.Helpers
     -- * Type level conveniences
     , module Data.TypedEncoding.Common.Util.TypeLits
+    , module Data.TypedEncoding.Combinators.Unsafe
    ) where
 import           Data.TypedEncoding.Common.Types
-import           Data.TypedEncoding.Internal.Enc (getTransformF)
 import           Data.TypedEncoding.Common.Class 
 import           Data.TypedEncoding.Instances.Support.Helpers 
 import           Data.TypedEncoding.Common.Util.TypeLits
+import           Data.TypedEncoding.Combinators.Unsafe 
 
 import           GHC.TypeLits
 import           Data.Proxy

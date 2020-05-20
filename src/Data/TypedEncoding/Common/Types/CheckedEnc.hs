@@ -22,6 +22,7 @@ import           Data.Proxy
 -- $setup
 -- >>> :set -XOverloadedStrings -XMultiParamTypeClasses -XDataKinds -XAllowAmbiguousTypes
 -- >>> import qualified Data.Text as T
+-- >>> import  Data.TypedEncoding.Combinators.Unsafe (unsafeSetPayload)
 
 
 -- * Untyped Enc
@@ -34,25 +35,25 @@ import           Data.Proxy
 -- @CheckedEnc@ is untyped version of 'Data.TypedEncoding.Internal.Enc.Enc'. 
 -- @CheckedEnc@ contains verified encoded data, encoding is visible
 -- at the value level only.
-data CheckedEnc conf str = MkCheckedEnc [EncAnn] conf str
+data CheckedEnc conf str = UnsafeMkCheckedEnc [EncAnn] conf str
      deriving (Show, Eq) 
 
 unsafeCheckedEnc:: [EncAnn] -> c -> s -> CheckedEnc c s
-unsafeCheckedEnc = MkCheckedEnc
+unsafeCheckedEnc = UnsafeMkCheckedEnc
 
 getCheckedPayload :: CheckedEnc conf str -> str
 getCheckedPayload = snd . getCheckedEncPayload
 
 getCheckedEncPayload :: CheckedEnc conf str -> ([EncAnn], str) 
-getCheckedEncPayload (MkCheckedEnc t _ s) = (t,s)
+getCheckedEncPayload (UnsafeMkCheckedEnc t _ s) = (t,s)
 
 toCheckedEnc :: forall xs c str . (SymbolList xs) => Enc xs c str -> CheckedEnc c str 
 toCheckedEnc (MkEnc p c s) = 
-        MkCheckedEnc (symbolVals @ xs) c s   
+        UnsafeMkCheckedEnc (symbolVals @ xs) c s   
 
 
 fromCheckedEnc :: forall xs c str . SymbolList xs => CheckedEnc c str -> Maybe (Enc xs c str)
-fromCheckedEnc (MkCheckedEnc xs c s) = 
+fromCheckedEnc (UnsafeMkCheckedEnc xs c s) = 
     let p = Proxy :: Proxy xs
     in if symbolVals @ xs == xs
        then Just $ MkEnc p c s
@@ -61,7 +62,7 @@ fromCheckedEnc (MkCheckedEnc xs c s) =
 ------------------------
 
 -- |
--- >>> let encsometest = MkCheckedEnc ["TEST"] () $ T.pack "hello"
+-- >>> let encsometest = UnsafeMkCheckedEnc ["TEST"] () $ T.pack "hello"
 -- >>> proc_toCheckedEncFromCheckedEnc @'["TEST"] encsometest
 -- True
 -- >>> proc_toCheckedEncFromCheckedEnc @'["TEST1"] encsometest
@@ -78,8 +79,8 @@ proc_fromCheckedEncToCheckedEnc x = (== Just x) . fromCheckedEnc . toCheckedEnc 
 
 -- |
 -- >>> displ $ unsafeCheckedEnc ["TEST"] () ("hello" :: T.Text)
--- "MkCheckedEnc [TEST] () (Text hello)"
+-- "UnsafeMkCheckedEnc [TEST] () (Text hello)"
 instance (Show c, Displ str) => Displ (CheckedEnc c str) where
-    displ (MkCheckedEnc xs c s) = 
-        "MkCheckedEnc " ++ displ xs  ++ " " ++ show c ++ " " ++ displ s
+    displ (UnsafeMkCheckedEnc xs c s) = 
+        "UnsafeMkCheckedEnc " ++ displ xs  ++ " " ++ show c ++ " " ++ displ s
 

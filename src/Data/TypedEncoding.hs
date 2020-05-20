@@ -134,47 +134,54 @@
 --
 -- * "Examples.TypedEncoding"    
 module Data.TypedEncoding (
-    module Data.TypedEncoding
+  
+    -- * @Enc@ and basic combinators
+    Enc
+    , toEncoding
+    , fromEncoding
+    , getPayload
 
+    -- * Existentially quantified and untyped versions of @Enc@
+    , module Data.TypedEncoding.Common.Types.SomeEnc
+    , module  Data.TypedEncoding.Common.Types.CheckedEnc
+
+    -- * @Encoding@ and basic combinators
+    , Encoding (..)
+    , mkEncoding
+    , runEncoding
+    , _runEncoding 
+  
+    -- * List of encodings
+    , Encodings (..)
+    , runEncodings
+    , _runEncodings
+
+    -- * Similar to @Encoding@ and @Encodings@ but cover /Decoding/ and /Validation/
+    , module Data.TypedEncoding.Common.Types.Decoding
+    , module Data.TypedEncoding.Common.Types.Validation
+
+    -- * @UncheckedEnc@ is an /untyped/ version of Enc that represents not validated encoding      
+    , module Data.TypedEncoding.Common.Types.UncheckedEnc
+ 
     -- * Classes
     , module Data.TypedEncoding.Common.Class
+  
+    -- TODO cleaup types
+    , recreateErrUnknown
 
     -- * Combinators
     , module Data.TypedEncoding.Combinators.Common
     , module Data.TypedEncoding.Combinators.Encode
     , module Data.TypedEncoding.Combinators.Decode
     , module Data.TypedEncoding.Combinators.Validate
+    , module Data.TypedEncoding.Combinators.Unsafe
 
-    -- * Types
-    -- TODO v0.3 move back to selective imports?
-    , module Data.TypedEncoding.Internal.Enc
-    , module Data.TypedEncoding.Common.Types.Decoding
-    , module Data.TypedEncoding.Common.Types.Validation
-    , CheckedEnc
-
-    -- * Exceptions 
+   -- * Exceptions 
     , EncodeEx(..)
     , RecreateEx(..)
     , UnexpectedDecodeEx(..)
     , EncAnn 
-    -- * Existentially quantified version of @Enc@ and basic combinators
-    , module Data.TypedEncoding.Common.Types.SomeEnc
-    -- * Types and combinators for not verfied encoding 
-    , module Data.TypedEncoding.Common.Types.UncheckedEnc
-    -- * Basic @Enc@ Combinators
-    
-    --, getPayload 
-    --, unsafeSetPayload
-    --, fromEncoding
-    --, toEncoding
-    -- * Basic @CheckedEnc@ Combinators  
-    , unsafeCheckedEnc
-    , getCheckedPayload
-    , getCheckedEncPayload
-    , toCheckedEnc
-    , fromCheckedEnc
-    -- * Other Basic Combinators     
-    , recreateErrUnknown
+
  ) where
 
 import           Data.TypedEncoding.Common.Types
@@ -182,6 +189,7 @@ import           Data.TypedEncoding.Internal.Enc
 import           Data.TypedEncoding.Common.Types.Decoding
 import           Data.TypedEncoding.Common.Types.Validation
 
+import           Data.TypedEncoding.Common.Types.CheckedEnc
 import           Data.TypedEncoding.Common.Types.SomeEnc
 import           Data.TypedEncoding.Common.Types.UncheckedEnc
 import           Data.TypedEncoding.Common.Class
@@ -189,3 +197,4 @@ import           Data.TypedEncoding.Combinators.Common
 import           Data.TypedEncoding.Combinators.Encode
 import           Data.TypedEncoding.Combinators.Decode
 import           Data.TypedEncoding.Combinators.Validate
+import           Data.TypedEncoding.Combinators.Unsafe
