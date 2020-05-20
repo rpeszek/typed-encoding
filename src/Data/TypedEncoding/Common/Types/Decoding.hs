@@ -14,13 +14,13 @@
 -- Internal definition of types
 --
 -- Decoding types for @Enc@
-module Data.TypedEncoding.Types.Decoding where
+module Data.TypedEncoding.Common.Types.Decoding where
 
 import           Data.Proxy
 import           GHC.TypeLits
 
 import           Data.TypedEncoding.Internal.Enc
-import           Data.TypedEncoding.Types.Common
+import           Data.TypedEncoding.Common.Types.Common
 
 
 data Decoding f (nm :: Symbol) (alg :: Symbol) conf str where

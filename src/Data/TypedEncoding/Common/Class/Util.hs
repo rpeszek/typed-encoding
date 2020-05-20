@@ -11,9 +11,9 @@
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE AllowAmbiguousTypes #-}
 
-module Data.TypedEncoding.Class.Util where
+module Data.TypedEncoding.Common.Class.Util where
 
-import           Data.TypedEncoding.Types.Common
+import           Data.TypedEncoding.Common.Types.Common
 
 import qualified Data.ByteString.Char8 as B
 import qualified Data.ByteString.Lazy.Char8 as BL

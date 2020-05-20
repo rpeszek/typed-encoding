@@ -12,12 +12,12 @@
 {-# LANGUAGE GADTs #-}
 {-# LANGUAGE AllowAmbiguousTypes #-}
 
-module Data.TypedEncoding.Class.Superset where
+module Data.TypedEncoding.Common.Class.Superset where
 
-import           Data.TypedEncoding.Util.TypeLits
---import           Data.TypedEncoding.Class.Util (displ)
+import           Data.TypedEncoding.Common.Util.TypeLits
+--import           Data.TypedEncoding.Common.Class.Util (displ)
 
-import           Data.TypedEncoding.Types (Enc(..) 
+import           Data.TypedEncoding.Common.Types (Enc(..) 
                                                    , withUnsafeCoerce
                                                    --, unsafeSetPayload
                                                    )
@@ -27,8 +27,8 @@ import           Data.Symbol.Ascii
 
 -- $setup
 -- >>> :set -XOverloadedStrings -XMultiParamTypeClasses -XDataKinds -XTypeApplications
--- >>> import           Data.TypedEncoding.Class.Util (displ)
--- >>> import           Data.TypedEncoding.Types (unsafeSetPayload)
+-- >>> import           Data.TypedEncoding.Common.Class.Util (displ)
+-- >>> import           Data.TypedEncoding.Common.Types (unsafeSetPayload)
 -- >>> import           Data.Text as T
 
 

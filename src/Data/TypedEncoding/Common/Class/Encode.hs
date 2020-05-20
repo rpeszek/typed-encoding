@@ -8,10 +8,10 @@
 {-# LANGUAGE AllowAmbiguousTypes #-}
 {-# LANGUAGE TypeApplications #-}
 
-module Data.TypedEncoding.Class.Encode where
+module Data.TypedEncoding.Common.Class.Encode where
 
 import           Data.TypedEncoding.Internal.Enc
-import           Data.TypedEncoding.Class.Util -- Append
+import           Data.TypedEncoding.Common.Class.Util -- Append
 import           Data.TypedEncoding.Combinators.Common
 import           GHC.TypeLits
 import           Data.Functor.Identity

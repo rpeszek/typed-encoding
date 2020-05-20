@@ -16,8 +16,8 @@ module Data.TypedEncoding.Instances.Support.Helpers where
 import           Data.String
 import           Data.Proxy
 import           Text.Read
-import           Data.TypedEncoding.Types
-import           Data.TypedEncoding.Class.IsStringR 
+import           Data.TypedEncoding.Common.Types
+import           Data.TypedEncoding.Common.Class.IsStringR 
 import           GHC.TypeLits
 
 -- TODO v0.3 some of this needs to move to call side exported combinators

@@ -12,11 +12,11 @@
 -- |
 -- Module defines 'CheckedEnc' - untyped ADT version of 'Enc' 
 
-module Data.TypedEncoding.Types.CheckedEnc where
+module Data.TypedEncoding.Common.Types.CheckedEnc where
 
 import           Data.TypedEncoding.Internal.Enc
-import           Data.TypedEncoding.Types.Common
-import           Data.TypedEncoding.Class.Util
+import           Data.TypedEncoding.Common.Types.Common
+import           Data.TypedEncoding.Common.Class.Util
 import           Data.Proxy
 
 -- $setup

@@ -11,22 +11,22 @@
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE AllowAmbiguousTypes #-}
 
-module Data.TypedEncoding.Class (
-    module Data.TypedEncoding.Class
-    , module Data.TypedEncoding.Class.Util
-    , module Data.TypedEncoding.Class.Encode
-    , module Data.TypedEncoding.Class.Decode
-    , module Data.TypedEncoding.Class.Validate 
-    , module Data.TypedEncoding.Class.Superset 
+module Data.TypedEncoding.Common.Class (
+    module Data.TypedEncoding.Common.Class
+    , module Data.TypedEncoding.Common.Class.Util
+    , module Data.TypedEncoding.Common.Class.Encode
+    , module Data.TypedEncoding.Common.Class.Decode
+    , module Data.TypedEncoding.Common.Class.Validate 
+    , module Data.TypedEncoding.Common.Class.Superset 
   ) where
 
-import           Data.TypedEncoding.Class.Util
-import           Data.TypedEncoding.Class.Encode
-import           Data.TypedEncoding.Class.Decode
-import           Data.TypedEncoding.Class.Validate
-import           Data.TypedEncoding.Class.Superset
+import           Data.TypedEncoding.Common.Class.Util
+import           Data.TypedEncoding.Common.Class.Encode
+import           Data.TypedEncoding.Common.Class.Decode
+import           Data.TypedEncoding.Common.Class.Validate
+import           Data.TypedEncoding.Common.Class.Superset
 
-import           Data.TypedEncoding.Types (Enc(..) 
+import           Data.TypedEncoding.Common.Types (Enc(..) 
                                                    , withUnsafeCoerce
                                                    -- , getPayload
                                                    )

@@ -18,7 +18,7 @@ import           Data.Proxy
 -- import           Data.Word
 import           Text.Read
 
-import           Data.TypedEncoding.Class.IsStringR
+import           Data.TypedEncoding.Common.Class.IsStringR
 import           Data.TypedEncoding.Instances.Support
 
 -- $setup

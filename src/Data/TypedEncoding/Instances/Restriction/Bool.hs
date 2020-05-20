@@ -36,7 +36,7 @@ import           Data.Symbol.Ascii
 
 import           Data.TypedEncoding
 import           Data.TypedEncoding.Instances.Support
--- import           Data.TypedEncoding.Util.TypeLits
+-- import           Data.TypedEncoding.Common.Util.TypeLits
 
 -- import qualified Data.Text as T
 -- import           Data.TypedEncoding.Instances.Restriction.Misc()

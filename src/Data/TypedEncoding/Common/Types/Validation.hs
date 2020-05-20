@@ -14,14 +14,14 @@
 -- Internal definition of types
 --
 -- Validation types for @Enc@
-module Data.TypedEncoding.Types.Validation where
+module Data.TypedEncoding.Common.Types.Validation where
 
 import           Data.Proxy
 import           GHC.TypeLits
 
 import           Data.TypedEncoding.Internal.Enc
-import           Data.TypedEncoding.Types.Common
-import           Data.TypedEncoding.Types.UncheckedEnc
+import           Data.TypedEncoding.Common.Types.Common
+import           Data.TypedEncoding.Common.Types.UncheckedEnc
 
 -- |
 -- Validation unwraps a layer of encoding and offers payload data down the encoding stack

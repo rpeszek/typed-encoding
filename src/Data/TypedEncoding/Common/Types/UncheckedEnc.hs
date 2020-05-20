@@ -11,11 +11,11 @@
 -- |
 -- Internal definition of types
 
-module Data.TypedEncoding.Types.UncheckedEnc where
+module Data.TypedEncoding.Common.Types.UncheckedEnc where
 
 import           Data.Proxy
-import           Data.TypedEncoding.Class.Util
-import           Data.TypedEncoding.Types.Common
+import           Data.TypedEncoding.Common.Class.Util
+import           Data.TypedEncoding.Common.Types.Common
 
 -- $setup
 -- >>> :set -XOverloadedStrings -XMultiParamTypeClasses -XDataKinds -XAllowAmbiguousTypes
@@ -26,7 +26,7 @@ import           Data.TypedEncoding.Types.Common
 
 -- | Represents some encoded string where encoding was not validated.
 --
--- Similar to 'Data.TypedEncoding.Types.CheckedEnc' but unlike
+-- Similar to 'Data.TypedEncoding.Common.Types.CheckedEnc' but unlike
 -- @CheckedEnc@ it can contain payloads that have invalid encoding.
 -- 
 data UncheckedEnc c str = MkUncheckedEnc [EncAnn] c str deriving (Show, Eq)

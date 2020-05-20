@@ -11,13 +11,13 @@
 -- {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE AllowAmbiguousTypes #-}
 
-module Data.TypedEncoding.Class.Validate where
+module Data.TypedEncoding.Common.Class.Validate where
 
-import           Data.TypedEncoding.Types (UnexpectedDecodeEx(..), RecreateEx(..))
+import           Data.TypedEncoding.Common.Types (UnexpectedDecodeEx(..), RecreateEx(..))
 import           Data.TypedEncoding.Internal.Enc
-import           Data.TypedEncoding.Types.Validation
+import           Data.TypedEncoding.Common.Types.Validation
 
-import           Data.TypedEncoding.Class.Util
+import           Data.TypedEncoding.Common.Class.Util
 import           Data.Proxy
 import           Data.Functor.Identity
 import           GHC.TypeLits

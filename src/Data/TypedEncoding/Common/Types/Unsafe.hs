@@ -4,10 +4,10 @@
 {-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE FlexibleInstances #-}
 
-module Data.TypedEncoding.Types.Unsafe where
+module Data.TypedEncoding.Common.Types.Unsafe where
 
 import           Data.Proxy
-import           Data.TypedEncoding.Types
+import           Data.TypedEncoding.Common.Types
 
  
 -- | Allows to operate within Enc. These are considered unsafe.

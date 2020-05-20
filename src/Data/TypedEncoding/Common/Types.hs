@@ -11,31 +11,31 @@
 -- |
 -- Internal definition of types
 
-module Data.TypedEncoding.Types (
-        module Data.TypedEncoding.Types
+module Data.TypedEncoding.Common.Types (
+        module Data.TypedEncoding.Common.Types
         -- * Main encoding type and basic combinators.
         , module Data.TypedEncoding.Internal.Enc
-        , module Data.TypedEncoding.Types.Decoding
-        , module Data.TypedEncoding.Types.Validation
+        , module Data.TypedEncoding.Common.Types.Decoding
+        , module Data.TypedEncoding.Common.Types.Validation
         -- * Untyped version and existentially quantified versions of Enc
-        , module Data.TypedEncoding.Types.CheckedEnc
+        , module Data.TypedEncoding.Common.Types.CheckedEnc
         -- * Not verified encoded data
-        , module Data.TypedEncoding.Types.UncheckedEnc
+        , module Data.TypedEncoding.Common.Types.UncheckedEnc
         -- * Commmon types
-        , module Data.TypedEncoding.Types.Common
+        , module Data.TypedEncoding.Common.Types.Common
     ) where
 
 import           Data.TypedEncoding.Internal.Enc
-import           Data.TypedEncoding.Types.Decoding
-import           Data.TypedEncoding.Types.Validation
-import           Data.TypedEncoding.Types.CheckedEnc
-import           Data.TypedEncoding.Types.UncheckedEnc
-import           Data.TypedEncoding.Types.Common
+import           Data.TypedEncoding.Common.Types.Decoding
+import           Data.TypedEncoding.Common.Types.Validation
+import           Data.TypedEncoding.Common.Types.CheckedEnc
+import           Data.TypedEncoding.Common.Types.UncheckedEnc
+import           Data.TypedEncoding.Common.Types.Common
 
 import           Data.Proxy
 -- import           Data.Functor.Identity
 import           GHC.TypeLits
--- import           Data.TypedEncoding.Class.Util
+-- import           Data.TypedEncoding.Common.Class.Util
 
 -- $setup
 -- >>> :set -XOverloadedStrings -XMultiParamTypeClasses -XDataKinds -XAllowAmbiguousTypes

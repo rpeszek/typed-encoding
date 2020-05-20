@@ -10,8 +10,8 @@
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE AllowAmbiguousTypes #-}
 
--- | Future replacement for "Data.TypedEncoding.Class.IsStringR"
-module Data.TypedEncoding.Class.Util.StringConstraints where
+-- | Future replacement for "Data.TypedEncoding.Common.Class.IsStringR"
+module Data.TypedEncoding.Common.Class.Util.StringConstraints where
 
 import qualified Data.List as L
 import qualified Data.Text as T

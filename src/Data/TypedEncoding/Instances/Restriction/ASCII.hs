@@ -22,7 +22,7 @@
 module Data.TypedEncoding.Instances.Restriction.ASCII where
 
 import           Data.TypedEncoding.Instances.Support
-import           Data.TypedEncoding.Class.Util.StringConstraints
+import           Data.TypedEncoding.Common.Class.Util.StringConstraints
 
 import           Data.TypedEncoding.Internal.Util (explainBool)
 import           Data.Char

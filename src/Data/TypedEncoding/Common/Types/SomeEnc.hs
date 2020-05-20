@@ -13,12 +13,12 @@
 -- Module defines 'SomeEnc' - existentially quantified version of @Enc@
 -- and basic combinators
 
-module Data.TypedEncoding.Types.SomeEnc where
+module Data.TypedEncoding.Common.Types.SomeEnc where
 
 import           Data.TypedEncoding.Internal.Enc
-import           Data.TypedEncoding.Class.Util
-import           Data.TypedEncoding.Types.SomeAnnotation
-import           Data.TypedEncoding.Types.CheckedEnc
+import           Data.TypedEncoding.Common.Class.Util
+import           Data.TypedEncoding.Common.Types.SomeAnnotation
+import           Data.TypedEncoding.Common.Types.CheckedEnc
 
 -- $setup
 -- >>> :set -XOverloadedStrings -XMultiParamTypeClasses -XDataKinds -XAllowAmbiguousTypes

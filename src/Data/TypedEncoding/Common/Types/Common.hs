@@ -10,9 +10,9 @@
 {-# LANGUAGE KindSignatures  #-}
 {-# LANGUAGE UndecidableInstances #-}
 
-module Data.TypedEncoding.Types.Common where
+module Data.TypedEncoding.Common.Types.Common where
 
-import           Data.TypedEncoding.Util.TypeLits
+import           Data.TypedEncoding.Common.Util.TypeLits
 import           GHC.TypeLits
 
 

@@ -6,8 +6,8 @@
 {-# LANGUAGE FlexibleInstances #-}
 
 -- | This Module will be removed in 0.3.x.x in favor of 
--- "Data.TypedEncoding.Class.Util.StringConstraints"
-module Data.TypedEncoding.Class.IsStringR where
+-- "Data.TypedEncoding.Common.Class.Util.StringConstraints"
+module Data.TypedEncoding.Common.Class.IsStringR where
 
 import           Data.Proxy
 
@@ -25,7 +25,7 @@ import qualified Data.Text.Lazy as TL
 -- >>> import Test.QuickCheck.Instances.ByteString()
 
 -- | This class will be removed in 0.3.x.x in favor of classes definined in 
--- "Data.TypedEncoding.Class.Util.StringConstraints"
+-- "Data.TypedEncoding.Common.Class.Util.StringConstraints"
 --
 -- Reverses 'Data.String.IsString'
 --

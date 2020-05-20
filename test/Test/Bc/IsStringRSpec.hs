@@ -29,7 +29,7 @@ import           Test.Hspec
 import           Data.Word
 import           Data.Either
 import           Data.TypedEncoding
-import           Data.TypedEncoding.Class.IsStringR 
+import           Data.TypedEncoding.Common.Class.IsStringR 
 import           Data.TypedEncoding.Instances.Restriction.Misc ()
 
 newtype MyStr = MyStr String deriving (Eq, Show)

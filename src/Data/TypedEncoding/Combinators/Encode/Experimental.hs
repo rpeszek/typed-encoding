@@ -15,13 +15,13 @@ module Data.TypedEncoding.Combinators.Encode.Experimental where
 
 import           Data.TypedEncoding.Combinators.Encode
 import           Data.TypedEncoding.Internal.Enc
-import           Data.TypedEncoding.Types.Common
-import           Data.TypedEncoding.Class.Util -- Append
-import           Data.TypedEncoding.Class.Encode    
+import           Data.TypedEncoding.Common.Types.Common
+import           Data.TypedEncoding.Common.Class.Util -- Append
+import           Data.TypedEncoding.Common.Class.Encode    
 import           Data.Functor.Identity
 import           GHC.TypeLits
 
--- * Combinators equivalent to "Data.TypedEncoding.Class.Encode" that automatically figure out algorithm name.
+-- * Combinators equivalent to "Data.TypedEncoding.Common.Class.Encode" that automatically figure out algorithm name.
 -- Cause slow compilation when used
 
 _encF :: forall nm xs f c str alg . (Encode f nm alg c str, alg ~ AlgNm nm) => Enc xs c str -> f (Enc (nm ': xs) c str)

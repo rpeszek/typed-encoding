@@ -21,11 +21,11 @@
 --
 -- Currently this is spread out in different modules
 --
--- * "Data.TypedEncoding.Class.Util"
--- * "Data.TypedEncoding.Types.SomeAnnotation"
+-- * "Data.TypedEncoding.Common.Class.Util"
+-- * "Data.TypedEncoding.Common.Types.SomeAnnotation"
 --
 -- (TODO) these will need to get consolidated.
-module  Data.TypedEncoding.Util.TypeLits where
+module  Data.TypedEncoding.Common.Util.TypeLits where
 
 import           GHC.TypeLits
 -- import           Data.Symbol.Utils

@@ -11,9 +11,9 @@
 module Data.TypedEncoding.Combinators.Validate where
 
 import           Data.TypedEncoding.Combinators.Common
-import           Data.TypedEncoding.Types
-import           Data.TypedEncoding.Class.Validate
-import           Data.TypedEncoding.Class.Util (SymbolList, Append)
+import           Data.TypedEncoding.Common.Types
+import           Data.TypedEncoding.Common.Class.Validate
+import           Data.TypedEncoding.Common.Class.Util (SymbolList, Append)
 import           GHC.TypeLits
 import           Data.Functor.Identity
 

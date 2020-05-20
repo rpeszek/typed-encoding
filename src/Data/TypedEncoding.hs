@@ -137,7 +137,7 @@ module Data.TypedEncoding (
     module Data.TypedEncoding
 
     -- * Classes
-    , module Data.TypedEncoding.Class
+    , module Data.TypedEncoding.Common.Class
 
     -- * Combinators
     , module Data.TypedEncoding.Combinators.Common
@@ -148,8 +148,8 @@ module Data.TypedEncoding (
     -- * Types
     -- TODO v0.3 move back to selective imports?
     , module Data.TypedEncoding.Internal.Enc
-    , module Data.TypedEncoding.Types.Decoding
-    , module Data.TypedEncoding.Types.Validation
+    , module Data.TypedEncoding.Common.Types.Decoding
+    , module Data.TypedEncoding.Common.Types.Validation
     , CheckedEnc
 
     -- * Exceptions 
@@ -158,9 +158,9 @@ module Data.TypedEncoding (
     , UnexpectedDecodeEx(..)
     , EncAnn 
     -- * Existentially quantified version of @Enc@ and basic combinators
-    , module Data.TypedEncoding.Types.SomeEnc
+    , module Data.TypedEncoding.Common.Types.SomeEnc
     -- * Types and combinators for not verfied encoding 
-    , module Data.TypedEncoding.Types.UncheckedEnc
+    , module Data.TypedEncoding.Common.Types.UncheckedEnc
     -- * Basic @Enc@ Combinators
     
     --, getPayload 
@@ -177,14 +177,14 @@ module Data.TypedEncoding (
     , recreateErrUnknown
  ) where
 
-import           Data.TypedEncoding.Types
+import           Data.TypedEncoding.Common.Types
 import           Data.TypedEncoding.Internal.Enc
-import           Data.TypedEncoding.Types.Decoding
-import           Data.TypedEncoding.Types.Validation
+import           Data.TypedEncoding.Common.Types.Decoding
+import           Data.TypedEncoding.Common.Types.Validation
 
-import           Data.TypedEncoding.Types.SomeEnc
-import           Data.TypedEncoding.Types.UncheckedEnc
-import           Data.TypedEncoding.Class
+import           Data.TypedEncoding.Common.Types.SomeEnc
+import           Data.TypedEncoding.Common.Types.UncheckedEnc
+import           Data.TypedEncoding.Common.Class
 import           Data.TypedEncoding.Combinators.Common
 import           Data.TypedEncoding.Combinators.Encode
 import           Data.TypedEncoding.Combinators.Decode

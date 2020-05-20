@@ -10,8 +10,8 @@
 -- | Combinators reexported in Data.TypedEncoding
 module Data.TypedEncoding.Combinators.Common where
 
-import           Data.TypedEncoding.Types
-import           Data.TypedEncoding.Class.Util (Append)
+import           Data.TypedEncoding.Common.Types
+import           Data.TypedEncoding.Common.Class.Util (Append)
 import           GHC.TypeLits
 import           Data.Proxy
 

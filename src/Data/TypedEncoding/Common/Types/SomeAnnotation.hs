@@ -7,10 +7,10 @@
 {-# LANGUAGE RankNTypes #-}
 
 -- | internally used existential type for taking track of annotations
-module Data.TypedEncoding.Types.SomeAnnotation where
+module Data.TypedEncoding.Common.Types.SomeAnnotation where
 
-import           Data.TypedEncoding.Types.Common
-import           Data.TypedEncoding.Class.Util
+import           Data.TypedEncoding.Common.Types.Common
+import           Data.TypedEncoding.Common.Class.Util
 import           Data.TypedEncoding.Internal.Util
 import           Data.Proxy
 import           GHC.TypeLits

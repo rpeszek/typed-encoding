@@ -18,8 +18,8 @@ module Data.TypedEncoding.Internal.Enc where
 import           Data.Proxy
 import           GHC.TypeLits
 
-import           Data.TypedEncoding.Class.Util
-import           Data.TypedEncoding.Types.Common
+import           Data.TypedEncoding.Common.Class.Util
+import           Data.TypedEncoding.Common.Types.Common
 
 -- $setup
 -- >>> :set -XOverloadedStrings -XMultiParamTypeClasses -XDataKinds -XAllowAmbiguousTypes
@@ -97,7 +97,7 @@ getTransformF fn c str = getPayload <$> fn (unsafeSetPayload c str)
 --
 -- Encoding instance needs to either define a function that return this type or 
 -- implement 
--- 'Data.TypedEncoding.Class.Encode.Encode'
+-- 'Data.TypedEncoding.Common.Class.Encode.Encode'
 -- or (preferably) both.
 --
 -- Similar boilerplate for Decoding and Validation is specified in separate modules.
@@ -130,7 +130,7 @@ _runEncoding = runEncoding @(AlgNm nm)
 -- Wraps a list of @Encoding@ elements.
 --
 -- Similarly to 'Encoding' it can be used with a typeclass
--- 'Data.TypedEncoding.Class.Encode.EncodeAll'
+-- 'Data.TypedEncoding.Common.Class.Encode.EncodeAll'
 data Encodings f (nms :: [Symbol]) (algs :: [Symbol]) conf str where
     -- | constructor is to be treated as Unsafe to Encode and Decode instance implementations
     -- particular encoding instances may expose smart constructors for limited data types
