@@ -97,7 +97,40 @@ recreateAll -> recrAll
 recreateFAll -> recrFAll (forall order changed, first to type variables flipped to nms f c str from f nms)
 ```
 
+### ToString FromString
 
+Changes in order of type variables (new order is more consistent)
+```
+-- old
+class ToEncString x str f a where
+    toEncStringF :: a -> f (Enc '[nm] () str)
+
+-- new
+class ToEncString f nm ann a str where
+    toEncF :: a -> f (Enc '[nm] () str)
+
+-- old
+class FromEncString a f str x where
+
+--
+
+```
+
+```
+order of type variables change in backward compatible combinators: 
+toEncString
+toEncStringF 
+fromEncString
+fromEncStringF
+
+e.g
+-- old
+fromEncString :: forall a str nm . (FromEncString a Identity str nm) => Enc '[nm] () str -> a
+
+-- new
+fromEncString :: forall nm a str  . (FromEncString Identity nm nm a str) => Enc '[nm] () str -> a
+
+```
 
 Other notes:
 

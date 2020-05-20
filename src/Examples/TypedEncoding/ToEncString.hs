@@ -83,7 +83,7 @@ tstIp = IpV4F 128 1 1 10
 -- This is done with help of existing @"r-Word8-decimal"@ annotation defined
 -- in "Data.TypedEncoding.Instances.Restriction.Common"
 --
--- >>> toEncString @"r-IPv4" @T.Text tstIp
+-- >>> toEncString @"r-IPv4" @IpV4 @T.Text tstIp
 -- MkEnc Proxy () "128.1.1.10"
 --
 -- Implementation is a classic map reduce where reduce is done with help of
@@ -107,8 +107,8 @@ tstIp = IpV4F 128 1 1 10
 -- @HList@ could be used for record types with heterogeneous fields.
 --
 -- Currently, 'type-encoding' library does not have these types in scope.  
-instance ToEncString "r-IPv4" T.Text Identity IpV4 where
-    toEncStringF = Identity . reduce . map
+instance ToEncString Identity "r-IPv4" "r-IPv4" IpV4 T.Text where
+    toEncF = Identity . reduce . map
       where map :: IpV4F Word8 -> IpV4F (Enc '["r-Word8-decimal"] () T.Text) 
             map = fmap toEncString
 
@@ -117,8 +117,8 @@ instance ToEncString "r-IPv4" T.Text Identity IpV4 where
 
 -- |
 --
--- >>> let enc = toEncString @"r-IPv4" @T.Text tstIp
--- >>> fromEncString @IpV4 enc
+-- >>> let enc = toEncString @"r-IPv4" @IpV4 @T.Text tstIp
+-- >>> fromEncString @"r-IPv4" @IpV4 enc
 -- IpV4F {oct1 = 128, oct2 = 1, oct3 = 1, oct4 = 10}
 --
 -- To get 'IpV4' out of the string we need to reverse previous @reduce@.
@@ -132,8 +132,8 @@ instance ToEncString "r-IPv4" T.Text Identity IpV4 where
 --
 -- Note, again, the error condition exposed by this implementation could have been avoided
 -- if 'EnT.splitPayload' returned fixed size @Vect 4@.
-instance (UnexpectedDecodeErr f, Applicative f) => FromEncString IpV4 f T.Text "r-IPv4" where   
-    fromEncStringF = fmap map . unreduce
+instance (UnexpectedDecodeErr f, Applicative f) => FromEncString f "r-IPv4" "r-IPv4" IpV4 T.Text where   
+    fromEncF = fmap map . unreduce
       where unreduce :: Enc '["r-IPv4"] () T.Text -> f (IpV4F (Enc '["r-Word8-decimal"] () T.Text))
             unreduce = asUnexpected @"r-IPv4" . recover . EnT.splitPayload @ '["r-Word8-decimal"] (T.splitOn ".")
             

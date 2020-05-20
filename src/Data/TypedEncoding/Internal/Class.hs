@@ -43,27 +43,48 @@ import           Data.Functor.Identity
 import           GHC.TypeLits
 
 
--- TODO v0.3 change to @ToEncString nm alg str f a@ ? Maybe not?
 
 -- | 
 -- Generalized Java @toString@ or a type safe version of Haskell's 'Show'.
 --
--- Encodes @a@ as @Enc '[xs]@.
+-- Encodes @a@ as @Enc '[xs]@ specifying algorithm @alg@ and using effect @f@ 
 --
-class KnownSymbol x => ToEncString x str f a where
-    toEncStringF :: a -> f (Enc '[x] () str)
+class (KnownSymbol nm, KnownSymbol ann) => ToEncString f nm ann a str where
+    toEncF :: a -> f (Enc '[nm] () str)
 
-toEncString :: forall x str f a  . (ToEncString x str Identity a) => a -> Enc '[x] () str
-toEncString = runIdentity . toEncStringF
+
+-- backward compatible v0.2 like combinators
+toEncStringF :: forall nm f a str  . (ToEncString f nm nm a str) => a -> f (Enc '[nm] () str)
+toEncStringF = toEncStringF' @nm @nm
+
+toEncStringF' :: forall alg nm f a str  . (ToEncString f nm alg a str) => a -> f (Enc '[nm] () str)
+toEncStringF' = toEncF @f @nm @alg
+
+toEncString :: forall nm a str  . (ToEncString Identity nm nm a str) => a -> Enc '[nm] () str
+toEncString = toEncString' @nm @nm
+
+toEncString' :: forall alg nm a str  . (ToEncString Identity nm alg a str) => a -> Enc '[nm] () str
+toEncString' = runIdentity . toEncF @Identity @nm @alg
 
 
 -- | 
 -- Reverse of 'ToEncString' decodes encoded string back to @a@
-class (KnownSymbol x) => FromEncString a f str x where
-    fromEncStringF :: Enc '[x] () str -> f a
+class (KnownSymbol nm, KnownSymbol ann) => FromEncString f nm ann a str where
+    fromEncF :: Enc '[nm] () str -> f a
 
-fromEncString :: forall a str x . (FromEncString a Identity str x) => Enc '[x] () str -> a
-fromEncString = runIdentity . fromEncStringF
+-- backward compatible v0.2 like combinators
+fromEncStringF :: forall nm f a str  . (FromEncString f nm nm a str) => Enc '[nm] () str -> f a
+fromEncStringF = fromEncStringF' @nm @nm
+
+fromEncStringF' :: forall alg nm f a str  . (FromEncString f nm alg a str) => Enc '[nm] () str -> f a
+fromEncStringF' = fromEncF @f @nm @alg
+
+fromEncString :: forall nm a str  . (FromEncString Identity nm nm a str) => Enc '[nm] () str -> a
+fromEncString = fromEncString' @nm @nm
+
+fromEncString' :: forall alg nm a str  . (FromEncString Identity nm alg a str) => Enc '[nm] () str -> a
+fromEncString' = runIdentity . fromEncF @Identity @nm @alg
+
 
 -- Other classes --
 

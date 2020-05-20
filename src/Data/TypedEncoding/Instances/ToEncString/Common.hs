@@ -29,16 +29,16 @@ import           Data.Word
 import           Text.Read
 import           Data.Functor.Identity
 
+-- f nm ann a str
+instance IsString str => ToEncString Identity "r-()" "r-()" () str where
+    toEncF _ = Identity $ MkEnc Proxy () (fromString "()")
 
-instance IsString str => ToEncString "r-()" str Identity () where
-    toEncStringF _ = Identity $ MkEnc Proxy () (fromString "()")
+instance IsString str => ToEncString Identity "r-Int-decimal" "r-Int-decimal" Int str where
+    toEncF  i = Identity $ MkEnc Proxy () (fromString . show $ i)
 
-instance IsString str => ToEncString "r-Int-decimal" str Identity Int where
-    toEncStringF i = Identity $ MkEnc Proxy () (fromString . show $ i)
-
-instance IsString str => ToEncString "r-Word8-decimal" str Identity Word8 where
-    toEncStringF i = Identity $ MkEnc Proxy () (fromString . show $ i)
+instance IsString str => ToEncString Identity "r-Word8-decimal" "r-Word8-decimal" Word8 str where
+    toEncF  i = Identity $ MkEnc Proxy () (fromString . show $ i)
 
 -- All instances of "r-Word8-decimal" are  @Show@ / @Read@ based
-instance (IsStringR str, UnexpectedDecodeErr f, Applicative f) => FromEncString Word8 f str "r-Word8-decimal" where
-    fromEncStringF  = asUnexpected @ "r-Word8-decimal" . readEither . toString . getPayload
+instance (IsStringR str, UnexpectedDecodeErr f, Applicative f) => FromEncString f "r-Word8-decimal" "r-Word8-decimal" Word8 str where
+    fromEncF  = asUnexpected @ "r-Word8-decimal" . readEither . toString . getPayload
