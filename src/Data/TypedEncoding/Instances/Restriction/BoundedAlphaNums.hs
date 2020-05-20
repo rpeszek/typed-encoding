@@ -82,13 +82,13 @@ encFBan = mkEncoding $ implEncodeF @s (verifyBoundedAlphaNum (Proxy :: Proxy s))
 
 -- * Decoding
 
-instance (KnownSymbol s, IsR s ~ 'True, AlgNm s ~ "r-ban", Applicative f) => Decode f s "r-ban" c str where
+instance (KnownSymbol s, Restriction s, Algorithm s "r-ban", Applicative f) => Decode f s "r-ban" c str where
     decoding = decAnyR
 
 
 -- * Validation
 
-instance (KnownSymbol s , IsBan s ~ 'True, AlgNm s ~ "r-ban", IsStringR str, RecreateErr f, Applicative f) => Validate f s "r-ban" c str where
+instance (KnownSymbol s , IsBan s ~ 'True, Algorithm s "r-ban", IsStringR str, RecreateErr f, Applicative f) => Validate f s "r-ban" c str where
     validation = validFromEnc' @"r-ban" encFBan
 
 

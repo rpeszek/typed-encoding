@@ -40,7 +40,7 @@ import           Data.Proxy
 -- * Decoding 
 
 -- | Universal decoding for all "r-" types
-decAnyR :: (IsR s ~ 'True, AlgNm s ~ x, Applicative f) => Decoding f s x c str
+decAnyR :: (Restriction r, Algorithm r alg, Applicative f) => Decoding f r alg c str
 decAnyR  = mkDecoding $ implTranP id 
 
 -- * Validation
@@ -56,11 +56,11 @@ validFromDec' (UnsafeMkDecoding p fn) = UnsafeMkValidation p (decAsRecreateErr .
         decAsRecreateErr (Right r) = pure r
 
 
-validR :: forall nm f c str . (IsR nm ~ 'True, KnownSymbol nm, RecreateErr f, Applicative f) => Encoding (Either EncodeEx) nm nm c str -> Validation f nm nm c str  
+validR :: forall nm f c str . (Restriction nm, KnownSymbol nm, RecreateErr f, Applicative f) => Encoding (Either EncodeEx) nm nm c str -> Validation f nm nm c str  
 validR = validFromEnc' @nm @nm 
 
 -- | Can cause slow compilation if used
-validR' :: forall nm f c str alg . (IsR nm ~ 'True, AlgNm nm ~ alg, KnownSymbol nm, RecreateErr f, Applicative f) =>  Encoding (Either EncodeEx) nm alg c str -> Validation f nm alg c str  
+validR' :: forall nm f c str alg . (Restriction nm, Algorithm nm alg, KnownSymbol nm, RecreateErr f, Applicative f) =>  Encoding (Either EncodeEx) nm alg c str -> Validation f nm alg c str  
 validR' = validFromEnc' @alg @nm 
 
 
@@ -79,7 +79,7 @@ validFromEnc' (UnsafeMkEncoding p fn) = UnsafeMkValidation p (encAsRecreateErr .
 
 -- TODO v0.3 remove
 -- | Universal decode for all "r-" types
-decFR :: (IsR s ~ 'True, Applicative f) => 
+decFR :: (Restriction s, Applicative f) => 
             Enc (s ': xs) c str -> f (Enc xs c str) 
 decFR = implTranP id 
 
@@ -91,7 +91,7 @@ decFR = implTranP id
 -- For "r-" encoding recreate and encode are the same other than the exception type used. 
 --
 -- The convention in @typed-encoding@ is to implement encode and convert it to recreate.
-recWithEncR :: forall (s :: Symbol) xs c str . (IsR s ~ 'True) 
+recWithEncR :: forall (s :: Symbol) xs c str . (Restriction s) 
                        => (Enc xs c str -> Either EncodeEx (Enc (s ': xs) c str)) 
                        -> Enc xs c str -> Either RecreateEx (Enc (s ': xs) c str)
 recWithEncR = unsafeRecWithEncR
@@ -102,18 +102,3 @@ unsafeRecWithEncR :: forall (s :: Symbol) xs c str .
                        -> Enc xs c str -> Either RecreateEx (Enc (s ': xs) c str)
 unsafeRecWithEncR fn = either (Left . encToRecrEx) Right . fn
 
--- |
--- >>> :kind! IsR "r-UPPER"
--- ...
--- ... 'True
---
--- >>> :kind! IsR "do-UPPER"
--- ...
--- = (TypeError ... 
-type family IsR (s :: Symbol) :: Bool where
-    IsR s = AcceptEq ('Text "Not restriction encoding " ':<>: ShowType s ) (CmpSymbol "r-" (Take 2 s))
-
-
-type family IsROrEmpty (s :: Symbol) :: Bool where
-    IsROrEmpty "" = True
-    IsROrEmpty x  = IsR x

@@ -194,8 +194,7 @@ encBoolNot :: forall s t xs c str . (
     BoolOpIs s "not" ~ 'True
     , KnownSymbol s
     , FirstTerm s ~ t
-    , KnownSymbol t
-    , IsR t ~ 'True
+    , Restriction t 
     ) => (Enc xs c str -> Either EncodeEx (Enc (t ': xs) c str)) -> Enc xs c str -> Either EncodeEx (Enc (s ': xs) c str)  
 encBoolNot fn en0 = 
         let 
@@ -224,7 +223,7 @@ encBoolNot' :: forall s t xs c str . (
     , KnownSymbol s
     , FirstTerm s ~ t
     , KnownSymbol t
-    , IsR t ~ 'True
+    , Restriction t 
     , Encode (Either EncodeEx) t t c str
     ) => Enc xs c str -> Either EncodeEx (Enc (s ': xs) c str)  
 encBoolNot' = encBoolNot'' @t
@@ -233,8 +232,7 @@ encBoolNot'' :: forall alg s t xs c str . (
     BoolOpIs s "not" ~ 'True
     , KnownSymbol s
     , FirstTerm s ~ t
-    , KnownSymbol t
-    , IsR t ~ 'True
+    , Restriction t  
     , Encode (Either EncodeEx) t alg c str
     ) => Enc xs c str -> Either EncodeEx (Enc (s ': xs) c str)  
 encBoolNot'' = encBoolNot (encF' @alg @t @xs)

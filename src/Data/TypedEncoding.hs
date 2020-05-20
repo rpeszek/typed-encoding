@@ -4,6 +4,10 @@
 -- |
 -- = Overview
 --
+-- /This module needs to be imported at the call site to use encodings./
+-- 
+-- /To implement new encodings import "Data.TypedEncoding.Instances.Support" instead./
+-- 
 -- This library uses 'GHC.TypeLits' symbols to specify and work with types like
 --
 -- @
@@ -96,7 +100,7 @@
 -- Here is list of instance modules available in typed-encoding library itself
 --
 -- * "Data.TypedEncoding.Instances.Enc.Base64"
--- * "Data.TypedEncoding.Instances.Restriction.Misc" 
+-- * "Data.TypedEncoding.Instances.Restriction.Misc" (replaces @Common@ from v0.2)
 -- * "Data.TypedEncoding.Instances.Restriction.ASCII" 
 -- * "Data.TypedEncoding.Instances.Restriction.UTF8" 
 -- * "Data.TypedEncoding.Instances.Restriction.Bool" (moved from @Combinators@ to @Instances@ in v0.3)
