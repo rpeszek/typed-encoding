@@ -22,7 +22,7 @@
 module Data.TypedEncoding.Instances.Restriction.ASCII where
 
 import           Data.TypedEncoding.Instances.Support
-import           Data.TypedEncoding.Internal.Class.Util.StringConstraints
+import           Data.TypedEncoding.Class.Util.StringConstraints
 
 import           Data.TypedEncoding.Internal.Util (explainBool)
 import           Data.Char
@@ -35,6 +35,7 @@ import           Data.Char
 -- >>> import qualified Data.ByteString.Char8 as B8
 -- >>> import Test.QuickCheck
 -- >>> import Test.QuickCheck.Instances.ByteString()
+-- >>> import Data.TypedEncoding
 -- >>> :{
 -- instance Arbitrary (Enc '["r-ASCII"] () B.ByteString) where 
 --      arbitrary =  fmap (unsafeSetPayload ()) 

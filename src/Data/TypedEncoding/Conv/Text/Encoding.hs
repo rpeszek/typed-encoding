@@ -27,6 +27,7 @@ import           Data.TypedEncoding.Unsafe (withUnsafe)
 -- >>> import qualified Data.ByteString.Char8 as B8
 -- >>> import Data.Char
 -- >>> import Data.Either
+-- >>> import Data.TypedEncoding
 -- >>> import Data.TypedEncoding.Conv.Text
 -- >>> let emptyUTF8B = unsafeSetPayload () "" :: Enc '["r-UTF8"] () B.ByteString  
 -- >>> :{

@@ -15,19 +15,19 @@
 module Data.TypedEncoding.Instances.Support (
     module Data.TypedEncoding.Instances.Support
     -- * Types
-    , module Data.TypedEncoding.Internal.Types
+    , module Data.TypedEncoding.Types
     -- * Classes
-    , module Data.TypedEncoding.Internal.Class
+    , module Data.TypedEncoding.Class
     -- * Combinators
-    , module Data.TypedEncoding.Internal.Instances.Combinators
+    , module Data.TypedEncoding.Instances.Support.Helpers
     -- * Type level conveniences
-    , module Data.TypedEncoding.Internal.Util.TypeLits
+    , module Data.TypedEncoding.Util.TypeLits
    ) where
-import           Data.TypedEncoding.Internal.Types
-import           Data.TypedEncoding.Internal.Types.Enc (getTransformF)
-import           Data.TypedEncoding.Internal.Class 
-import           Data.TypedEncoding.Internal.Instances.Combinators 
-import           Data.TypedEncoding.Internal.Util.TypeLits
+import           Data.TypedEncoding.Types
+import           Data.TypedEncoding.Internal.Enc (getTransformF)
+import           Data.TypedEncoding.Class 
+import           Data.TypedEncoding.Instances.Support.Helpers 
+import           Data.TypedEncoding.Util.TypeLits
 
 import           GHC.TypeLits
 import           Data.Proxy

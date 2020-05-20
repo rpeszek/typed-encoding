@@ -29,9 +29,8 @@ import           Test.Hspec
 import           Data.Word
 import           Data.Either
 import           Data.TypedEncoding
-import           Data.TypedEncoding.Internal.Class.IsStringR 
-import           Data.TypedEncoding.Instances.Restriction.Common ()
-import           Data.TypedEncoding.Instances.ToEncString.Common ()
+import           Data.TypedEncoding.Class.IsStringR 
+import           Data.TypedEncoding.Instances.Restriction.Misc ()
 
 newtype MyStr = MyStr String deriving (Eq, Show)
 

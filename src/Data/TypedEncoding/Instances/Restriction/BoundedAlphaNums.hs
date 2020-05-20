@@ -38,8 +38,8 @@ import           Data.Char
 import           Data.Proxy
 import           Data.Either
 
-import           Data.TypedEncoding.Internal.Util.TypeLits
-import           Data.TypedEncoding.Internal.Class.IsStringR
+import           Data.TypedEncoding.Util.TypeLits
+import           Data.TypedEncoding.Class.IsStringR
 import           Data.TypedEncoding.Instances.Support
 
 -- $setup

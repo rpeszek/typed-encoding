@@ -36,16 +36,16 @@ import           Data.Symbol.Ascii
 
 import           Data.TypedEncoding
 import           Data.TypedEncoding.Instances.Support
--- import           Data.TypedEncoding.Internal.Util.TypeLits
+-- import           Data.TypedEncoding.Util.TypeLits
 
 -- import qualified Data.Text as T
--- import           Data.TypedEncoding.Instances.Restriction.Common()
+-- import           Data.TypedEncoding.Instances.Restriction.Misc()
 
 
 -- $setup
 -- >>> :set -XOverloadedStrings -XMultiParamTypeClasses -XDataKinds -XTypeApplications
 -- >>> import qualified Data.Text as T
--- >>> import           Data.TypedEncoding.Instances.Restriction.Common()
+-- >>> import           Data.TypedEncoding.Instances.Restriction.Misc()
 
 
 -- |

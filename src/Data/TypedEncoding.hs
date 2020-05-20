@@ -96,13 +96,12 @@
 -- Here is list of instance modules available in typed-encoding library itself
 --
 -- * "Data.TypedEncoding.Instances.Enc.Base64"
--- * "Data.TypedEncoding.Instances.Restriction.Common" 
+-- * "Data.TypedEncoding.Instances.Restriction.Misc" 
 -- * "Data.TypedEncoding.Instances.Restriction.ASCII" 
 -- * "Data.TypedEncoding.Instances.Restriction.UTF8" 
 -- * "Data.TypedEncoding.Instances.Restriction.Bool" (moved from @Combinators@ to @Instances@ in v0.3)
 -- * "Data.TypedEncoding.Instances.Restriction.BoundedAlphaNums" (moved from @Combinators@ to @Instances@ in v0.3)
 -- * "Data.TypedEncoding.Instances.Do.Sample" 
--- * "Data.TypedEncoding.Instances.ToEncString.Common" 
 -- 
 -- This list is not intended to be exhaustive, rather separate libraries
 -- can provide instances for other encodings and transformations.
@@ -136,28 +135,32 @@
 -- * "Examples.TypedEncoding"    
 module Data.TypedEncoding (
     module Data.TypedEncoding
+
     -- * Classes
-    , module Data.TypedEncoding.Internal.Class
-    -- TODO v0.3
-    -- * Encoding class and Encoder (replaces EncodeFAll)
-    , module Data.TypedEncoding.Internal.Class.Encoder
+    , module Data.TypedEncoding.Class
+
     -- * Combinators
-    , module Data.TypedEncoding.Internal.Combinators.Common
-    , module Data.TypedEncoding.Internal.Combinators.Validate
+    , module Data.TypedEncoding.Combinators.Common
+    , module Data.TypedEncoding.Combinators.Encode
+    , module Data.TypedEncoding.Combinators.Decode
+    , module Data.TypedEncoding.Combinators.Validate
+
     -- * Types
     -- TODO v0.3 move back to selective imports?
-    , module Data.TypedEncoding.Internal.Types.Enc
-    , module Data.TypedEncoding.Internal.Types.Decoding
-    , module Data.TypedEncoding.Internal.Types.Validation
+    , module Data.TypedEncoding.Internal.Enc
+    , module Data.TypedEncoding.Types.Decoding
+    , module Data.TypedEncoding.Types.Validation
     , CheckedEnc
+
+    -- * Exceptions 
     , EncodeEx(..)
     , RecreateEx(..)
     , UnexpectedDecodeEx(..)
     , EncAnn 
     -- * Existentially quantified version of @Enc@ and basic combinators
-    , module Data.TypedEncoding.Internal.Types.SomeEnc
+    , module Data.TypedEncoding.Types.SomeEnc
     -- * Types and combinators for not verfied encoding 
-    , module Data.TypedEncoding.Internal.Types.UncheckedEnc
+    , module Data.TypedEncoding.Types.UncheckedEnc
     -- * Basic @Enc@ Combinators
     
     --, getPayload 
@@ -174,14 +177,15 @@ module Data.TypedEncoding (
     , recreateErrUnknown
  ) where
 
-import           Data.TypedEncoding.Internal.Types
-import           Data.TypedEncoding.Internal.Types.Enc
-import           Data.TypedEncoding.Internal.Types.Decoding
-import           Data.TypedEncoding.Internal.Types.Validation
+import           Data.TypedEncoding.Types
+import           Data.TypedEncoding.Internal.Enc
+import           Data.TypedEncoding.Types.Decoding
+import           Data.TypedEncoding.Types.Validation
 
-import           Data.TypedEncoding.Internal.Types.SomeEnc
-import           Data.TypedEncoding.Internal.Types.UncheckedEnc
-import           Data.TypedEncoding.Internal.Class
-import           Data.TypedEncoding.Internal.Combinators.Common
-import           Data.TypedEncoding.Internal.Combinators.Validate
-import           Data.TypedEncoding.Internal.Class.Encoder
+import           Data.TypedEncoding.Types.SomeEnc
+import           Data.TypedEncoding.Types.UncheckedEnc
+import           Data.TypedEncoding.Class
+import           Data.TypedEncoding.Combinators.Common
+import           Data.TypedEncoding.Combinators.Encode
+import           Data.TypedEncoding.Combinators.Decode
+import           Data.TypedEncoding.Combinators.Validate

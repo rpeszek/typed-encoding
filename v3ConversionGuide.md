@@ -136,4 +136,9 @@ Other notes:
 
 - Minor changes in forall variable order in combinators for "r-bool:" encodings.
 
+- Encoder type removed, replaced by Endodings.
+
 - checkWithValidationsEnc -> check
+
+-  `Data.TypedEncoding.Instances.ToEncString.Common` and `Data.TypedEncoding.Instances.Restriction.Common`
+   merged into Data.TypedEncoding.Instances.Restriction.Misc

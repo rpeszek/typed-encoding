@@ -12,7 +12,7 @@
 module Test.Bc.ASCIISpec where
 
 import qualified Data.TypedEncoding.Instances.Restriction.ASCII as ASCII
-import           Data.TypedEncoding.Internal.Class.Util.StringConstraints
+import           Data.TypedEncoding.Class.Util.StringConstraints
 
 
 -- import qualified Data.ByteString as B

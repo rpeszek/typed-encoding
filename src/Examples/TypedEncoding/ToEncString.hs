@@ -36,8 +36,7 @@ module Examples.TypedEncoding.ToEncString where
 
 import           Data.TypedEncoding
 import qualified Data.TypedEncoding.Instances.Support as EnT
-import           Data.TypedEncoding.Instances.Restriction.Common ()
-import           Data.TypedEncoding.Instances.ToEncString.Common ()
+import           Data.TypedEncoding.Instances.Restriction.Misc ()
 import           Data.TypedEncoding.Instances.Enc.Base64 ()
 import           Data.TypedEncoding.Instances.Restriction.ASCII ()
 import           Data.TypedEncoding.Instances.Restriction.UTF8 ()
@@ -81,7 +80,7 @@ tstIp = IpV4F 128 1 1 10
 -- In this example @toEncString@ converts 'IpV4' to @Enc '["r-IPv4"] Text@.
 --  
 -- This is done with help of existing @"r-Word8-decimal"@ annotation defined
--- in "Data.TypedEncoding.Instances.Restriction.Common"
+-- in "Data.TypedEncoding.Instances.Restriction.Misc"
 --
 -- >>> toEncString @"r-IPv4" @IpV4 @T.Text tstIp
 -- MkEnc Proxy () "128.1.1.10"

@@ -9,8 +9,8 @@
 module Data.TypedEncoding.Conv.ByteString.Char8 where
 
 import qualified Data.ByteString.Char8 as B8
-import           Data.TypedEncoding.Internal.Types.Enc (Enc, unsafeChangePayload)
-import qualified Data.TypedEncoding.Internal.Util.TypeLits as Knds
+import           Data.TypedEncoding.Internal.Enc (Enc, unsafeChangePayload)
+import qualified Data.TypedEncoding.Util.TypeLits as Knds
 import           Data.TypedEncoding
 
 -- $setup
