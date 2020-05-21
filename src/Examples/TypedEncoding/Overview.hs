@@ -32,6 +32,7 @@ import qualified Data.Text as T
 
 -- $setup
 -- >>> :set -XOverloadedStrings -XMultiParamTypeClasses -XDataKinds -XTypeApplications
+-- >>> import Data.Functor.Identity
 --
 -- This module contains some ghci friendly values to play with.
 --
@@ -48,35 +49,50 @@ import qualified Data.Text as T
 -- >>> displ helloB64
 -- "MkEnc '[enc-B64] () (ByteString SGVsbG8gV29ybGQ=)"
 -- 
--- >>> encodeAll . toEncoding () $ "Hello World" :: Enc '["enc-B64"] () B.ByteString
+-- >>> encAll . toEncoding () $ "Hello World" :: Enc '["enc-B64"] () B.ByteString
 -- MkEnc Proxy () "SGVsbG8gV29ybGQ="
---
--- There is currently an alternative polymorphic way (prototype) to create encodings by /running/ 'Encoder' on 'encodings'.
--- This approach works better with more open / dynamic encoding setup it also provides first class @Encoder@. 
--- In future versions encodeAll will either be improved to provide similar flexibility or will be deprecated and removed.
--- 
--- >>> displ <$> (runEncoder @'["enc-B64"] encodings $ toEncoding () "Hello" :: Either EncodeEx (Enc '["enc-B64"] () B.ByteString))
--- Right "MkEnc '[enc-B64] () (ByteString SGVsbG8=)"
 helloB64 :: Enc '["enc-B64"] () B.ByteString
-helloB64 = encodeAll . toEncoding () $ "Hello World"
+helloB64 = encAll . toEncoding () $ "Hello World"
+
+-- | "Hello World" double-Base64 encoded.
+-- Notice the same code used as in single encoding, the game is played at type level.
+--
+-- >>> encAll . toEncoding () $ "Hello World" :: Enc '["enc-B64","enc-B64"] () B.ByteString  
+-- MkEnc Proxy () "U0dWc2JHOGdWMjl5YkdRPQ=="
+--
+-- >>> displ helloB64B64
+-- "MkEnc '[enc-B64,enc-B64] () (ByteString U0dWc2JHOGdWMjl5YkdRPQ==)"
+--
+-- An alternative version of the above code is this:
+--
+-- >>> fmap displ . runEncodings @'["enc-B64","enc-B64"] @'["enc-B64","enc-B64"] @Identity encodings . toEncoding () $ ("Hello World" :: B.ByteString)
+-- Identity "MkEnc '[enc-B64,enc-B64] () (ByteString U0dWc2JHOGdWMjl5YkdRPQ==)"
+--
+-- This is how @typed-encoding@ works, the "Data.TypedEncoding.Common.Class.Encode.EncodeAll"
+-- constraint can be used to get access to list to encodings required by the symbol annotation. 
+-- 'runEncodings' executes all the necessary transformations.
+--
+-- Similar story is true for /decoding/ and /validation/. In these examples we will use shortcut combinators.
+helloB64B64 :: Enc '["enc-B64","enc-B64"] () B.ByteString
+helloB64B64 = encAll . toEncoding () $ "Hello World"
 
 -- | Previous text decoded from Base64
 --
--- >>> fromEncoding . decodeAll $ helloB64 
+-- >>> fromEncoding . decAll $ helloB64 
 -- "Hello World"
 helloB64Decoded :: B.ByteString
-helloB64Decoded = fromEncoding . decodeAll $ helloB64
+helloB64Decoded = fromEncoding . decAll $ helloB64
 
--- | 'recreateFAll' allows for recovering data at program boundaries (for example, when parsing JSON input).
+-- | 'recrFAll' allows for recovering data at program boundaries (for example, when parsing JSON input).
 -- It makes sure that the content satisfies specified encodings.
 -- 
--- >>> recreateFAll . toEncoding () $ "SGVsbG8gV29ybGQ=" :: Either RecreateEx (Enc '["enc-B64"] () B.ByteString)
+-- >>> recrFAll . toEncoding () $ "SGVsbG8gV29ybGQ=" :: Either RecreateEx (Enc '["enc-B64"] () B.ByteString)
 -- Right (MkEnc Proxy () "SGVsbG8gV29ybGQ=")
 --
--- >>> recreateFAll . toEncoding () $ "SGVsbG8gV29ybGQ" :: Either RecreateEx (Enc '["enc-B64"] () B.ByteString)
+-- >>> recrFAll . toEncoding () $ "SGVsbG8gV29ybGQ" :: Either RecreateEx (Enc '["enc-B64"] () B.ByteString)
 -- Left (RecreateEx "enc-B64" ("invalid padding"))
 --
--- The above example start by placing payload in zero-encoded @Enc '[] ()@ type and then apply 'recreateFAll'
+-- The above example start by placing payload in zero-encoded @Enc '[] ()@ type and then apply 'recrFAll'
 -- this is a good way to recreate encoded type if encoding is known. 
 --
 -- If is it not, 'UncheckedEnc' type can be used. 
@@ -86,54 +102,49 @@ helloB64Decoded = fromEncoding . decodeAll $ helloB64
 -- This module is concerned only with the first approach. 
 --
 -- >>> let unchecked = toUncheckedEnc ["enc-B64"] () ("SGVsbG8gV29ybGQ=" :: T.Text)
--- >>> verifyUncheckedEnc' @'["enc-B64"] unchecked
+-- >>> check @'["enc-B64"] @(Either RecreateEx) unchecked
 -- Just (Right (MkEnc Proxy () "SGVsbG8gV29ybGQ="))
 helloB64Recovered :: Either RecreateEx (Enc '["enc-B64"] () B.ByteString)
-helloB64Recovered = recreateFAll . toEncoding () $ "SGVsbG8gV29ybGQ="
+helloB64Recovered = recrFAll . toEncoding () $ "SGVsbG8gV29ybGQ="
 
--- | "Hello World" double-Base64 encoded.
--- Notice the same code used as in single encoding, the game is played at type level.
---
--- >>> encodeAll . toEncoding () $ "Hello World" :: Enc '["enc-B64","enc-B64"] () B.ByteString  
--- MkEnc Proxy () "U0dWc2JHOGdWMjl5YkdRPQ=="
---
--- >>> displ helloB64B64
--- "MkEnc '[enc-B64,enc-B64] () (ByteString U0dWc2JHOGdWMjl5YkdRPQ==)"
-helloB64B64 :: Enc '["enc-B64","enc-B64"] () B.ByteString
-helloB64B64 = encodeAll . toEncoding () $ "Hello World"
 
 -- | Double Base64 encoded "Hello World" with one layer of encoding removed
 --
--- >>> decodePart @'["enc-B64"] $ helloB64B64 :: Enc '["enc-B64"] () B.ByteString
+-- >>> decPart @'["enc-B64"] $ helloB64B64 :: Enc '["enc-B64"] () B.ByteString
 -- MkEnc Proxy () "SGVsbG8gV29ybGQ="
 --
 -- >>> helloB64B64PartDecode == helloB64
 -- True
+--
+-- @decPart@ is a convenience function that simply replies decoding 'above' first "enc-B64"
+--
+-- >>> above @'["enc-B64"] @'["enc-B64"] @'[] decAll $ helloB64B64 
+-- MkEnc Proxy () "SGVsbG8gV29ybGQ="
 helloB64B64PartDecode :: Enc '["enc-B64"] () B.ByteString
-helloB64B64PartDecode = decodePart @'["enc-B64"] helloB64B64
+helloB64B64PartDecode = decPart @'["enc-B64"] helloB64B64
 
 -- | 'helloB64B64' all the way to 'B.ByteString'
 --
 -- Notice a similar polymorphism in decoding.
 --
--- >>> fromEncoding . decodeAll $ helloB64B64 :: B.ByteString 
+-- >>> fromEncoding . decAll $ helloB64B64 :: B.ByteString 
 -- "Hello World"
 -- 
 -- We can also decode all the parts: 
 --
--- >>> fromEncoding . decodePart @'["enc-B64","enc-B64"] $ helloB64B64
+-- >>> fromEncoding . decPart @'["enc-B64","enc-B64"] $ helloB64B64
 -- "Hello World"
 helloB64B64Decoded :: B.ByteString
-helloB64B64Decoded = fromEncoding . decodeAll $ helloB64B64
+helloB64B64Decoded = fromEncoding . decAll $ helloB64B64
 
 -- | what happens when we try to recover encoded once text to @Enc '["enc-B64", "enc-B64"]@. 
 --
 -- Again, notice the same expression is used as in previous recovery. 
 --
--- >>> recreateFAll . toEncoding () $ "SGVsbG8gV29ybGQ=" :: Either RecreateEx (Enc '["enc-B64", "enc-B64"] () B.ByteString)
+-- >>> recrFAll . toEncoding () $ "SGVsbG8gV29ybGQ=" :: Either RecreateEx (Enc '["enc-B64", "enc-B64"] () B.ByteString)
 -- Left (RecreateEx "enc-B64" ("invalid padding"))
 helloB64B64RecoveredErr :: Either RecreateEx (Enc '["enc-B64", "enc-B64"] () B.ByteString)
-helloB64B64RecoveredErr = recreateFAll . toEncoding () $ "SGVsbG8gV29ybGQ="
+helloB64B64RecoveredErr = recrFAll . toEncoding () $ "SGVsbG8gV29ybGQ="
 
 
 
@@ -147,17 +158,17 @@ helloB64B64RecoveredErr = recreateFAll . toEncoding () $ "SGVsbG8gV29ybGQ="
 --  
 -- The same code is used as in "enc-" examples to encode (now transform).
 --
--- >>> encodeAll . toEncoding () $ "Hello World" :: Enc '["do-UPPER"] () T.Text
+-- >>> encAll . toEncoding () $ "Hello World" :: Enc '["do-UPPER"] () T.Text
 -- MkEnc Proxy () "HELLO WORLD"
 helloUPP :: Enc '["do-UPPER"] () T.Text
-helloUPP = encodeAll . toEncoding () $ "Hello World"
+helloUPP = encAll . toEncoding () $ "Hello World"
 
 -- | Sample compound transformation 
 -- 
--- >>> encodeAll . toEncoding () $ "HeLLo world" :: Enc '["do-reverse", "do-Title"] () T.Text
+-- >>> encAll . toEncoding () $ "HeLLo world" :: Enc '["do-reverse", "do-Title"] () T.Text
 -- MkEnc Proxy () "dlroW olleH" 
 helloTitleRev :: Enc '["do-reverse", "do-Title"] () T.Text
-helloTitleRev = encodeAll . toEncoding () $ "HeLLo world"
+helloTitleRev = encAll . toEncoding () $ "HeLLo world"
 
 
 
@@ -175,7 +186,7 @@ instance HasA SizeLimit Config where
 -- | `helloTitle' is needed in following examples
 --
 helloTitle :: Enc '["do-Title"] Config T.Text
-helloTitle = encodeAll . toEncoding exampleConf $ "hello wOrld"
+helloTitle = encAll . toEncoding exampleConf $ "hello wOrld"
 
 -- | Configuration can be used to impact the encoding process.
 --
@@ -183,30 +194,35 @@ helloTitle = encodeAll . toEncoding exampleConf $ "hello wOrld"
 -- But since both "do-reverse", "do-Title" are polymorphic in 
 -- configuration we can also do this:
 --
--- >>> encodeAll . toEncoding exampleConf $ "HeLLo world" :: Enc '["do-reverse", "do-Title"] Config T.Text
+-- >>> encAll . toEncoding exampleConf $ "HeLLo world" :: Enc '["do-reverse", "do-Title"] Config T.Text
 -- MkEnc Proxy (Config {sizeLimit = SizeLimit {unSizeLimit = 8}}) "dlroW olleH"
 --
--- >>> encodeAll . toEncoding exampleConf $ "HeLlo world" :: Enc '["do-size-limit", "do-reverse", "do-Title"] Config T.Text
+-- >>> encAll . toEncoding exampleConf $ "HeLlo world" :: Enc '["do-size-limit", "do-reverse", "do-Title"] Config T.Text
 -- MkEnc Proxy (Config {sizeLimit = SizeLimit {unSizeLimit = 8}}) "dlroW ol"
 --
 -- Instead, encode previously defined 'helloTitle' by reversing it and adding size limit
 --
--- >>> encodePart @'["do-size-limit", "do-reverse"] helloTitle :: Enc '["do-size-limit", "do-reverse", "do-Title"] Config T.Text
+-- >>> encPart @'["do-size-limit", "do-reverse"] helloTitle :: Enc '["do-size-limit", "do-reverse", "do-Title"] Config T.Text
+-- MkEnc Proxy (Config {sizeLimit = SizeLimit {unSizeLimit = 8}}) "dlroW ol"
+--
+-- @encPart@ is simply encAll played above "do-Title" encoding:
+--
+-- >>> above @'["do-Title"] @'[] @'["do-size-limit", "do-reverse"] encAll helloTitle
 -- MkEnc Proxy (Config {sizeLimit = SizeLimit {unSizeLimit = 8}}) "dlroW ol"
 helloRevLimit :: Enc '["do-size-limit", "do-reverse", "do-Title"] Config T.Text
-helloRevLimit = encodePart @'["do-size-limit", "do-reverse"] helloTitle
+helloRevLimit = encPart @'["do-size-limit", "do-reverse"] helloTitle
 
--- >>> encodeAll . toEncoding exampleConf $ "HeLlo world" :: Enc '["enc-B64", "do-size-limit"] Config B.ByteString
+-- >>> encAll . toEncoding exampleConf $ "HeLlo world" :: Enc '["enc-B64", "do-size-limit"] Config B.ByteString
 -- MkEnc Proxy (Config {sizeLimit = SizeLimit {unSizeLimit = 8}}) "SGVMbG8gd28="
 helloLimitB64 :: Enc '["enc-B64", "do-size-limit"] Config B.ByteString
-helloLimitB64 = encodeAll . toEncoding exampleConf $ "HeLlo world"
+helloLimitB64 = encAll . toEncoding exampleConf $ "HeLlo world"
 
 -- | ... and we unwrap the B64 part only
 -- 
--- >>> decodePart @'["enc-B64"] $ helloLimitB64
+-- >>> decPart @'["enc-B64"] $ helloLimitB64
 -- MkEnc Proxy (Config {sizeLimit = SizeLimit {unSizeLimit = 8}}) "HeLlo wo"
 helloRevLimitParDec :: Enc '["do-size-limit"] Config B.ByteString
-helloRevLimitParDec =  decodePart @'["enc-B64"] helloLimitB64
+helloRevLimitParDec =  decPart @'["enc-B64"] helloLimitB64
 
 
 
@@ -223,21 +239,21 @@ helloRevLimitParDec =  decodePart @'["enc-B64"] helloLimitB64
 --
 -- Note naming thing: "r-" is partial identity ("r-" is from restriction).
 --
--- >>>  encodeFAll . toEncoding () $ "HeLlo world" :: Either EncodeEx (Enc '["r-ASCII"] () B.ByteString) 
+-- >>>  encFAll . toEncoding () $ "HeLlo world" :: Either EncodeEx (Enc '["r-ASCII"] () B.ByteString) 
 -- Right (MkEnc Proxy () "HeLlo world")
 helloAscii :: Either EncodeEx (Enc '["r-ASCII"] () B.ByteString)
-helloAscii = encodeFAll . toEncoding () $ "HeLlo world" 
+helloAscii = encFAll . toEncoding () $ "HeLlo world" 
 
 -- | Arguably the type we used for helloB64 was too permissive.
 -- a better version is here:
 --
--- >>> encodeFAll . toEncoding () $ "Hello World" :: Either EncodeEx (Enc '["enc-B64", "r-ASCII"] () B.ByteString)
+-- >>> encFAll . toEncoding () $ "Hello World" :: Either EncodeEx (Enc '["enc-B64", "r-ASCII"] () B.ByteString)
 -- Right (MkEnc Proxy () "SGVsbG8gV29ybGQ=") 
 helloAsciiB64 :: Either EncodeEx (Enc '["enc-B64", "r-ASCII"] () B.ByteString)
-helloAsciiB64 = encodeFAll . toEncoding () $ "Hello World"
+helloAsciiB64 = encFAll . toEncoding () $ "Hello World"
 
 -- |
--- >>> decodePart @'["enc-B64"] <$> helloAsciiB64
+-- >>> decPart @'["enc-B64"] <$> helloAsciiB64
 -- Right (MkEnc Proxy () "Hello World")
 helloAsciiB64PartDec :: Either EncodeEx (Enc '["r-ASCII"] () B.ByteString)
-helloAsciiB64PartDec = decodePart @'["enc-B64"] <$> helloAsciiB64 
+helloAsciiB64PartDec = decPart @'["enc-B64"] <$> helloAsciiB64 

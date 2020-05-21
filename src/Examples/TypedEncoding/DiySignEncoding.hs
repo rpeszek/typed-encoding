@@ -68,10 +68,10 @@ decodeSign t =
 -- >>> helloSigned
 -- MkEnc Proxy () "11:Hello World"
 --
--- >>> fromEncoding . decodeAll $ helloSigned 
+-- >>> fromEncoding . decAll $ helloSigned 
 -- "Hello World"
 helloSigned :: Enc '["my-sign"] () T.Text
-helloSigned = encodeAll . toEncoding () $ "Hello World"
+helloSigned = encAll . toEncoding () $ "Hello World"
 
 -- | property checks that 'T.Text' values are expected to decode 
 -- without error after encoding.
@@ -79,8 +79,8 @@ helloSigned = encodeAll . toEncoding () $ "Hello World"
 -- prop> \t -> propEncDec
 propEncDec :: T.Text -> Bool
 propEncDec t = 
-    let enc = encodeAll . toEncoding () $ t :: Enc '["my-sign"] () T.Text
-    in t == (fromEncoding . decodeAll $ enc)
+    let enc = encAll . toEncoding () $ t :: Enc '["my-sign"] () T.Text
+    in t == (fromEncoding . decAll $ enc)
 
 hacker :: Either RecreateEx (Enc '["my-sign"] () T.Text)
 hacker = 
@@ -88,34 +88,38 @@ hacker =
         -- | payload is sent over network and get corrupted
         newpay = payload <> " corruption" 
         -- | boundary check recovers the data
-        newdata = recreateFAll . toEncoding () $ newpay :: Either RecreateEx (Enc '["my-sign"] () T.Text)
+        newdata = recrFAll . toEncoding () $ newpay :: Either RecreateEx (Enc '["my-sign"] () T.Text)
     in newdata    
 -- ^ Hacker example
 -- The data was transmitted over a network and got corrupted.
 --
 -- >>> let payload = getPayload $ helloSigned :: T.Text
 -- >>> let newpay = payload <> " corruption" 
--- >>> recreateFAll . toEncoding () $ newpay :: Either RecreateEx (Enc '["my-sign"] () T.Text)
+-- >>> recrFAll . toEncoding () $ newpay :: Either RecreateEx (Enc '["my-sign"] () T.Text)
 -- Left (RecreateEx "my-sign" ("Corrupted Signature"))
 --
--- >>> recreateFAll . toEncoding () $ payload :: Either RecreateEx (Enc '["my-sign"] () T.Text)
+-- >>> recrFAll . toEncoding () $ payload :: Either RecreateEx (Enc '["my-sign"] () T.Text)
 -- Right (MkEnc Proxy () "11:Hello World")
 
 
 -- | Because encoding function is pure we can create instance of EncodeF 
 -- that is polymorphic in effect @f@. This is done using 'EnT.implTranP' combinator.
-instance Applicative f => EncodeF f (Enc xs c T.Text) (Enc ("my-sign" ': xs) c T.Text) where
-    encodeF = EnT.implEncodeP encodeSign    
+instance Applicative f => Encode f "my-sign" "my-sign" c T.Text where
+   encoding = EnT._implEncodingP encodeSign    
 
 -- | Decoding allows effectful @f@ to allow for troubleshooting and unsafe payload changes.
 --
--- Implementation simply uses 'EnT.implDecodeF' combinator on the 'asUnexpected' composed with decoding function.
+-- Implementation simply uses 'EnT.implDecodingF' combinator on the 'asUnexpected' composed with decoding function.
 -- 'UnexpectedDecodeErr' has Identity instance allowing for decoding that assumes errors are not possible.
 -- For debugging purposes or when unsafe changes to "my-sign" @Error UnexpectedDecodeEx@ instance can be used.
-instance (UnexpectedDecodeErr f, Applicative f) => DecodeF f (Enc ("my-sign" ': xs) c T.Text) (Enc xs c T.Text) where
-    decodeF = EnT.implDecodeF (asUnexpected @"my-sign" . decodeSign) 
+instance (UnexpectedDecodeErr f, Applicative f) => Decode f "my-sign" "my-sign" c T.Text where
+    decoding = decMySign 
+
+decMySign :: (UnexpectedDecodeErr f, Applicative f) => Decoding f "my-sign" "my-sign" c T.Text
+decMySign = EnT.implDecodingF (asUnexpected @"my-sign" . decodeSign) 
 
 -- | Recreation allows effectful @f@ to check for tampering with data.
--- Implementation simply uses 'EnT.implCheckPrevF' combinator on the recovery function.
-instance (RecreateErr f, Applicative f) => RecreateF f (Enc xs c T.Text) (Enc ("my-sign" ': xs) c T.Text) where   
-    checkPrevF = EnT.implCheckPrevF (asRecreateErr @"my-sign" . decodeSign) 
+-- Implementation simply uses 'EnT.validFromDec' combinator on the recovery function.
+instance (RecreateErr f, Applicative f) => Validate f "my-sign" "my-sign" c T.Text where
+    validation = EnT.validFromDec decMySign
+

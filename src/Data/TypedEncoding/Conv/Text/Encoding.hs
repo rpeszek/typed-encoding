@@ -27,13 +27,14 @@ import           Data.TypedEncoding.Unsafe (withUnsafe)
 -- >>> import qualified Data.ByteString.Char8 as B8
 -- >>> import Data.Char
 -- >>> import Data.Either
+-- >>> import Data.TypedEncoding
 -- >>> import Data.TypedEncoding.Conv.Text
 -- >>> let emptyUTF8B = unsafeSetPayload () "" :: Enc '["r-UTF8"] () B.ByteString  
 -- >>> :{
 -- instance Arbitrary (Enc '["r-UTF8"] () B.ByteString) where 
 --      arbitrary =  fmap (fromRight emptyUTF8B) 
 --                   . flip suchThat isRight 
---                   . fmap (encodeFAll @(Either EncodeEx) @'["r-UTF8"] @(). toEncoding ()) $ arbitrary 
+--                   . fmap (encFAll @'["r-UTF8"] @(Either EncodeEx) @(). toEncoding ()) $ arbitrary 
 -- instance Arbitrary (Enc '["r-UTF8"] () T.Text) where 
 --      arbitrary =  fmap (unsafeSetPayload ()) 
 --                         arbitrary 

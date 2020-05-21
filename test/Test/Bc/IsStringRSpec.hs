@@ -29,9 +29,8 @@ import           Test.Hspec
 import           Data.Word
 import           Data.Either
 import           Data.TypedEncoding
-import           Data.TypedEncoding.Internal.Class.IsStringR 
-import           Data.TypedEncoding.Instances.Restriction.Common ()
-import           Data.TypedEncoding.Instances.ToEncString.Common ()
+import           Data.TypedEncoding.Common.Class.IsStringR 
+import           Data.TypedEncoding.Instances.Restriction.Misc ()
 
 newtype MyStr = MyStr String deriving (Eq, Show)
 
@@ -63,15 +62,15 @@ spec =
         it "Word8 fromEncString err works" $   
            fromEncStringTestErr `shouldSatisfy` isLeft
         it "EncodeF works" $
-          (encodeFAll @(Either EncodeEx) @'["r-Word8-decimal"] . toEncoding () $ tstWord8) `shouldSatisfy` isRight   
+          (encFAll @'["r-Word8-decimal"] @(Either EncodeEx) . toEncoding () $ tstWord8) `shouldSatisfy` isRight   
         it "EncodeF err works" $
-          (encodeFAll @(Either EncodeEx) @'["r-Word8-decimal"] . toEncoding () $ tstNotWord8') `shouldSatisfy` isLeft
+          (encFAll @'["r-Word8-decimal"] @(Either EncodeEx). toEncoding () $ tstNotWord8') `shouldSatisfy` isLeft
         it "RecreateF works" $
-          (recreateFAll @(Either RecreateEx) @'["r-Word8-decimal"] . toEncoding () $ tstWord8) `shouldSatisfy` isRight   
+          (recrFAll @'["r-Word8-decimal"] @(Either RecreateEx) . toEncoding () $ tstWord8) `shouldSatisfy` isRight   
         it "RecreateF err works" $
-          (recreateFAll @(Either RecreateEx) @'["r-Word8-decimal"] . toEncoding () $ tstNotWord8) `shouldSatisfy` isLeft
+          (recrFAll @'["r-Word8-decimal"] @(Either RecreateEx) . toEncoding () $ tstNotWord8) `shouldSatisfy` isLeft
         it "DecodeF works" $
-          (fromEncoding . decodeAll $ tstWord8Enc) `shouldBe` tstWord8   
+          (fromEncoding . decAll $ tstWord8Enc) `shouldBe` tstWord8   
    
 runSpec :: IO ()
 runSpec = hspec spec           

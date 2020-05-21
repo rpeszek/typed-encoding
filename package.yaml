@@ -1,5 +1,5 @@
 name:                typed-encoding
-version:             0.2.2.0
+version:             0.3.0.0
 github:              "rpeszek/typed-encoding"
 license:             BSD3
 author:              "Robert Peszek"
@@ -55,6 +55,7 @@ tests:
     - quickcheck-instances >= 0.3.20 && < 0.4
     other-modules: 
     - Test.Bc.IsStringRSpec
+    - Test.Bc.ASCIISpec
 
   typed-encoding-doctest:
     main:                Spec.hs

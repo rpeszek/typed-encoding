@@ -5,8 +5,8 @@
 {-# LANGUAGE FlexibleInstances #-}
 
 module Data.TypedEncoding.Unsafe (
-     module Data.TypedEncoding.Internal.Types.Unsafe
+     module Data.TypedEncoding.Common.Types.Unsafe
   ) where
 
-import           Data.TypedEncoding.Internal.Types.Unsafe
+import           Data.TypedEncoding.Common.Types.Unsafe
 

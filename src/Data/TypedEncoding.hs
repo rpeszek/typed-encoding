@@ -4,6 +4,10 @@
 -- |
 -- = Overview
 --
+-- /This module needs to be imported at the call site to use encodings./
+-- 
+-- /To implement new encodings import "Data.TypedEncoding.Instances.Support" instead./
+-- 
 -- This library uses 'GHC.TypeLits' symbols to specify and work with types like
 --
 -- @
@@ -96,11 +100,12 @@
 -- Here is list of instance modules available in typed-encoding library itself
 --
 -- * "Data.TypedEncoding.Instances.Enc.Base64"
--- * "Data.TypedEncoding.Instances.Restriction.Common" 
+-- * "Data.TypedEncoding.Instances.Restriction.Misc" (replaces @Common@ from v0.2)
 -- * "Data.TypedEncoding.Instances.Restriction.ASCII" 
 -- * "Data.TypedEncoding.Instances.Restriction.UTF8" 
+-- * "Data.TypedEncoding.Instances.Restriction.Bool" (moved from @Combinators@ to @Instances@ in v0.3)
+-- * "Data.TypedEncoding.Instances.Restriction.BoundedAlphaNums" (moved from @Combinators@ to @Instances@ in v0.3)
 -- * "Data.TypedEncoding.Instances.Do.Sample" 
--- * "Data.TypedEncoding.Instances.ToEncString.Common" 
 -- 
 -- This list is not intended to be exhaustive, rather separate libraries
 -- can provide instances for other encodings and transformations.
@@ -115,8 +120,6 @@
 --
 -- Included combinator modules:
 --
--- * "Data.TypedEncoding.Combinators.Restriction.Bool"
--- * "Data.TypedEncoding.Combinators.Restriction.BoundedAlphaNums"
 --
 -- Conversion combinator module structure is similar to one found in @text@ and @bytestring@ packages
 -- And can be found (since 0.2.2) in
@@ -135,42 +138,69 @@
 --
 -- * "Examples.TypedEncoding"    
 module Data.TypedEncoding (
-    module Data.TypedEncoding
-    -- * Classes
-    , module Data.TypedEncoding.Internal.Class
-    -- * Encoding class and Encoder (replaces EncodeFAll)
-    , module Data.TypedEncoding.Internal.Class.Encoder
-    -- * Combinators
-    , module Data.TypedEncoding.Internal.Combinators
-    -- * Types
-    , Enc
-    , CheckedEnc
-    , EncodeEx(..)
-    , RecreateEx(..)
-    , UnexpectedDecodeEx(..)
-    , EncAnn 
-    -- * Existentially quantified version of @Enc@ and basic combinators
-    , module Data.TypedEncoding.Internal.Types.SomeEnc
-    -- * Types and combinators for not verfied encoding 
-    , module Data.TypedEncoding.Internal.Types.UncheckedEnc
-    -- * Basic @Enc@ Combinators
-    , getPayload 
-    , unsafeSetPayload
-    , fromEncoding
+  
+    -- * @Enc@ and basic combinators
+    Enc
     , toEncoding
-    -- * Basic @CheckedEnc@ Combinators  
-    , unsafeCheckedEnc
-    , getCheckedPayload
-    , getCheckedEncPayload
-    , toCheckedEnc
-    , fromCheckedEnc
-    -- * Other Basic Combinators     
-    , recreateErrUnknown
+    , fromEncoding
+    , getPayload
+
+    -- * Existentially quantified and untyped versions of @Enc@
+    , module Data.TypedEncoding.Common.Types.SomeEnc
+    , module  Data.TypedEncoding.Common.Types.CheckedEnc
+
+    -- * @Encoding@ and basic combinators
+    , Encoding (..)
+    , _mkEncoding
+    , runEncoding
+    , _runEncoding 
+  
+    -- * List of encodings
+    , Encodings (..)
+    , runEncodings
+    , _runEncodings
+
+    -- * Similar to @Encoding@ and @Encodings@ but cover /Decoding/ and /Validation/
+    , module Data.TypedEncoding.Common.Types.Decoding
+    , module Data.TypedEncoding.Common.Types.Validation
+
+    -- * @UncheckedEnc@ is an /untyped/ version of Enc that represents not validated encoding      
+    , module Data.TypedEncoding.Common.Types.UncheckedEnc
+ 
+    -- * Classes
+    , module Data.TypedEncoding.Common.Class
+  
+      -- * Combinators
+    , module Data.TypedEncoding.Combinators.Common
+    , module Data.TypedEncoding.Combinators.Encode
+    , module Data.TypedEncoding.Combinators.Decode
+    , module Data.TypedEncoding.Combinators.Validate
+    , module Data.TypedEncoding.Combinators.Unsafe
+    , module Data.TypedEncoding.Combinators.ToEncStr
+    , module Data.TypedEncoding.Combinators.Promotion
+
+    -- * Exceptions 
+    , module Data.TypedEncoding.Common.Types.Exceptions
+
+    
+    , module Data.TypedEncoding.Common.Types.Common
+
  ) where
 
-import           Data.TypedEncoding.Internal.Types
-import           Data.TypedEncoding.Internal.Types.SomeEnc
-import           Data.TypedEncoding.Internal.Types.UncheckedEnc
-import           Data.TypedEncoding.Internal.Class
-import           Data.TypedEncoding.Internal.Combinators
-import           Data.TypedEncoding.Internal.Class.Encoder
+import           Data.TypedEncoding.Internal.Enc
+import           Data.TypedEncoding.Common.Types.Decoding
+import           Data.TypedEncoding.Common.Types.Validation
+
+import           Data.TypedEncoding.Common.Types.Common
+import           Data.TypedEncoding.Common.Types.CheckedEnc
+import           Data.TypedEncoding.Common.Types.SomeEnc
+import           Data.TypedEncoding.Common.Types.UncheckedEnc
+import           Data.TypedEncoding.Common.Types.Exceptions
+import           Data.TypedEncoding.Common.Class
+import           Data.TypedEncoding.Combinators.Common
+import           Data.TypedEncoding.Combinators.Encode
+import           Data.TypedEncoding.Combinators.Decode
+import           Data.TypedEncoding.Combinators.Validate
+import           Data.TypedEncoding.Combinators.Unsafe
+import           Data.TypedEncoding.Combinators.ToEncStr
+import           Data.TypedEncoding.Combinators.Promotion

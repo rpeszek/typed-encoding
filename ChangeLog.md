@@ -7,7 +7,7 @@
 - `Data.TypedEncoding.Internal.Class.IsStringR` expected to be be changed / replaced
 - functions used to create encoding instances or encoding combinators (e.g. `implEncodeP`) will get more constraints. 
 - (never ending) rework of internal module stucture to make it easier to navigate 
-- Instance and Combinator modules will be merged.
+- Instances and Combinators modules will be merged.
 - (post 0.3) "enc-B64" will be moved to a different package (more distant goal)
 
 ## Unreleased changes
@@ -16,7 +16,11 @@
   - deprecated ByteString / Text conversion functions in `Data.TypedEncoding.Instances.Restriction.ASCII`, 
     `Data.TypedEncoding.Instances.Restriction.ASCII` and `Data.TypedEncoding.Instances.Enc.Base64`
     have been removed.
-  - Displ String instance (used in examples, has been made consistent with Text and ByteString)
+  - `Displ String` instance (used in examples, has been made consistent with Text and ByteString)
+  - Modules moved: `Data.TypedEncoding.Combinators` merged into `Data.TypedEncoding.Instances`.
+
+- new
+  - `above` combinator subsumes partial encoding / decoding combinators. 
 
 ## 0.2.2 
 
