@@ -10,7 +10,7 @@ module Data.TypedEncoding.Instances.Enc.Base64 where
 
 import           Data.TypedEncoding
 import           Data.TypedEncoding.Instances.Support
-import           Data.TypedEncoding.Instances.Support.Deprecated
+import           Data.TypedEncoding.Instances.Support.Unsafe
 
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Lazy as BL

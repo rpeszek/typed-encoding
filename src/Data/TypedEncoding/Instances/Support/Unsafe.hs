@@ -8,9 +8,9 @@
 {-# LANGUAGE AllowAmbiguousTypes #-}
 {-# LANGUAGE FlexibleContexts #-}
 
--- | Direct use of these methods is deprecated.
--- use "Data.TypedEncoding.Instances.Support.Encode" or "Data.TypedEncoding.Instances.Support.Decode" 
-module Data.TypedEncoding.Instances.Support.Deprecated where
+-- | Direct use of these methods is discouraged.
+-- Use "Data.TypedEncoding.Instances.Support.Encode" or "Data.TypedEncoding.Instances.Support.Decode" 
+module Data.TypedEncoding.Instances.Support.Unsafe where
 
 import           Data.Proxy
 import           Data.TypedEncoding.Common.Types

@@ -11,7 +11,7 @@
 
 module Data.TypedEncoding.Instances.Support.Encode where
 
-import           Data.TypedEncoding.Instances.Support.Deprecated
+import           Data.TypedEncoding.Instances.Support.Unsafe
 import           Data.TypedEncoding.Internal.Enc
 import           Data.Proxy
 import           Data.TypedEncoding.Common.Types

@@ -11,7 +11,7 @@
 -- | v0.2 style decoding combinators
 module Data.TypedEncoding.Instances.Support.Decode where
 
-import           Data.TypedEncoding.Instances.Support.Deprecated
+import           Data.TypedEncoding.Instances.Support.Unsafe
 import           Data.TypedEncoding.Common.Types.Decoding
 import           Data.Proxy
 import           Data.TypedEncoding.Common.Types

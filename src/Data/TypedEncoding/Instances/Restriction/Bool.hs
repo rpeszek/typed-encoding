@@ -38,7 +38,7 @@ import           Data.Symbol.Ascii
 
 import           Data.TypedEncoding
 import           Data.TypedEncoding.Instances.Support
-import           Data.TypedEncoding.Instances.Support.Deprecated
+import           Data.TypedEncoding.Instances.Support.Unsafe
 
 
 

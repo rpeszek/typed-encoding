@@ -27,7 +27,7 @@ module Data.TypedEncoding.Instances.Support (
     -- * Type level conveniences
     , module Data.TypedEncoding.Common.Util.TypeLits
     , module Data.TypedEncoding.Combinators.Unsafe
-    --, module Data.TypedEncoding.Instances.Support.Deprecated
+    --, module Data.TypedEncoding.Instances.Support.Unsafe
    ) where
 
 import           Data.TypedEncoding.Instances.Support.Common 

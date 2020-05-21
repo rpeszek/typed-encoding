@@ -14,7 +14,7 @@
 -- encoding, decoding, recreate, or type to string conversions.
 module Data.TypedEncoding.Instances.Support.Common where
 
-import           Data.TypedEncoding.Instances.Support.Deprecated
+import           Data.TypedEncoding.Instances.Support.Unsafe
 import           Data.TypedEncoding.Common.Types
 import           Data.Proxy
 

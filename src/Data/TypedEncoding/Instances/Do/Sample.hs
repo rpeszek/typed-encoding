@@ -20,7 +20,7 @@ import qualified Data.ByteString as B
 import           Data.Char
 
 import           Data.TypedEncoding.Instances.Support
-import           Data.TypedEncoding.Instances.Support.Deprecated
+import           Data.TypedEncoding.Instances.Support.Unsafe
 
 
 instance Applicative f => Encode f "do-UPPER" "do-UPPER" c T.Text where
