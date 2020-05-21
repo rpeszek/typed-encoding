@@ -30,7 +30,7 @@ instance ValidateAll f '[] '[] conf str where
     validations = ZeroV
 
 instance (ValidateAll f nms algs conf str, Validate f nm alg conf str) => ValidateAll f (nm ': nms) (alg ': algs) conf str where  
-    validations = AppendV validation validations      
+    validations = ConsV validation validations      
 
 
 

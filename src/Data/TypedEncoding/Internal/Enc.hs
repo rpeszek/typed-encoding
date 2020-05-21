@@ -132,7 +132,7 @@ data Encoding f (nm :: Symbol) (alg :: Symbol) conf str where
 --
 -- Here are other conventions that relate to the existence of @alg@
 --
--- * functions ending with @'@, for example "Data.TypedEncoding.Combinators.Encode.encodeF'" have @alg@
+-- * functions ending with @'@, for example 'Data.TypedEncoding.Combinators.Encode.encodeF'' have @alg@
 --   as first type variable in the @forall@ list.
 --
 -- * functions without tick tend to assume @nm ~ alg@
@@ -170,7 +170,7 @@ data Encodings f (nms :: [Symbol]) (algs :: [Symbol]) conf str where
     -- | constructor is to be treated as Unsafe to Encode and Decode instance implementations
     -- particular encoding instances may expose smart constructors for limited data types
     ZeroE :: Encodings f '[] '[] conf str
-    AppendE ::  Encoding f nm alg conf str -> Encodings f nms algs conf str -> Encodings f (nm ': nms) (alg ': algs) conf str
+    ConsE ::  Encoding f nm alg conf str -> Encodings f nms algs conf str -> Encodings f (nm ': nms) (alg ': algs) conf str
 
 -- |
 -- Runs encodings, requires -XTypeApplication annotation specifying the algorithm(s)
@@ -181,7 +181,7 @@ data Encodings f (nms :: [Symbol]) (algs :: [Symbol]) conf str where
 
 runEncodings' :: forall algs nms f c str . (Monad f) => Encodings f nms algs c str -> Enc ('[]::[Symbol]) c str -> f (Enc nms c str)
 runEncodings' ZeroE enc0 = pure enc0
-runEncodings' (AppendE fn enc) enc0 = 
+runEncodings' (ConsE fn enc) enc0 = 
         let re :: f (Enc _ c str) = runEncodings' enc enc0
         in re >>= runEncoding' fn
 

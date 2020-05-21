@@ -27,7 +27,7 @@ instance DecodeAll f '[] '[] conf str where
     decodings = ZeroD 
 
 instance (DecodeAll f nms algs conf str, Decode f nm alg conf str) => DecodeAll f (nm ': nms) (alg ': algs) conf str where  
-    decodings = AppendD decoding decodings      
+    decodings = ConsD decoding decodings      
 
 
 -- | With type safety in place decoding errors should be unexpected.

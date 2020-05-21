@@ -33,7 +33,7 @@ instance EncodeAll f '[] '[] conf str where
     encodings = ZeroE  
 
 instance (EncodeAll f nms algs conf str, Encode f nm alg conf str) => EncodeAll f (nm ': nms) (alg ': algs) conf str where  
-    encodings = AppendE encoding encodings      
+    encodings = ConsE encoding encodings      
 
 
 

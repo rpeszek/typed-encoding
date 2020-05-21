@@ -56,13 +56,13 @@ data Validations f (nms :: [Symbol]) (algs :: [Symbol]) conf str where
     -- | constructor is to be treated as Unsafe to Encode and Decode instance implementations
     -- particular encoding instances may expose smart constructors for limited data types
     ZeroV :: Validations f '[] '[] conf str
-    AppendV ::  Validation f nm alg conf str -> Validations f nms algs conf str -> Validations f (nm ': nms) (alg ': algs) conf str
+    ConsV ::  Validation f nm alg conf str -> Validations f nms algs conf str -> Validations f (nm ': nms) (alg ': algs) conf str
 
 -- | This basically puts payload in decoded state.
 -- More useful combinators are in "Data.TypedEncoding.Combinators.Validate"
 runValidationChecks :: forall algs nms f c str . (Monad f) => Validations f nms algs c str -> Enc nms c str -> f (Enc ('[]::[Symbol]) c str)
 runValidationChecks ZeroV enc0 = pure enc0
-runValidationChecks (AppendV fn xs) enc = 
+runValidationChecks (ConsV fn xs) enc = 
         let re :: f (Enc _ c str) = runValidation fn enc
         in re >>= runValidationChecks xs
 

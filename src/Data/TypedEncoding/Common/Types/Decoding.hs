@@ -62,11 +62,11 @@ data Decodings f (nms :: [Symbol]) (algs :: [Symbol]) conf str where
     -- | constructor is to be treated as Unsafe to Encode and Decode instance implementations
     -- particular encoding instances may expose smart constructors for limited data types
     ZeroD :: Decodings f '[] '[] conf str
-    AppendD ::  Decoding f nm alg conf str -> Decodings f nms algs conf str -> Decodings f (nm ': nms) (alg ': algs) conf str
+    ConsD ::  Decoding f nm alg conf str -> Decodings f nms algs conf str -> Decodings f (nm ': nms) (alg ': algs) conf str
 
 runDecodings :: forall algs nms f c str . (Monad f) => Decodings f nms algs c str -> Enc nms c str -> f (Enc ('[]::[Symbol]) c str)
 runDecodings ZeroD enc0 = pure enc0
-runDecodings (AppendD fn xs) enc = 
+runDecodings (ConsD fn xs) enc = 
         let re :: f (Enc _ c str) = runDecoding fn enc
         in re >>= runDecodings xs
 
