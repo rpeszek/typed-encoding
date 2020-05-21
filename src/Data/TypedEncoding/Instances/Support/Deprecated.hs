@@ -12,13 +12,9 @@
 -- use "Data.TypedEncoding.Instances.Support.Encode" or "Data.TypedEncoding.Instances.Support.Decode" 
 module Data.TypedEncoding.Instances.Support.Deprecated where
 
-import           Data.String
 import           Data.Proxy
-import           Text.Read
 import           Data.TypedEncoding.Common.Types
 import           Data.TypedEncoding.Combinators.Unsafe
-import           Data.TypedEncoding.Common.Class.IsStringR 
-import           GHC.TypeLits
 
 
 

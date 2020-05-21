@@ -17,12 +17,10 @@ module Data.TypedEncoding.Combinators.Promotion where
 
 import           Data.TypedEncoding.Common.Class
 import           Data.TypedEncoding.Common.Util.TypeLits
---import           Data.TypedEncoding.Common.Class.Util (displ)
 
 import           Data.TypedEncoding.Common.Types (Enc(..) )
 import           Data.TypedEncoding.Combinators.Unsafe (withUnsafeCoerce)
-import           GHC.TypeLits
-import           Data.Symbol.Ascii
+
 
 -- $setup
 -- >>> :set -XOverloadedStrings -XMultiParamTypeClasses -XDataKinds -XTypeApplications

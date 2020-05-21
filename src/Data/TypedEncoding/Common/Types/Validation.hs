@@ -21,7 +21,7 @@ import           GHC.TypeLits
 
 import           Data.TypedEncoding.Internal.Enc
 import           Data.TypedEncoding.Common.Types.Common
-import           Data.TypedEncoding.Common.Types.UncheckedEnc
+
 
 -- |
 -- Validation unwraps a layer of encoding and offers payload data down the encoding stack

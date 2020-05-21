@@ -15,7 +15,6 @@ import           Data.Word
 import           Data.Functor.Identity
 import           Data.String
 import           Data.Proxy
--- import           Data.Word
 import           Text.Read
 
 import           Data.TypedEncoding.Common.Class.IsStringR

@@ -13,17 +13,10 @@
 
 module Data.TypedEncoding.Common.Types.Exceptions where
 
-import           Data.TypedEncoding.Internal.Enc
-import           Data.TypedEncoding.Common.Types.Decoding
-import           Data.TypedEncoding.Common.Types.Validation
-import           Data.TypedEncoding.Common.Types.CheckedEnc
-import           Data.TypedEncoding.Common.Types.UncheckedEnc
-import           Data.TypedEncoding.Common.Types.Common
 
 import           Data.Proxy
--- import           Data.Functor.Identity
 import           GHC.TypeLits
--- import           Data.TypedEncoding.Common.Class.Util
+
 
 -- $setup
 -- >>> :set -XOverloadedStrings -XMultiParamTypeClasses -XDataKinds -XAllowAmbiguousTypes

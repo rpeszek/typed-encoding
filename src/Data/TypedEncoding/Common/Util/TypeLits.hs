@@ -28,9 +28,8 @@
 module  Data.TypedEncoding.Common.Util.TypeLits where
 
 import           GHC.TypeLits
--- import           Data.Symbol.Utils
 import           Data.Symbol.Ascii
--- import           Data.Proxy
+
 
 -- $setup
 -- >>> :set -XScopedTypeVariables -XTypeFamilies -XKindSignatures -XDataKinds

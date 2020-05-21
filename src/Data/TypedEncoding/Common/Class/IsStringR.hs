@@ -12,7 +12,6 @@ module Data.TypedEncoding.Common.Class.IsStringR where
 import           Data.Proxy
 
 import           Data.String
--- import qualified Data.ByteString.Char8 as B
 import qualified Data.Text as T
 import qualified Data.Text.Lazy as TL
 

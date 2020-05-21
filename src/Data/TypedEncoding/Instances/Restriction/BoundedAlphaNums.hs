@@ -55,10 +55,6 @@ type instance IsSupersetOpen "r-ASCII" "r-ban" xs = 'True
 instance (KnownSymbol s , IsBan s ~ 'True, AlgNm s ~ "r-ban", IsStringR str) => Encode (Either EncodeEx) s "r-ban" c str where
     encoding = encFBan
 
--- TODO remove 
-
--- instance  (KnownSymbol s, "r-ban" ~ TakeUntil s ":" , IsStringR str, WhichEncoder (Either EncodeEx) xs grps c str) => WhichEncoder (Either EncodeEx) (s ': xs) ("r-ban" ': grps) c str where
---     encoder = AppendEnc encFBan encoder
 
 -- |
 -- >>> runEncoding encFBan . toEncoding () $ "C59F9FB7-4621-44D9-9020-CE37BF6E2BD1" :: Either EncodeEx (Enc '["r-ban:FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF"] () T.Text)
@@ -90,8 +86,7 @@ instance (KnownSymbol s , IsBan s ~ 'True, Algorithm s "r-ban", IsStringR str, R
     validation = validFromEnc' @"r-ban" encFBan
 
 
--- TODO v0.3 remove f from forall in encFBan (slightly breaking chanage)
-
+-- * Implementation
 
 -- |
 -- >>> verifyBoundedAlphaNum (Proxy :: Proxy "r-ban:FF-FF") (T.pack "12-3E")

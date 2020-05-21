@@ -16,14 +16,6 @@ module Data.TypedEncoding.Instances.Support.Common where
 
 import           Data.TypedEncoding.Instances.Support.Deprecated
 import           Data.TypedEncoding.Common.Types
-import           Data.TypedEncoding.Common.Class 
-import           Data.TypedEncoding.Instances.Support.Helpers 
-import           Data.TypedEncoding.Instances.Support.Encode 
-import           Data.TypedEncoding.Instances.Support.Decode 
-import           Data.TypedEncoding.Common.Util.TypeLits
-import           Data.TypedEncoding.Combinators.Unsafe 
-
-import           GHC.TypeLits
 import           Data.Proxy
 
 -- $setup

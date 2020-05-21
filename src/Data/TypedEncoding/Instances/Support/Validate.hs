@@ -15,9 +15,6 @@
 module Data.TypedEncoding.Instances.Support.Validate where
 import           Data.TypedEncoding.Common.Types
 import           Data.TypedEncoding.Common.Class 
-import           Data.TypedEncoding.Instances.Support.Helpers 
-import           Data.TypedEncoding.Common.Util.TypeLits
-import           Data.TypedEncoding.Combinators.Unsafe 
 
 import           GHC.TypeLits
 import           Data.Proxy

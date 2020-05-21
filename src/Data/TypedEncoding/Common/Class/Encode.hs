@@ -11,11 +11,7 @@
 module Data.TypedEncoding.Common.Class.Encode where
 
 import           Data.TypedEncoding.Internal.Enc
-import           Data.TypedEncoding.Common.Class.Util -- Append
-import           Data.TypedEncoding.Combinators.Common
-import           GHC.TypeLits
-import           Data.Functor.Identity
-import           Data.Proxy
+
 
 -- | 
 -- Using 2 Symbol type variables (@nm@ and @alg@) creates what seems like redundant typing

@@ -13,12 +13,8 @@ module Data.TypedEncoding.Instances.Support.Encode where
 
 import           Data.TypedEncoding.Instances.Support.Deprecated
 import           Data.TypedEncoding.Internal.Enc
-import           Data.String
 import           Data.Proxy
-import           Text.Read
 import           Data.TypedEncoding.Common.Types
-import           Data.TypedEncoding.Combinators.Unsafe
-import           Data.TypedEncoding.Common.Class.IsStringR 
 import           GHC.TypeLits
 
 

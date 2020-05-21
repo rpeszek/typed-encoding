@@ -15,6 +15,8 @@
 --
 -- @since 0.2.1.0
 -- 
+-- /(Experimental)/ This module was not converted to v0.3.
+--
 -- == Grammar
 -- 
 -- Simple grammar requires boolean terms to be included in parentheses
@@ -38,10 +40,6 @@ import           Data.TypedEncoding
 import           Data.TypedEncoding.Instances.Support
 import           Data.TypedEncoding.Instances.Support.Deprecated
 
--- import           Data.TypedEncoding.Common.Util.TypeLits
-
--- import qualified Data.Text as T
--- import           Data.TypedEncoding.Instances.Restriction.Misc()
 
 
 -- $setup

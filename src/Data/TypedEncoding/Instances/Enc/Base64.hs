@@ -22,8 +22,7 @@ import qualified Data.Text.Lazy.Encoding as TEL
 import qualified Data.ByteString.Base64 as B64
 import qualified Data.ByteString.Base64.Lazy as BL64
 
--- import qualified Data.ByteString.Base64.URL as B64URL
--- import qualified Data.ByteString.Base64.URL.Lazy as BL64URL
+
 
 -- $setup
 -- >>> :set -XScopedTypeVariables -XKindSignatures -XMultiParamTypeClasses -XDataKinds -XPolyKinds -XPartialTypeSignatures -XFlexibleInstances

@@ -39,4 +39,4 @@ import           Data.TypedEncoding.Common.Types
 import           Data.TypedEncoding.Common.Class 
 import           Data.TypedEncoding.Common.Util.TypeLits
 import           Data.TypedEncoding.Combinators.Unsafe 
--- import           Data.TypedEncoding.Instances.Support.Deprecated
+

@@ -14,9 +14,6 @@ module Test.Bc.ASCIISpec where
 import qualified Data.TypedEncoding.Instances.Restriction.ASCII as ASCII
 import           Data.TypedEncoding.Common.Class.Util.StringConstraints
 
-
--- import qualified Data.ByteString as B
--- import qualified Data.ByteString.Lazy as BL
 import qualified Data.Text as T
 import qualified Data.Text.Lazy as TL
 import qualified Data.List as L

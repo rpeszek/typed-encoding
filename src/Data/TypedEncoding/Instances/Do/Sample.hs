@@ -16,7 +16,7 @@ module Data.TypedEncoding.Instances.Do.Sample where
 import qualified Data.Text as T
 import qualified Data.Text.Lazy as TL
 import qualified Data.ByteString as B
--- import qualified Data.ByteString.Lazy as BL
+
 import           Data.Char
 
 import           Data.TypedEncoding.Instances.Support

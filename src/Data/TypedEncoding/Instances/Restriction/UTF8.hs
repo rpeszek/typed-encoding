@@ -16,19 +16,13 @@ module Data.TypedEncoding.Instances.Restriction.UTF8 where
 import           Data.TypedEncoding.Instances.Support
 
 import           Data.Proxy
--- import           GHC.TypeLits
 
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Lazy as BL
--- import qualified Data.Text as T
--- import qualified Data.Text.Lazy as TL
 import qualified Data.Text.Encoding as TE 
 import qualified Data.Text.Lazy.Encoding as TEL 
-
--- import qualified Data.ByteString.Char8 as B8
--- import qualified Data.ByteString.Lazy.Char8 as BL8
-
 import           Data.Either
+
 
 -- $setup
 -- >>> :set -XScopedTypeVariables -XKindSignatures -XMultiParamTypeClasses -XDataKinds -XPolyKinds -XPartialTypeSignatures -XFlexibleInstances -XTypeApplications

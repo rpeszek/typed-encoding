@@ -17,7 +17,7 @@ import           Data.TypedEncoding.Combinators.Common
 import           Data.TypedEncoding.Common.Class.Encode
 import           GHC.TypeLits
 import           Data.Functor.Identity
--- import           Data.Proxy
+
 
 -- * Convenience combinators which mimic pre-v0.3 type signatures. These assume that @algs@ are the same as @nms@
 

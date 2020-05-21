@@ -16,13 +16,9 @@
 module Data.TypedEncoding.Combinators.ToEncStr where
 
 import           Data.TypedEncoding.Common.Class
-
 import           Data.TypedEncoding.Common.Types (Enc(..) )
-import           Data.TypedEncoding.Combinators.Unsafe (withUnsafeCoerce)
 
 import           Data.Functor.Identity
-import           GHC.TypeLits
-
 
 toEncStringF :: forall nm f a str  . (ToEncString f nm nm a str) => a -> f (Enc '[nm] () str)
 toEncStringF = toEncStringF' @nm @nm
