@@ -20,14 +20,15 @@ import qualified Data.ByteString as B
 import           Data.Char
 
 import           Data.TypedEncoding.Instances.Support
+import           Data.TypedEncoding.Instances.Support.Deprecated
 
 
 instance Applicative f => Encode f "do-UPPER" "do-UPPER" c T.Text where
-    encoding = mkEncoding (implEncodeP T.toUpper)
+    encoding = _implEncodingP T.toUpper
 
 instance (RecreateErr f, Applicative f) => Validate f "do-UPPER" "do-UPPER" c T.Text where
     validation = mkValidation $
-                          implCheckPrevF (asRecreateErr @"do-UPPER" . (\t -> 
+                          implTranF (asRecreateErr @"do-UPPER" . (\t -> 
                                  let (g,b) = T.partition isUpper t
                                  in if T.null b
                                     then Right t
@@ -36,30 +37,30 @@ instance (RecreateErr f, Applicative f) => Validate f "do-UPPER" "do-UPPER" c T.
 
 
 instance Applicative f => Encode f "do-UPPER" "do-UPPER" c TL.Text where
-    encoding = mkEncoding (implEncodeP TL.toUpper)
+    encoding = _implEncodingP TL.toUpper
 
 
 
 instance Applicative f => Encode f "do-lower" "do-lower" c T.Text where
-    encoding = mkEncoding $ implEncodeP T.toLower   
+    encoding = _implEncodingP T.toLower   
 
 instance Applicative f => Encode f "do-lower" "do-lower" c TL.Text where
-    encoding = mkEncoding $  implEncodeP TL.toLower 
+    encoding = _implEncodingP TL.toLower 
 
 instance Applicative f => Encode f "do-Title" "do-Title" c T.Text where
-    encoding = mkEncoding $ implEncodeP T.toTitle   
+    encoding = _implEncodingP T.toTitle   
 
 instance Applicative f => Encode f "do-Title" "do-Title" c TL.Text where
-    encoding = mkEncoding $ implEncodeP TL.toTitle   
+    encoding = _implEncodingP TL.toTitle   
 
 instance Applicative f => Encode f "do-reverse" "do-reverse" c T.Text where
-    encoding = mkEncoding $ implEncodeP T.reverse 
+    encoding = _implEncodingP T.reverse 
 instance Applicative f => Encode f "do-reverse" "do-reverse" c TL.Text where
-    encoding = mkEncoding $ implEncodeP TL.reverse    
+    encoding = _implEncodingP TL.reverse    
 
 newtype SizeLimit = SizeLimit {unSizeLimit :: Int} deriving (Eq, Show)
 instance (HasA SizeLimit c, Applicative f) => Encode f "do-size-limit" "do-size-limit" c T.Text where
-    encoding = mkEncoding $ implEncodeP' (T.take . unSizeLimit . has @ SizeLimit) 
+    encoding = _implEncodingConfP (T.take . unSizeLimit . has @ SizeLimit) 
 instance (HasA SizeLimit c, Applicative f) => Encode f "do-size-limit" "do-size-limit" c B.ByteString where
-    encoding = mkEncoding $ implEncodeP' (B.take . unSizeLimit .  has @ SizeLimit) 
+    encoding = _implEncodingConfP (B.take . unSizeLimit .  has @ SizeLimit) 
 

@@ -25,8 +25,6 @@
 -- This is a simple implementation that converts to @String@, should be used
 -- only with short length data.
 --
--- Decoding function @decFR@ is located in
--- "Data.TypedEncoding.Instances.Support"
 --
 -- @since 0.2.1.0
 module Data.TypedEncoding.Instances.Restriction.BoundedAlphaNums where 
@@ -73,17 +71,17 @@ encFBan :: forall s t xs c str .
                 IsStringR str
               , KnownSymbol s
               , IsBan s ~ 'True
-              , AlgNm s ~ "r-ban"
+              , Algorithm s "r-ban"
               ) => 
               Encoding (Either EncodeEx) s "r-ban" c str
-encFBan = mkEncoding $ implEncodeF @s (verifyBoundedAlphaNum (Proxy :: Proxy s))              
+encFBan = _implEncodingEx @s (verifyBoundedAlphaNum (Proxy :: Proxy s))              
 
 
 
 -- * Decoding
 
 instance (KnownSymbol s, Restriction s, Algorithm s "r-ban", Applicative f) => Decode f s "r-ban" c str where
-    decoding = decAnyR
+    decoding = decAnyR_
 
 
 -- * Validation

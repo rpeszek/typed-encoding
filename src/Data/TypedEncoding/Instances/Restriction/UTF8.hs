@@ -73,10 +73,10 @@ instance Encode (Either EncodeEx) "r-UTF8" "r-UTF8" c BL.ByteString where
     encoding = encUTF8BL :: Encoding (Either EncodeEx) "r-UTF8" "r-UTF8" c BL.ByteString
 
 encUTF8B :: Encoding (Either EncodeEx) "r-UTF8" "r-UTF8" c B.ByteString
-encUTF8B = mkEncoding (implEncodeF @"r-UTF8"(fmap TE.encodeUtf8 . TE.decodeUtf8'))
+encUTF8B = _implEncodingEx (fmap TE.encodeUtf8 . TE.decodeUtf8')
 
 encUTF8BL :: Encoding (Either EncodeEx) "r-UTF8" "r-UTF8" c BL.ByteString
-encUTF8BL = mkEncoding (implEncodeF @"r-UTF8" (fmap TEL.encodeUtf8 . TEL.decodeUtf8'))
+encUTF8BL = _implEncodingEx (fmap TEL.encodeUtf8 . TEL.decodeUtf8')
 
 -- * Decoding
 

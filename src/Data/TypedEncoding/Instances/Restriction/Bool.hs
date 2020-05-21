@@ -36,6 +36,8 @@ import           Data.Symbol.Ascii
 
 import           Data.TypedEncoding
 import           Data.TypedEncoding.Instances.Support
+import           Data.TypedEncoding.Instances.Support.Deprecated
+
 -- import           Data.TypedEncoding.Common.Util.TypeLits
 
 -- import qualified Data.Text as T
@@ -246,10 +248,17 @@ decBoolR :: forall f xs t s c str . (
 
 decBoolR = implTranP id 
 
+
+-- | needs to be converted to v0.3 style
 recWithEncBoolR :: forall (s :: Symbol) xs c str . (NestedR s ~ 'True) 
                        => (Enc xs c str -> Either EncodeEx (Enc (s ': xs) c str)) 
                        -> Enc xs c str -> Either RecreateEx (Enc (s ': xs) c str)
 recWithEncBoolR = unsafeRecWithEncR
+
+unsafeRecWithEncR :: forall (s :: Symbol) xs c str .
+                       (Enc xs c str -> Either EncodeEx (Enc (s ': xs) c str)) 
+                       -> Enc xs c str -> Either RecreateEx (Enc (s ': xs) c str)
+unsafeRecWithEncR fn = either (Left . encToRecrEx) Right . fn
 
 -- * Type family based parser 
 

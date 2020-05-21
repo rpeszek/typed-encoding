@@ -151,7 +151,7 @@ module Data.TypedEncoding (
 
     -- * @Encoding@ and basic combinators
     , Encoding (..)
-    , mkEncoding
+    , _mkEncoding
     , runEncoding
     , _runEncoding 
   
@@ -170,35 +170,37 @@ module Data.TypedEncoding (
     -- * Classes
     , module Data.TypedEncoding.Common.Class
   
-    -- TODO cleaup types
-    , recreateErrUnknown
-
-    -- * Combinators
+      -- * Combinators
     , module Data.TypedEncoding.Combinators.Common
     , module Data.TypedEncoding.Combinators.Encode
     , module Data.TypedEncoding.Combinators.Decode
     , module Data.TypedEncoding.Combinators.Validate
     , module Data.TypedEncoding.Combinators.Unsafe
+    , module Data.TypedEncoding.Combinators.ToEncStr
+    , module Data.TypedEncoding.Combinators.Promotion
 
-   -- * Exceptions 
-    , EncodeEx(..)
-    , RecreateEx(..)
-    , UnexpectedDecodeEx(..)
-    , EncAnn 
+    -- * Exceptions 
+    , module Data.TypedEncoding.Common.Types.Exceptions
+
+    
+    , module Data.TypedEncoding.Common.Types.Common
 
  ) where
 
-import           Data.TypedEncoding.Common.Types
 import           Data.TypedEncoding.Internal.Enc
 import           Data.TypedEncoding.Common.Types.Decoding
 import           Data.TypedEncoding.Common.Types.Validation
 
+import           Data.TypedEncoding.Common.Types.Common
 import           Data.TypedEncoding.Common.Types.CheckedEnc
 import           Data.TypedEncoding.Common.Types.SomeEnc
 import           Data.TypedEncoding.Common.Types.UncheckedEnc
+import           Data.TypedEncoding.Common.Types.Exceptions
 import           Data.TypedEncoding.Common.Class
 import           Data.TypedEncoding.Combinators.Common
 import           Data.TypedEncoding.Combinators.Encode
 import           Data.TypedEncoding.Combinators.Decode
 import           Data.TypedEncoding.Combinators.Validate
 import           Data.TypedEncoding.Combinators.Unsafe
+import           Data.TypedEncoding.Combinators.ToEncStr
+import           Data.TypedEncoding.Combinators.Promotion

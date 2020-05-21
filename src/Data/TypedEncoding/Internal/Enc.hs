@@ -66,7 +66,14 @@ getPayload (MkEnc _ _ str) = str
 -- Wraps encoding function that adds encoding to existing stack.
 -- Contains type level information about algorithm used. 
 --
--- Example:
+-- This type is used by programs implementing encoding instance.
+-- Such program needs to define a value of this type. 
+-- It also implements 'Data.TypedEncoding.Common.Class.Encode.Encode' instance that simply returns that value.
+--
+-- Programs using encoding can access this type using 'Data.TypedEncoding.Common.Class.Encode.Encode.encoding'
+-- but a better (and recommended) approach is to use plural sibling 'Encodings'.
+--
+-- Examples: -- TODO v0.3
 --
 -- @
 -- Encoding Identity "enc-B64" "enc-B64" () ByteString
@@ -98,9 +105,15 @@ data Encoding f (nm :: Symbol) (alg :: Symbol) conf str where
     UnsafeMkEncoding :: Proxy nm -> (forall (xs :: [Symbol]) . Enc xs conf str -> f (Enc (nm ': xs) conf str)) -> Encoding f nm alg conf str
 
 -- | Type safe smart constructor
--- adding the type family @(AlgNm nm)@ restriction to UnsafeMkEncoding slows down compilation, especially in tests.      
-mkEncoding :: forall f (nm :: Symbol) conf str . (forall (xs :: [Symbol]) . Enc xs conf str -> f (Enc (nm ': xs) conf str)) -> Encoding f nm (AlgNm nm) conf str
-mkEncoding = UnsafeMkEncoding Proxy
+--
+-- Adding the type family @(AlgNm nm)@ restriction to UnsafeMkEncoding slows down compilation, especially in tests.  
+-- This approach also provides more future flexibility. 
+-- 
+-- /Notice underscore @_@ convention, it indicates a use of @Algorithm@ @AlgNm@: compiler figures out @alg@ value. These can be slower to compile when used. /
+-- 
+-- This particular function appears to not increase compilation time. 
+_mkEncoding :: forall f (nm :: Symbol) conf str . (forall (xs :: [Symbol]) . Enc xs conf str -> f (Enc (nm ': xs) conf str)) -> Encoding f nm (AlgNm nm) conf str
+_mkEncoding = UnsafeMkEncoding Proxy
 
 runEncoding :: forall alg nm f xs conf str . Encoding f nm alg conf str -> Enc xs conf str -> f (Enc (nm ': xs) conf str)
 runEncoding (UnsafeMkEncoding _ fn) = fn
@@ -108,14 +121,27 @@ runEncoding (UnsafeMkEncoding _ fn) = fn
 -- | Same as 'runEncoding" but compiler figures out algorithm name
 --
 -- Using it can slowdown compilation
-_runEncoding :: forall nm f xs conf str alg . (AlgNm nm ~ alg) => Encoding f nm alg conf str -> Enc xs conf str -> f (Enc (nm ': xs) conf str)
+--
+-- /Notice underscore @_@ convention, it indicates a use of @Algorithm@ @AlgNm@: compiler figures out @alg@ value. These can be slower to compile when used. /
+--
+-- Current definition of @Algorithm nm alg@ is @AlgNm nm ~ alg@, which means that name has a format
+-- @alg:...@, for example @"ban:999-99-9999". This most likely will be relaxed in the future
+-- allowing for more than one algorithm @alg@ that can produce given encoding @nm@.
+--
+-- If that happens @-XTypeApplications@ annotations will be needed and @_@ methods will simply 
+-- use default algorithm name.
+_runEncoding :: forall nm f xs conf str alg . (Algorithm nm alg) => Encoding f nm alg conf str -> Enc xs conf str -> f (Enc (nm ': xs) conf str)
 _runEncoding = runEncoding @(AlgNm nm)
 
 -- |
 -- Wraps a list of @Encoding@ elements.
 --
--- Similarly to 'Encoding' it can be used with a typeclass
--- 'Data.TypedEncoding.Common.Class.Encode.EncodeAll'
+-- Can be easily accessed with 'Data.TypedEncoding.Common.Class.Encode.EncodeAll' constraint using
+-- 'Data.TypedEncoding.Common.Class.Encode.EncodeAll.encodings'.
+--
+-- Example:
+-- TODO v0.3
+--
 data Encodings f (nms :: [Symbol]) (algs :: [Symbol]) conf str where
     -- | constructor is to be treated as Unsafe to Encode and Decode instance implementations
     -- particular encoding instances may expose smart constructors for limited data types
@@ -130,5 +156,7 @@ runEncodings (AppendE fn enc) enc0 =
 
 
 -- | At possibly big compilation cost, have compiler figure out algorithm names.
+--
+-- (see '_runEncoding')
 _runEncodings :: forall nms f c str algs . (Monad f, algs ~ AlgNmMap nms) => Encodings f nms algs c str -> Enc ('[]::[Symbol]) c str -> f (Enc nms c str)
 _runEncodings = runEncodings @(AlgNmMap nms)

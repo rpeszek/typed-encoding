@@ -10,6 +10,7 @@
 {-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE PartialTypeSignatures #-}
 {-# OPTIONS_GHC -Wno-partial-type-signatures #-}
+
 -- |
 -- Internal definition of types
 --
@@ -22,6 +23,10 @@ import           GHC.TypeLits
 import           Data.TypedEncoding.Internal.Enc
 import           Data.TypedEncoding.Common.Types.Common
 
+-- |
+-- Similar to 'Data.TypedEncoding.Common.Types.Enc.Encoding'
+--
+-- Used to create instances of decoding.
 
 data Decoding f (nm :: Symbol) (alg :: Symbol) conf str where
     -- | Consider this constructor as private or use it with care
@@ -35,7 +40,7 @@ data Decoding f (nm :: Symbol) (alg :: Symbol) conf str where
     UnsafeMkDecoding :: Proxy nm -> (forall (xs :: [Symbol]) . Enc (nm ': xs) conf str -> f (Enc xs conf str)) -> Decoding f nm alg conf str
 
 -- | Type safe smart constructor
--- adding the type family @(AlgNm nm)@ restriction to UnsafeMkDecoding slows down compilation, especially in tests.      
+-- (See also 'Data.TypedEncoding.Common.Types.Enc._mkEncoding')      
 mkDecoding :: forall f (nm :: Symbol) conf str . (forall (xs :: [Symbol]) . Enc (nm ': xs) conf str -> f (Enc xs conf str)) -> Decoding f nm (AlgNm nm) conf str
 mkDecoding = UnsafeMkDecoding Proxy
 
@@ -51,8 +56,8 @@ _runDecoding = runDecoding @(AlgNm nm)
 -- |
 -- Wraps a list of @Decoding@ elements.
 --
--- Similarly to 'Decoding' it can be used with a typeclass
--- 'Data.TypedDecoding.Internal.Class.Encode.EncodeAll'
+-- Similarly to 'Data.TypedEncoding.Common.Types.Enc.Encodings' can be used with a typeclass
+-- 'Data.TypedDecoding.Internal.Class.Decode.DecodeAll'
 data Decodings f (nms :: [Symbol]) (algs :: [Symbol]) conf str where
     -- | constructor is to be treated as Unsafe to Encode and Decode instance implementations
     -- particular encoding instances may expose smart constructors for limited data types

@@ -29,8 +29,6 @@ type Restriction s = (KnownSymbol s, IsR s ~ 'True)
 type Algorithm nm alg = AlgNm nm ~ alg
 
 
--- TODO v3 more to internal
-
 -- |
 -- Converts encoding name to algorithm name, this assumes the ":" delimiter expected by this library. 
 --

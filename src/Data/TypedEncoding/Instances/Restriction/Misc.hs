@@ -40,7 +40,7 @@ instance (IsStringR str, UnexpectedDecodeErr f, Applicative f) => FromEncString 
     fromEncF  = asUnexpected @ "r-Word8-decimal" . readEither . toString . getPayload
 
 encWord8Dec :: (IsStringR str) => Encoding (Either EncodeEx) "r-Word8-decimal" "r-Word8-decimal" c str
-encWord8Dec = mkEncoding $ implEncodeF @"r-Word8-decimal" (verifyWithRead @Word8 "Word8-decimal")
+encWord8Dec = _implEncodingEx (verifyWithRead @Word8 "Word8-decimal")
 
 
 instance (IsStringR str) =>  Encode (Either EncodeEx) "r-Int-decimal" "r-Int-decimal" c str where
@@ -53,7 +53,7 @@ instance IsString str => ToEncString Identity "r-Int-decimal" "r-Int-decimal" In
     toEncF  i = Identity $ MkEnc Proxy () (fromString . show $ i)
 
 encIntDec :: (IsStringR str) => Encoding (Either EncodeEx) "r-Int-decimal" "r-Int-decimal" c str
-encIntDec =  mkEncoding $ implEncodeF @"r-Int-decimal" (verifyWithRead @Int "Int-decimal")
+encIntDec =  _implEncodingEx (verifyWithRead @Int "Int-decimal")
 
 
 

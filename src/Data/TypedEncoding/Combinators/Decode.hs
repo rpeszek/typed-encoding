@@ -10,14 +10,14 @@
 -- | Combinators reexported in Data.TypedEncoding
 module Data.TypedEncoding.Combinators.Decode where
 
-import           Data.TypedEncoding.Common.Types (UnexpectedDecodeEx(..))
+-- import           Data.TypedEncoding.Common.Types (UnexpectedDecodeEx(..))
 import           Data.TypedEncoding.Internal.Enc
 import           Data.TypedEncoding.Common.Types.Decoding
 import           Data.TypedEncoding.Combinators.Common
 
 import           Data.TypedEncoding.Common.Class.Util
 import           Data.TypedEncoding.Common.Class.Decode
-import           Data.Proxy
+-- import           Data.Proxy
 import           Data.Functor.Identity
 import           GHC.TypeLits
 

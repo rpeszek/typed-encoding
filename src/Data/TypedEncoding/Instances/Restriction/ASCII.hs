@@ -46,26 +46,6 @@ import           Data.Char
 
 
 -----------------
--- Conversions --
------------------
-
--- TODO v0.3 Superset
-
--- | allow to treat ASCII encodings as UTF8 forgetting about B64 encoding
--- 
--- UTF-8 is backward compatible on first 128 characters using just one byte to store it.
--- 
--- Payload does not change when @ASCII@ only strings are encoded to @UTF8@ in types like @ByteString@.
---
--- >>> let Right tstAscii = encFAll . toEncoding () $ "Hello World" :: Either EncodeEx (Enc '["r-ASCII"] () T.Text)
--- >>> displ (inject @ "r-UTF8" tstAscii)
--- "MkEnc '[r-UTF8] () (Text Hello World)"
-instance Superset "r-UTF8" "r-ASCII" where
-
--- type instance IsSuperset "r-UTF8" "r-ASCII" = True  
--- type instance IsSuperset "r-ASCII" "r-ASCII" = True  
-
------------------
 -- Encodings  --
 -----------------
 
@@ -80,10 +60,10 @@ instance Char8Find str => Encode (Either EncodeEx) "r-ASCII" "r-ASCII" c str whe
     encoding = encASCII
 
 encASCIIChar :: Encoding (Either EncodeEx) "r-ASCII" "r-ASCII" c Char 
-encASCIIChar = mkEncoding $ implEncodeF @"r-ASCII" (\c -> explainBool NonAsciiChar (c, isAscii c))    
+encASCIIChar = _implEncodingEx (\c -> explainBool NonAsciiChar (c, isAscii c))    
 
 encASCII :: Char8Find str =>  Encoding (Either EncodeEx) "r-ASCII" "r-ASCII" c str
-encASCII = mkEncoding $ implEncodeF @"r-ASCII" encImpl
+encASCII = _implEncodingEx @"r-ASCII" encImpl
 
 encImpl :: Char8Find str => str -> Either NonAsciiChar str
 encImpl str = case find (not . isAscii) str of 
