@@ -23,7 +23,12 @@ import           Data.TypedEncoding.Common.Types.Common
 
 -- $setup
 -- >>> :set -XOverloadedStrings -XMultiParamTypeClasses -XDataKinds -XAllowAmbiguousTypes
+-- >>> import qualified Data.ByteString as B
 -- >>> import qualified Data.Text as T
+-- >>> import Data.Functor.Identity
+-- >>> import Data.TypedEncoding
+-- >>> import Data.TypedEncoding.Instances.Enc.Base64 ()
+-- >>> import Data.TypedEncoding.Instances.Restriction.BoundedAlphaNums ()
 
 -- Contains encoded data annotated by 
 --
@@ -51,7 +56,7 @@ instance (SymbolList xs, Show c, Displ str) => Displ ( Enc xs c str) where
         "MkEnc '" ++ displ (Proxy :: Proxy xs) ++ " " ++ show c ++ " " ++ displ s
 
 
-toEncoding :: conf -> str -> Enc '[] conf str
+toEncoding :: conf -> str -> Enc ('[] :: [Symbol]) conf str
 toEncoding = MkEnc Proxy 
 
 fromEncoding :: Enc '[] conf str -> str
@@ -73,19 +78,32 @@ getPayload (MkEnc _ _ str) = str
 -- Programs using encoding can access this type using 'Data.TypedEncoding.Common.Class.Encode.Encode.encoding'
 -- but a better (and recommended) approach is to use plural sibling 'Encodings'.
 --
--- Examples: -- TODO v0.3
+-- * @"nm"@ symbol defines the encoding
+-- * @"alg"@ symbol defines algorithm 
+--
+-- These two are related, currently this library only supports 
+--
+-- * Names containing ":" using format "alg:...", for example name "r-ban:999" has "r-ban" algorithm 
+-- * Names without ":" require that @nm ~ alg@
+--
+-- Future version are likely to relax this, possibly introducing ability do defined more than one algorithm
+-- for given encoding. 
+--
+-- Examples: 
 --
 -- @
 -- Encoding Identity "enc-B64" "enc-B64" () ByteString
 -- @
 --
--- Contains function that applies base 64 encoding (encoding name and algorithm name are "enc-B64") 
--- to ByteString with no additional configuration @()@ and runs in @Identity@ Functor.
+-- Represents a /Byte 64/ encoder that can operate on any stack of previous encodings.
+-- (encoding name and algorithm name are "enc-B64", there is no  
+-- additional configuration @()@ needed and it runs in the @Identity@ Functor.
 -- 
 -- @
 -- Encoding (Either EncodeEx) "r-ban:9" "r-ban" () String
 -- @
--- encodes a single character <= @'Z'@
+--
+-- encodes a single character @ <= 9'@
 --
 -- Encoding instance needs to either define a function that return this type or 
 -- implement 
@@ -107,7 +125,10 @@ data Encoding f (nm :: Symbol) (alg :: Symbol) conf str where
 -- | Type safe smart constructor
 --
 -- Adding the type family @(AlgNm nm)@ restriction to UnsafeMkEncoding slows down compilation, especially in tests.  
--- This approach also provides more future flexibility. 
+-- Using smart constructor does not have that issue.
+--
+-- This approach also provides more future flexibility with possibility of future overloads relaxing current 
+-- limitations on @alg@ names. 
 -- 
 -- /Notice underscore @_@ convention, it indicates a use of @Algorithm@ @AlgNm@: compiler figures out @alg@ value. These can be slower to compile when used. /
 -- 
@@ -122,11 +143,8 @@ runEncoding (UnsafeMkEncoding _ fn) = fn
 --
 -- Using it can slowdown compilation
 --
--- /Notice underscore @_@ convention, it indicates a use of @Algorithm@ @AlgNm@: compiler figures out @alg@ value. These can be slower to compile when used. /
---
--- Current definition of @Algorithm nm alg@ is @AlgNm nm ~ alg@, which means that name has a format
--- @alg:...@, for example @"ban:999-99-9999". This most likely will be relaxed in the future
--- allowing for more than one algorithm @alg@ that can produce given encoding @nm@.
+-- This combinator has @Algorithm nm alg@ constraint (which stands for @TakeUntil ":" nm ~ alg@.
+-- If rules on @alg@ are relaxed this will just return the /default/ algorithm.
 --
 -- If that happens @-XTypeApplications@ annotations will be needed and @_@ methods will simply 
 -- use default algorithm name.
@@ -134,19 +152,27 @@ _runEncoding :: forall nm f xs conf str alg . (Algorithm nm alg) => Encoding f n
 _runEncoding = runEncoding @(AlgNm nm)
 
 -- |
--- Wraps a list of @Encoding@ elements.
+-- HList like construction that defines a list of @Encoding@ elements.
+--
+-- This type is used by programs using / manipulating encodings.
 --
 -- Can be easily accessed with 'Data.TypedEncoding.Common.Class.Encode.EncodeAll' constraint using
--- 'Data.TypedEncoding.Common.Class.Encode.EncodeAll.encodings'.
+-- 'Data.TypedEncoding.Common.Class.Encode.EncodeAll.encodings'.  But could also be used by creating
+-- @Encodings@ list by hand.
 --
--- Example:
--- TODO v0.3
 --
 data Encodings f (nms :: [Symbol]) (algs :: [Symbol]) conf str where
     -- | constructor is to be treated as Unsafe to Encode and Decode instance implementations
     -- particular encoding instances may expose smart constructors for limited data types
     ZeroE :: Encodings f '[] '[] conf str
     AppendE ::  Encoding f nm alg conf str -> Encodings f nms algs conf str -> Encodings f (nm ': nms) (alg ': algs) conf str
+
+-- |
+-- Runs encodings, requires -XTypeApplication annotation specifying the algorithm(s)
+--
+-- >>> runEncodings @'["r-ban"] encodings . toEncoding () $ ("22") :: Either EncodeEx (Enc '["r-ban:111"] () T.Text)
+-- Left (EncodeEx "r-ban:111" ("Input list has wrong size expecting 3 but length \"22\" == 2"))
+
 
 runEncodings :: forall algs nms f c str . (Monad f) => Encodings f nms algs c str -> Enc ('[]::[Symbol]) c str -> f (Enc nms c str)
 runEncodings ZeroE enc0 = pure enc0
@@ -155,8 +181,14 @@ runEncodings (AppendE fn enc) enc0 =
         in re >>= runEncoding fn
 
 
--- | At possibly big compilation cost, have compiler figure out algorithm names.
+-- | At a possibly some compilation cost, have compiler figure out algorithm names.
 --
--- (see '_runEncoding')
+-- >>> _runEncodings encodings . toEncoding () $ ("Hello World") :: Identity (Enc '["enc-B64","enc-B64"] () B.ByteString)
+-- Identity (MkEnc Proxy () "U0dWc2JHOGdWMjl5YkdRPQ==")
+-- 
+-- >>> _runEncodings encodings . toEncoding () $ ("22") :: Either EncodeEx (Enc '["r-ban:111"] () T.Text)
+-- Left (EncodeEx "r-ban:111" ("Input list has wrong size expecting 3 but length \"22\" == 2"))
+--
+-- (see also '_runEncoding')
 _runEncodings :: forall nms f c str algs . (Monad f, algs ~ AlgNmMap nms) => Encodings f nms algs c str -> Enc ('[]::[Symbol]) c str -> f (Enc nms c str)
 _runEncodings = runEncodings @(AlgNmMap nms)

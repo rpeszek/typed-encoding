@@ -32,6 +32,7 @@ import qualified Data.Text as T
 
 -- $setup
 -- >>> :set -XOverloadedStrings -XMultiParamTypeClasses -XDataKinds -XTypeApplications
+-- >>> import Data.Functor.Identity
 --
 -- This module contains some ghci friendly values to play with.
 --
@@ -50,16 +51,30 @@ import qualified Data.Text as T
 -- 
 -- >>> encAll . toEncoding () $ "Hello World" :: Enc '["enc-B64"] () B.ByteString
 -- MkEnc Proxy () "SGVsbG8gV29ybGQ="
---
--- There is currently an alternative polymorphic way (prototype) to create encodings by /running/ 'Encoder' on 'encodings'.
--- This approach works better with more open / dynamic encoding setup it also provides first class @Encoder@. 
--- In future versions encodeAll will either be improved to provide similar flexibility or will be deprecated and removed.
--- 
--- TODO v0.3
--- displ <$> (runEncoder @'["enc-B64"] encoder $ toEncoding () "Hello" :: Either EncodeEx (Enc '["enc-B64"] () B.ByteString))
--- Right "MkEnc '[enc-B64] () (ByteString SGVsbG8=)"
 helloB64 :: Enc '["enc-B64"] () B.ByteString
 helloB64 = encAll . toEncoding () $ "Hello World"
+
+-- | "Hello World" double-Base64 encoded.
+-- Notice the same code used as in single encoding, the game is played at type level.
+--
+-- >>> encAll . toEncoding () $ "Hello World" :: Enc '["enc-B64","enc-B64"] () B.ByteString  
+-- MkEnc Proxy () "U0dWc2JHOGdWMjl5YkdRPQ=="
+--
+-- >>> displ helloB64B64
+-- "MkEnc '[enc-B64,enc-B64] () (ByteString U0dWc2JHOGdWMjl5YkdRPQ==)"
+--
+-- An alternative version of the above code is this:
+--
+-- >>> fmap displ . runEncodings @'["enc-B64","enc-B64"] @'["enc-B64","enc-B64"] @Identity encodings . toEncoding () $ ("Hello World" :: B.ByteString)
+-- Identity "MkEnc '[enc-B64,enc-B64] () (ByteString U0dWc2JHOGdWMjl5YkdRPQ==)"
+--
+-- This is how @typed-encoding@ works, the "Data.TypedEncoding.Common.Class.Encode.EncodeAll"
+-- constraint can be used to get access to list to encodings required by the symbol annotation. 
+-- 'runEncodings' executes all the necessary transformations.
+--
+-- Similar story is true for /decoding/ and /validation/. In these examples we will use shortcut combinators.
+helloB64B64 :: Enc '["enc-B64","enc-B64"] () B.ByteString
+helloB64B64 = encAll . toEncoding () $ "Hello World"
 
 -- | Previous text decoded from Base64
 --
@@ -92,16 +107,6 @@ helloB64Decoded = fromEncoding . decAll $ helloB64
 helloB64Recovered :: Either RecreateEx (Enc '["enc-B64"] () B.ByteString)
 helloB64Recovered = recrFAll . toEncoding () $ "SGVsbG8gV29ybGQ="
 
--- | "Hello World" double-Base64 encoded.
--- Notice the same code used as in single encoding, the game is played at type level.
---
--- >>> encAll . toEncoding () $ "Hello World" :: Enc '["enc-B64","enc-B64"] () B.ByteString  
--- MkEnc Proxy () "U0dWc2JHOGdWMjl5YkdRPQ=="
---
--- >>> displ helloB64B64
--- "MkEnc '[enc-B64,enc-B64] () (ByteString U0dWc2JHOGdWMjl5YkdRPQ==)"
-helloB64B64 :: Enc '["enc-B64","enc-B64"] () B.ByteString
-helloB64B64 = encAll . toEncoding () $ "Hello World"
 
 -- | Double Base64 encoded "Hello World" with one layer of encoding removed
 --
