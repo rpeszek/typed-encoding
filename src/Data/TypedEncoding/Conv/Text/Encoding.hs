@@ -34,7 +34,7 @@ import           Data.TypedEncoding.Unsafe (withUnsafe)
 -- instance Arbitrary (Enc '["r-UTF8"] () B.ByteString) where 
 --      arbitrary =  fmap (fromRight emptyUTF8B) 
 --                   . flip suchThat isRight 
---                   . fmap (encFAll @'["r-UTF8"] @(Either EncodeEx) @(). toEncoding ()) $ arbitrary 
+--                   . fmap (encodeFAll @'["r-UTF8"] @(Either EncodeEx) @(). toEncoding ()) $ arbitrary 
 -- instance Arbitrary (Enc '["r-UTF8"] () T.Text) where 
 --      arbitrary =  fmap (unsafeSetPayload ()) 
 --                         arbitrary 

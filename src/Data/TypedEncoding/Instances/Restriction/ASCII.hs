@@ -14,10 +14,10 @@
 -- prop> B8.all ((< 128) . ord) . getPayload @ '["r-ASCII"] @() @B.ByteString
 -- 
 -- >>> :set -XOverloadedStrings -XMultiParamTypeClasses -XDataKinds
--- >>> encFAll . toEncoding () $ "Hello World" :: Either EncodeEx (Enc '["r-ASCII"] () T.Text)
+-- >>> encodeFAll . toEncoding () $ "Hello World" :: Either EncodeEx (Enc '["r-ASCII"] () T.Text)
 -- Right (MkEnc Proxy () "Hello World")
 --
--- >>> encFAll . toEncoding () $ "\194\160" :: Either EncodeEx (Enc '["r-ASCII"] () T.Text)
+-- >>> encodeFAll . toEncoding () $ "\194\160" :: Either EncodeEx (Enc '["r-ASCII"] () T.Text)
 -- Left (EncodeEx "r-ASCII" (NonAsciiChar '\194'))
 module Data.TypedEncoding.Instances.Restriction.ASCII where
 
@@ -79,6 +79,6 @@ instance (Char8Find str, RecreateErr f, Applicative f) => Validate f "r-ASCII" "
     validation = validR encASCII
 
 
--- tst = encFAll . toEncoding () $ "Hello World" :: Either EncodeEx (Enc '["r-ASCII"] () T.Text)
--- tst2 = encFAll . toEncoding () $ "\194\160" :: Either EncodeEx (Enc '["r-ASCII"] () T.Text)
--- tst3 = encFAll . toEncoding () $ "\194\160" :: Either EncodeEx (Enc '["r-ASCII"] () B.ByteString)
+-- tst = encodeFAll . toEncoding () $ "Hello World" :: Either EncodeEx (Enc '["r-ASCII"] () T.Text)
+-- tst2 = encodeFAll . toEncoding () $ "\194\160" :: Either EncodeEx (Enc '["r-ASCII"] () T.Text)
+-- tst3 = encodeFAll . toEncoding () $ "\194\160" :: Either EncodeEx (Enc '["r-ASCII"] () B.ByteString)

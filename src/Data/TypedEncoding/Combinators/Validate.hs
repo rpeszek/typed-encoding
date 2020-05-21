@@ -53,36 +53,36 @@ recreateWithValidations vers str@(MkEnc _ _ pay) =
 
 -- * v0.2 style recreate functions
 
-recrFAll :: forall nms f c str . (Monad f,  ValidateAll f nms nms c str) =>  
+recreateFAll :: forall nms f c str . (Monad f,  ValidateAll f nms nms c str) =>  
                Enc ('[]::[Symbol]) c str 
                -> f (Enc nms c str)  
-recrFAll = recrFAll' @nms @nms 
+recreateFAll = recreateFAll' @nms @nms 
 
-recrAll :: forall nms c str . (ValidateAll Identity nms nms c str) =>
+recreateAll :: forall nms c str . (ValidateAll Identity nms nms c str) =>
                Enc ('[]::[Symbol]) c str 
                -> Enc nms c str 
-recrAll = recrAll' @nms @nms  
+recreateAll = recreateAll' @nms @nms  
 
-recrFPart :: forall xs xsf f c str . (Monad f, ValidateAll f xs xs c str) => Enc xsf c str -> f (Enc (Append xs xsf) c str)
-recrFPart = recrFPart' @xs @xs 
+recreateFPart :: forall xs xsf f c str . (Monad f, ValidateAll f xs xs c str) => Enc xsf c str -> f (Enc (Append xs xsf) c str)
+recreateFPart = recreateFPart' @xs @xs 
 
 -- * Convenience combinators which mimic pre-v0.3 type signatures. These do not try to figure out @algs@ or assume much about them
 
-recrFAll' :: forall algs nms f c str . (Monad f,  ValidateAll f nms algs c str) =>  
+recreateFAll' :: forall algs nms f c str . (Monad f,  ValidateAll f nms algs c str) =>  
                Enc ('[]::[Symbol]) c str 
                -> f (Enc nms c str)  
-recrFAll' = recreateWithValidations @algs @nms @f validations 
+recreateFAll' = recreateWithValidations @algs @nms @f validations 
 
-recrAll' :: forall algs nms c str . (ValidateAll Identity nms algs c str) =>
+recreateAll' :: forall algs nms c str . (ValidateAll Identity nms algs c str) =>
                Enc ('[]::[Symbol]) c str 
                -> Enc nms c str 
-recrAll' = runIdentity . recrFAll' @algs 
+recreateAll' = runIdentity . recreateFAll' @algs 
 
-recrFPart' :: forall algs xs xsf f c str . (Monad f, ValidateAll f xs algs c str) => Enc xsf c str -> f (Enc (Append xs xsf) c str)
-recrFPart' = aboveF @xsf @'[] @xs (recrFAll' @algs) 
+recreateFPart' :: forall algs xs xsf f c str . (Monad f, ValidateAll f xs algs c str) => Enc xsf c str -> f (Enc (Append xs xsf) c str)
+recreateFPart' = aboveF @xsf @'[] @xs (recreateFAll' @algs) 
 
-recrPart' :: forall algs xs xsf c str . (ValidateAll Identity xs algs c str) => Enc xsf c str -> Enc (Append xs xsf) c str   
-recrPart' = runIdentity . recrFPart' @algs @xs
+recreatePart' :: forall algs xs xsf c str . (ValidateAll Identity xs algs c str) => Enc xsf c str -> Enc (Append xs xsf) c str   
+recreatePart' = runIdentity . recreateFPart' @algs @xs
 
 
 --------------------------------------------

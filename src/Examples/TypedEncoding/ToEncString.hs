@@ -275,7 +275,7 @@ recreateEncoding = mapM encodefn
 --
 -- so we can apply the decoding on the selected piece 
 --
--- >>> fmap (toCheckedEnc . decPart @'["enc-B64"]) . fromCheckedEnc @ '["enc-B64", "r-ASCII"] $ piece
+-- >>> fmap (toCheckedEnc . decodePart @'["enc-B64"]) . fromCheckedEnc @ '["enc-B64", "r-ASCII"] $ piece
 -- Just (UnsafeMkCheckedEnc ["r-ASCII"] () "Some ASCII Text")
 
 decodeB64ForTextOnly :: SimplifiedEmailEncB -> SimplifiedEmailEncB
@@ -286,10 +286,10 @@ decodeB64ForTextOnly = fmap (runAlternatives fromMaybe [tryUtf8, tryAscii])
     tryAscii = fmap (toCheckedEnc . decodeToAscii) . fromCheckedEnc @ '["enc-B64", "r-ASCII"] 
  
     decodeToUtf8 :: Enc '["enc-B64", "r-UTF8"] c B.ByteString -> _
-    decodeToUtf8 = decPart @'["enc-B64"]
+    decodeToUtf8 = decodePart @'["enc-B64"]
 
     decodeToAscii :: Enc '["enc-B64", "r-ASCII"] c B.ByteString -> _
-    decodeToAscii = decPart @'["enc-B64"]
+    decodeToAscii = decodePart @'["enc-B64"]
 
 
 -- * Helpers

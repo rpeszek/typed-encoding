@@ -57,10 +57,10 @@ instance (KnownSymbol s , IsBan s ~ 'True, AlgNm s ~ "r-ban", IsStringR str) => 
 
 
 -- |
--- >>> runEncoding encFBan . toEncoding () $ "C59F9FB7-4621-44D9-9020-CE37BF6E2BD1" :: Either EncodeEx (Enc '["r-ban:FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF"] () T.Text)
+-- >>> runEncoding' encFBan . toEncoding () $ "C59F9FB7-4621-44D9-9020-CE37BF6E2BD1" :: Either EncodeEx (Enc '["r-ban:FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF"] () T.Text)
 -- Right (MkEnc Proxy () "C59F9FB7-4621-44D9-9020-CE37BF6E2BD1")
 -- 
--- >>> recrFAll' @'["r-ban"] . toEncoding () $ "211-22-9934" :: Either RecreateEx (Enc '["r-ban:999-99-9999"] () T.Text)
+-- >>> recreateFAll' @'["r-ban"] . toEncoding () $ "211-22-9934" :: Either RecreateEx (Enc '["r-ban:999-99-9999"] () T.Text)
 -- Right (MkEnc Proxy () "211-22-9934")
 encFBan :: forall s t xs c str .
               (

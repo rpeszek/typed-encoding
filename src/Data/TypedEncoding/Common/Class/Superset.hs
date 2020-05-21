@@ -55,7 +55,7 @@ type family IsSuperset (y :: Symbol) (x :: Symbol) :: Bool where
 type family IsSupersetOpen (y :: Symbol) (x :: Symbol) (xs :: [Symbol]) :: Bool
 
 -- |
--- >>> let Right tstAscii = encFAll . toEncoding () $ "Hello World" :: Either EncodeEx (Enc '["r-ASCII"] () T.Text)
+-- >>> let Right tstAscii = encodeFAll . toEncoding () $ "Hello World" :: Either EncodeEx (Enc '["r-ASCII"] () T.Text)
 -- >>> displ (injectInto @ "r-UTF8" tstAscii)
 -- "MkEnc '[r-UTF8] () (Text Hello World)"
 injectInto :: forall y x xs c str . (IsSuperset y x ~ 'True) => Enc (x ': xs) c str ->  Enc (y ': xs) c str

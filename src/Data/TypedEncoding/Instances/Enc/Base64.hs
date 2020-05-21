@@ -43,7 +43,7 @@ acceptLenientL = withUnsafeCoerce (BL64.encode . BL64.decodeLenient)
 -- | allow to treat B64 encodings as ASCII forgetting about B64 encoding
 -- 
 --
--- >>> let tstB64 = encAll . toEncoding () $ "Hello World" :: Enc '["enc-B64"] () B.ByteString
+-- >>> let tstB64 = encodeAll . toEncoding () $ "Hello World" :: Enc '["enc-B64"] () B.ByteString
 -- >>> displ (flattenAs tstB64 :: Enc '["r-ASCII"] () B.ByteString)
 -- "MkEnc '[r-ASCII] () (ByteString SGVsbG8gV29ybGQ=)"
 instance FlattenAs "r-ASCII" "enc-B64-nontext" where

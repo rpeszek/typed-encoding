@@ -21,48 +21,48 @@ import           Data.Functor.Identity
 
 -- * Convenience combinators which mimic pre-v0.3 type signatures. These assume that @algs@ are the same as @nms@
 
-encF :: forall nm xs f c str . Encode f nm nm c str => Enc xs c str -> f (Enc (nm ': xs) c str)
-encF = encF' @nm @nm
+encodeF :: forall nm xs f c str . Encode f nm nm c str => Enc xs c str -> f (Enc (nm ': xs) c str)
+encodeF = encodeF' @nm @nm
 
-encFAll :: forall nms f c str . (Monad f,  EncodeAll f nms nms c str) =>  
+encodeFAll :: forall nms f c str . (Monad f,  EncodeAll f nms nms c str) =>  
                Enc ('[]::[Symbol]) c str 
                -> f (Enc nms c str)  
-encFAll = encFAll' @nms @nms
+encodeFAll = encodeFAll' @nms @nms
 
-encAll :: forall nms c str . (EncodeAll Identity nms nms c str) =>
+encodeAll :: forall nms c str . (EncodeAll Identity nms nms c str) =>
                Enc ('[]::[Symbol]) c str 
                -> Enc nms c str 
-encAll = encAll' @nms @nms 
+encodeAll = encodeAll' @nms @nms 
 
-encFPart :: forall xs xsf f c str . (Monad f, EncodeAll f xs xs c str) => Enc xsf c str -> f (Enc (Append xs xsf) c str)
-encFPart = encFPart' @xs @xs
+encodeFPart :: forall xs xsf f c str . (Monad f, EncodeAll f xs xs c str) => Enc xsf c str -> f (Enc (Append xs xsf) c str)
+encodeFPart = encodeFPart' @xs @xs
 
-encPart :: forall xs xsf c str . (EncodeAll Identity xs xs c str) => Enc xsf c str -> Enc (Append xs xsf) c str   
-encPart = encPart' @xs @xs
+encodePart :: forall xs xsf c str . (EncodeAll Identity xs xs c str) => Enc xsf c str -> Enc (Append xs xsf) c str   
+encodePart = encodePart' @xs @xs
 
 
 -- * Convenience combinators which mimic pre-v0.3 type signatures. These do not try to figure out @algs@ or assume much about them
 
-encF' :: forall alg nm xs f c str . (Encode f nm alg c str) => Enc xs c str -> f (Enc (nm ': xs) c str)
-encF' = runEncoding (encoding @f @nm @alg)
+encodeF' :: forall alg nm xs f c str . (Encode f nm alg c str) => Enc xs c str -> f (Enc (nm ': xs) c str)
+encodeF' = runEncoding' (encoding @f @nm @alg)
 
-encFAll' :: forall algs nms f c str . (Monad f,  EncodeAll f nms algs c str) =>  
+encodeFAll' :: forall algs nms f c str . (Monad f,  EncodeAll f nms algs c str) =>  
                Enc ('[]::[Symbol]) c str 
                -> f (Enc nms c str)  
-encFAll' = runEncodings @algs @nms @f encodings 
+encodeFAll' = runEncodings' @algs @nms @f encodings 
 
 -- | 
 -- 
-encAll' :: forall algs nms c str . (EncodeAll Identity nms algs c str) =>
+encodeAll' :: forall algs nms c str . (EncodeAll Identity nms algs c str) =>
                Enc ('[]::[Symbol]) c str 
                -> Enc nms c str 
-encAll' = runIdentity . encFAll' @algs 
+encodeAll' = runIdentity . encodeFAll' @algs 
 
-encFPart' :: forall algs xs xsf f c str . (Monad f, EncodeAll f xs algs c str) => Enc xsf c str -> f (Enc (Append xs xsf) c str)
-encFPart' = aboveF @xsf @'[] @xs (encFAll' @algs) 
--- encFPart' (MkEnc _ conf str) =  
---     let re :: f (Enc xs c str) = encFAll' @algs $ MkEnc Proxy conf str
+encodeFPart' :: forall algs xs xsf f c str . (Monad f, EncodeAll f xs algs c str) => Enc xsf c str -> f (Enc (Append xs xsf) c str)
+encodeFPart' = aboveF @xsf @'[] @xs (encodeFAll' @algs) 
+-- encodeFPart' (MkEnc _ conf str) =  
+--     let re :: f (Enc xs c str) = encodeFAll' @algs $ MkEnc Proxy conf str
 --     in  MkEnc Proxy conf . getPayload <$> re
 
-encPart' :: forall algs xs xsf c str . (EncodeAll Identity xs algs c str) => Enc xsf c str -> Enc (Append xs xsf) c str   
-encPart' = runIdentity . encFPart' @algs @xs
+encodePart' :: forall algs xs xsf c str . (EncodeAll Identity xs algs c str) => Enc xsf c str -> Enc (Append xs xsf) c str   
+encodePart' = runIdentity . encodeFPart' @algs @xs

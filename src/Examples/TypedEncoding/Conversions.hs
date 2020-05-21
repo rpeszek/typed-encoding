@@ -89,10 +89,10 @@ import           Data.TypedEncoding.Instances.Restriction.BoundedAlphaNums ()
 -- * Moving between Text and ByteString
 
 eHelloAsciiB :: Either EncodeEx (Enc '["r-ASCII"] () B.ByteString)
-eHelloAsciiB = encFAll . toEncoding () $ "HeLlo world" 
+eHelloAsciiB = encodeFAll . toEncoding () $ "HeLlo world" 
 -- ^ Example value to play with
 --
--- >>>  encFAll . toEncoding () $ "HeLlo world" :: Either EncodeEx (Enc '["r-ASCII"] () B.ByteString) 
+-- >>>  encodeFAll . toEncoding () $ "HeLlo world" :: Either EncodeEx (Enc '["r-ASCII"] () B.ByteString) 
 -- Right (MkEnc Proxy () "HeLlo world")
 
 Right helloAsciiB = eHelloAsciiB
@@ -133,7 +133,7 @@ helloZero = toEncoding () "Hello"
 -- 
 -- @EncB8.pack@ will not compile unless the encoding is ASCII restricted, this works:
 -- 
--- >>> fmap (displ . EncB8.pack) . encFAll @'["r-ASCII"] @(Either EncodeEx) $ helloZero
+-- >>> fmap (displ . EncB8.pack) . encodeFAll @'["r-ASCII"] @(Either EncodeEx) $ helloZero
 -- Right "MkEnc '[r-ASCII] () (ByteString Hello)"
 --
 -- And the result is a @ByteString@ with bonus annotation describing its content.
@@ -163,7 +163,7 @@ helloUtf8B :: Enc '["r-UTF8"] () B.ByteString
 helloUtf8B = injectInto helloAsciiB
 -- ^ To get UTF8 annotation, instead of doing this: 
 --
--- >>> encFAll . toEncoding () $ "HeLlo world" :: Either EncodeEx (Enc '["r-UTF8"] () B.ByteString)
+-- >>> encodeFAll . toEncoding () $ "HeLlo world" :: Either EncodeEx (Enc '["r-UTF8"] () B.ByteString)
 -- Right (MkEnc Proxy () "HeLlo world")
 -- 
 -- We should be able to convert the ASCII version we already have.
@@ -184,10 +184,10 @@ helloUtf8B = injectInto helloAsciiB
 -- * More complex rules
 
 helloUtf8B64B :: Enc '["enc-B64", "r-UTF8"] () B.ByteString
-helloUtf8B64B = encPart @'["enc-B64"] helloUtf8B 
+helloUtf8B64B = encodePart @'["enc-B64"] helloUtf8B 
 -- ^ We put Base64 on a ByteString which adheres to UTF8 layout
 --
--- >>> displ $ encPart @'["enc-B64"] helloUtf8B
+-- >>> displ $ encodePart @'["enc-B64"] helloUtf8B
 -- "MkEnc '[enc-B64,r-UTF8] () (ByteString SGVMbG8gd29ybGQ=)"
 
 helloUtf8B64T :: Enc '["enc-B64"] () T.Text
@@ -220,10 +220,10 @@ helloUtf8B64T = EncT.utf8Demote . EncTe.decodeUtf8 $ helloUtf8B64B
 -- these annotations on @Text@ encodings.  This approach gives us type level safety over UTF8 encoding/decoding errors.
 
 notTextB :: Enc '["enc-B64"] () B.ByteString
-notTextB = encAll . toEncoding () $ "\195\177"
+notTextB = encodeAll . toEncoding () $ "\195\177"
 -- ^ 'notTextB' a binary, one that does not even represent a valid UTF8.
 -- 
--- >>> encAll . toEncoding () $ "\195\177" :: Enc '["enc-B64"] () B.ByteString
+-- >>> encodeAll . toEncoding () $ "\195\177" :: Enc '["enc-B64"] () B.ByteString
 -- MkEnc Proxy () "w7E="
 --
 -- Decoding it to Text is prevented by the compiler
@@ -245,15 +245,15 @@ notTextB = encAll . toEncoding () $ "\195\177"
 -- * Lenient recovery
 
 lenientSomething :: Enc '["enc-B64-len"] () B.ByteString
-lenientSomething = recrAll . toEncoding () $ "abc==CB"
+lenientSomething = recreateAll . toEncoding () $ "abc==CB"
 -- ^ 
--- >>> recrAll . toEncoding () $ "abc==CB" :: Enc '["enc-B64-len"] () B.ByteString
+-- >>> recreateAll . toEncoding () $ "abc==CB" :: Enc '["enc-B64-len"] () B.ByteString
 -- MkEnc Proxy () "abc==CB"
 --
 -- The rest of Haskell does lenient decoding, type safety allows this library to use it for recovery.
 -- lenient algorithms are not partial and automatically fix invalid input:
 --
--- >>> recrFAll . toEncoding () $ "abc==CB" :: Either RecreateEx (Enc '["enc-B64"] () B.ByteString)
+-- >>> recreateFAll . toEncoding () $ "abc==CB" :: Either RecreateEx (Enc '["enc-B64"] () B.ByteString)
 -- Left (RecreateEx "enc-B64" ("invalid padding"))
 --
 -- This library allows to recover to "enc-B64-len" which is different than "enc-B64"
@@ -265,12 +265,12 @@ lenientSomething = recrAll . toEncoding () $ "abc==CB"
 --
 -- This is now properly encoded data
 --
--- >>> recrFAll . toEncoding () $ "abc=" :: Either RecreateEx (Enc '["enc-B64"] () B.ByteString)
+-- >>> recreateFAll . toEncoding () $ "abc=" :: Either RecreateEx (Enc '["enc-B64"] () B.ByteString)
 -- Right (MkEnc Proxy () "abc=")
 --
 -- Except the content could be surprising
 --
--- >>> decAll $ EnB64.acceptLenientS lenientSomething
+-- >>> decodeAll $ EnB64.acceptLenientS lenientSomething
 -- MkEnc Proxy () "i\183"
 
 

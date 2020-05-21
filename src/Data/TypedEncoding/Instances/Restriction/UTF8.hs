@@ -36,7 +36,7 @@ import           Data.Either
 -- instance Arbitrary (Enc '["r-UTF8"] () B.ByteString) where 
 --      arbitrary =  fmap (fromRight emptyUTF8B) 
 --                   . flip suchThat isRight 
---                   . fmap (encFAll @'["r-UTF8"] @(Either EncodeEx) @(). toEncoding ()) $ arbitrary 
+--                   . fmap (encodeFAll @'["r-UTF8"] @(Either EncodeEx) @(). toEncoding ()) $ arbitrary 
 -- :}
 
 
@@ -51,15 +51,15 @@ prxyUtf8 = Proxy :: Proxy "r-UTF8"
 
 -- | UTF8 encodings are defined for ByteString only as that would not make much sense for Text
 --
--- >>> encFAll . toEncoding () $ "\xc3\xb1" :: Either EncodeEx (Enc '["r-UTF8"] () B.ByteString)
+-- >>> encodeFAll . toEncoding () $ "\xc3\xb1" :: Either EncodeEx (Enc '["r-UTF8"] () B.ByteString)
 -- Right (MkEnc Proxy () "\195\177")
 --
--- >>> encFAll . toEncoding () $ "\xc3\x28" :: Either EncodeEx (Enc '["r-UTF8"] () B.ByteString)
+-- >>> encodeFAll . toEncoding () $ "\xc3\x28" :: Either EncodeEx (Enc '["r-UTF8"] () B.ByteString)
 -- Left (EncodeEx "r-UTF8" (Cannot decode byte '\xc3': Data.Text.Internal.Encoding.decodeUtf8: Invalid UTF-8 stream))
 --
 -- Following test uses 'verEncoding' helper that checks that bytes are encoded as Right iff they are valid UTF8 bytes
 --
--- prop> \(b :: B.ByteString) -> verEncoding b (fmap (fromEncoding . decAll . proxiedId (Proxy :: Proxy (Enc '["r-UTF8"] _ _))) . (encFAll :: _ -> Either EncodeEx _). toEncoding () $ b)
+-- prop> \(b :: B.ByteString) -> verEncoding b (fmap (fromEncoding . decodeAll . proxiedId (Proxy :: Proxy (Enc '["r-UTF8"] _ _))) . (encodeFAll :: _ -> Either EncodeEx _). toEncoding () $ b)
 instance Encode (Either EncodeEx) "r-UTF8" "r-UTF8" c B.ByteString where
     encoding = encUTF8B
 

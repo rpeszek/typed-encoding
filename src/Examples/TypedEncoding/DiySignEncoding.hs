@@ -68,10 +68,10 @@ decodeSign t =
 -- >>> helloSigned
 -- MkEnc Proxy () "11:Hello World"
 --
--- >>> fromEncoding . decAll $ helloSigned 
+-- >>> fromEncoding . decodeAll $ helloSigned 
 -- "Hello World"
 helloSigned :: Enc '["my-sign"] () T.Text
-helloSigned = encAll . toEncoding () $ "Hello World"
+helloSigned = encodeAll . toEncoding () $ "Hello World"
 
 -- | property checks that 'T.Text' values are expected to decode 
 -- without error after encoding.
@@ -79,8 +79,8 @@ helloSigned = encAll . toEncoding () $ "Hello World"
 -- prop> \t -> propEncDec
 propEncDec :: T.Text -> Bool
 propEncDec t = 
-    let enc = encAll . toEncoding () $ t :: Enc '["my-sign"] () T.Text
-    in t == (fromEncoding . decAll $ enc)
+    let enc = encodeAll . toEncoding () $ t :: Enc '["my-sign"] () T.Text
+    in t == (fromEncoding . decodeAll $ enc)
 
 hacker :: Either RecreateEx (Enc '["my-sign"] () T.Text)
 hacker = 
@@ -88,17 +88,17 @@ hacker =
         -- | payload is sent over network and get corrupted
         newpay = payload <> " corruption" 
         -- | boundary check recovers the data
-        newdata = recrFAll . toEncoding () $ newpay :: Either RecreateEx (Enc '["my-sign"] () T.Text)
+        newdata = recreateFAll . toEncoding () $ newpay :: Either RecreateEx (Enc '["my-sign"] () T.Text)
     in newdata    
 -- ^ Hacker example
 -- The data was transmitted over a network and got corrupted.
 --
 -- >>> let payload = getPayload $ helloSigned :: T.Text
 -- >>> let newpay = payload <> " corruption" 
--- >>> recrFAll . toEncoding () $ newpay :: Either RecreateEx (Enc '["my-sign"] () T.Text)
+-- >>> recreateFAll . toEncoding () $ newpay :: Either RecreateEx (Enc '["my-sign"] () T.Text)
 -- Left (RecreateEx "my-sign" ("Corrupted Signature"))
 --
--- >>> recrFAll . toEncoding () $ payload :: Either RecreateEx (Enc '["my-sign"] () T.Text)
+-- >>> recreateFAll . toEncoding () $ payload :: Either RecreateEx (Enc '["my-sign"] () T.Text)
 -- Right (MkEnc Proxy () "11:Hello World")
 
 

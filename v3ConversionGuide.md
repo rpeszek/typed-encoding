@@ -25,9 +25,9 @@ encB64B = implEncodingP B64.encode
 Call site use has not changed, however constraints and order of type parameters (for `-XTypeApplications`) on some of these functions have:
 
 
-- encodeF - order unchanged     -> encF
-- encodeAll - order unchanged           -> encAll 
-- encodeFAll - forall order changed (first to type variables flipped to `nms f c str` from `f nms`)    encFAll
+- encodeF - order unchanged     
+- encodeAll - order unchanged          
+- encodeFAll - forall order changed (first to type variables flipped to `nms f c str` from `f nms`)    
 
 Example:
 
@@ -39,7 +39,7 @@ encodeFAll
      -> f (Enc [Symbol] xs c str)
 
 -- new
-encFAll
+encodeFAll
   :: (Monad f, EncodeAll f nms nms c str) =>
      Enc
        [Symbol]
@@ -69,9 +69,9 @@ decB64B = implDecodingF_ (asUnexpected @"enc-B64" . B64.decode)
 
 Call site use has not changed, however constraints and order of type parameters (for `-XTypeApplications`) on some of these functions have:
 
-- decodeF - order unchanged -> decF
-- decodeAll - order unchanged -> decAll 
-- decodeFAll -  forall order changed (first to type variables flipped to `nms f c str` from `f nms`) -> decFAll 
+- decodeF - order unchanged 
+- decodeAll - order unchanged
+- decodeFAll -  forall order changed (first to type variables flipped to `nms f c str` from `f nms`) 
 
 
 ### Validation

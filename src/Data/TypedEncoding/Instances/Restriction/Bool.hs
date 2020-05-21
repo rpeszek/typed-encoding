@@ -76,7 +76,7 @@ encBoolOrLeft'' :: forall alg f s t xs c str . (
     , LeftTerm s ~ t
     , Encode f t alg c str
     ) => Enc xs c str -> f (Enc (s ': xs) c str)  
-encBoolOrLeft'' = encBoolOrLeft (encF' @alg @t @xs @f)
+encBoolOrLeft'' = encBoolOrLeft (encodeF' @alg @t @xs @f)
 
 -- |
 -- 
@@ -120,7 +120,7 @@ encBoolOrRight'' :: forall alg f s t xs c str . (
     , RightTerm s ~ t
     , Encode f t alg c str
     ) => Enc xs c str -> f (Enc (s ': xs) c str)  
-encBoolOrRight'' = encBoolOrRight (encF' @alg @t @xs @f) 
+encBoolOrRight'' = encBoolOrRight (encodeF' @alg @t @xs @f) 
 
 encBoolAnd :: forall f s t1 t2 xs c str . (
     BoolOpIs s "and" ~ 'True 
@@ -183,7 +183,7 @@ encBoolAnd'' :: forall al1 al2 s t1 t2 xs c str . (
     , Encode (Either EncodeEx) t1 al1 c str
     , Encode (Either EncodeEx) t2 al2 c str
     ) => Enc xs c str -> Either EncodeEx (Enc (s ': xs) c str)  
-encBoolAnd''  = encBoolAnd (encF' @al1 @t1 @xs) (encF' @al2 @t2 @xs) 
+encBoolAnd''  = encBoolAnd (encodeF' @al1 @t1 @xs) (encodeF' @al2 @t2 @xs) 
 
 
 -- tst1, tst2 :: Either EncodeEx (Enc '["boolNot:(r-Word8-decimal)"] () T.Text)
@@ -235,7 +235,7 @@ encBoolNot'' :: forall alg s t xs c str . (
     , Restriction t  
     , Encode (Either EncodeEx) t alg c str
     ) => Enc xs c str -> Either EncodeEx (Enc (s ': xs) c str)  
-encBoolNot'' = encBoolNot (encF' @alg @t @xs)
+encBoolNot'' = encBoolNot (encodeF' @alg @t @xs)
 
 -- | 
 -- Decodes boolean expression if all leaves are @"r-"@

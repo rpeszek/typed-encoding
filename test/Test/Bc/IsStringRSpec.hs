@@ -62,15 +62,15 @@ spec =
         it "Word8 fromEncString err works" $   
            fromEncStringTestErr `shouldSatisfy` isLeft
         it "EncodeF works" $
-          (encFAll @'["r-Word8-decimal"] @(Either EncodeEx) . toEncoding () $ tstWord8) `shouldSatisfy` isRight   
+          (encodeFAll @'["r-Word8-decimal"] @(Either EncodeEx) . toEncoding () $ tstWord8) `shouldSatisfy` isRight   
         it "EncodeF err works" $
-          (encFAll @'["r-Word8-decimal"] @(Either EncodeEx). toEncoding () $ tstNotWord8') `shouldSatisfy` isLeft
+          (encodeFAll @'["r-Word8-decimal"] @(Either EncodeEx). toEncoding () $ tstNotWord8') `shouldSatisfy` isLeft
         it "RecreateF works" $
-          (recrFAll @'["r-Word8-decimal"] @(Either RecreateEx) . toEncoding () $ tstWord8) `shouldSatisfy` isRight   
+          (recreateFAll @'["r-Word8-decimal"] @(Either RecreateEx) . toEncoding () $ tstWord8) `shouldSatisfy` isRight   
         it "RecreateF err works" $
-          (recrFAll @'["r-Word8-decimal"] @(Either RecreateEx) . toEncoding () $ tstNotWord8) `shouldSatisfy` isLeft
+          (recreateFAll @'["r-Word8-decimal"] @(Either RecreateEx) . toEncoding () $ tstNotWord8) `shouldSatisfy` isLeft
         it "DecodeF works" $
-          (fromEncoding . decAll $ tstWord8Enc) `shouldBe` tstWord8   
+          (fromEncoding . decodeAll $ tstWord8Enc) `shouldBe` tstWord8   
    
 runSpec :: IO ()
 runSpec = hspec spec           

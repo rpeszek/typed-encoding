@@ -27,7 +27,7 @@ import qualified Data.TypedEncoding.Instances.Restriction.ASCII()
 
 -- | Starting example
 exAsciiTE :: Either EncodeEx (Enc '["r-ASCII"] () T.Text)
-exAsciiTE = encFAll . toEncoding () $ "HELLO" 
+exAsciiTE = encodeFAll . toEncoding () $ "HELLO" 
 
 -- | with either removed
 exAsciiT :: Enc '["r-ASCII"] () T.Text
@@ -36,23 +36,23 @@ Right exAsciiT = exAsciiTE
 -- * Safe and Slow approach
 
 -- |
--- 'recrFAll' is the way to recover encoding in a safe way
+-- 'recreateFAll' is the way to recover encoding in a safe way
 --
 -- >>> let payload = getPayload exAsciiT
 -- >>> let newPayload = payload <> " some extra stuff"
--- >>> recrFAll . toEncoding () $ newPayload :: Either RecreateEx (Enc '["r-ASCII"] () T.Text)
+-- >>> recreateFAll . toEncoding () $ newPayload :: Either RecreateEx (Enc '["r-ASCII"] () T.Text)
 -- Right (MkEnc Proxy () "HELLO some extra stuff")
 --
 -- Alternatively, 'UncheckedEnc' type can be used in recreation, see 'Examples.TypedEncoding.Overview'
 -- 
 modifiedAsciiT :: Either RecreateEx (Enc '["r-ASCII"] () T.Text)
-modifiedAsciiT =  recrFAll . toEncoding () . ( <> " some extra stuff") . getPayload $ exAsciiT
+modifiedAsciiT =  recreateFAll . toEncoding () . ( <> " some extra stuff") . getPayload $ exAsciiT
   
 
 -- * Unsafe but fast
 
 -- |
--- The issue with 'recrFAll' is that it may be expensive.
+-- The issue with 'recreateFAll' is that it may be expensive.
 --
 -- This apprach uses 'Data.TypedEncoding.Unsafe.Unsafe' to perform (in general risky) operation on
 -- the internal payload.

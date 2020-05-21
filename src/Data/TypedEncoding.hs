@@ -4,10 +4,6 @@
 -- |
 -- = Overview
 --
--- /This module needs to be imported at the call site to use encodings./
--- 
--- /To implement new encodings import "Data.TypedEncoding.Instances.Support" instead./
--- 
 -- This library uses 'GHC.TypeLits' symbols to specify and work with types like
 --
 -- @
@@ -39,7 +35,7 @@
 --
 -- * /encoding/
 -- * /decoding/
--- * /recreation/ (verification of existing payload)
+-- * /validation (recreation)/ (verification of existing payload)
 -- * type conversions between encoded types
 --
 -- of string-like data (@ByteString@, @Text@) that is subject of some
@@ -59,7 +55,7 @@
 -- == "r-" restriction / predicate
 --
 -- * /encoding/ is a partial identity
--- * /recreation/ is a partial identity (matching encoding)
+-- * /validation/ is a partial identity (matching encoding)
 -- * /decoding/ is identity
 --
 -- Examples: @"r-UTF8"@, @"r-ASCII"@, upper alpha-numeric bound /r-ban/ restrictions like @"r-999-999-9999"@
@@ -93,7 +89,7 @@
 -- "@boolNot:(r-ASCII)"
 --
 --
--- = Usage
+-- = Call Site Usage
 --
 -- To use this library import this module and one or more /instance/ or /combinator/ module.
 --
@@ -107,19 +103,7 @@
 -- * "Data.TypedEncoding.Instances.Restriction.BoundedAlphaNums" (moved from @Combinators@ to @Instances@ in v0.3)
 -- * "Data.TypedEncoding.Instances.Do.Sample" 
 -- 
--- This list is not intended to be exhaustive, rather separate libraries
--- can provide instances for other encodings and transformations.
---
--- To implement a new encoding import this module and
---
--- * "Data.TypedEncoding.Instances.Support"
---
--- Defining annotations with combinators is an alternative to using typeclass instances. 
---
--- Combinator modules with be merged with Instances modules in the future.
---
--- Included combinator modules:
---
+-- ... and needed conversions. 
 --
 -- Conversion combinator module structure is similar to one found in @text@ and @bytestring@ packages
 -- And can be found (since 0.2.2) in
@@ -131,6 +115,14 @@
 -- * "Data.TypedEncoding.Conv.ByteString.Char8"
 -- * "Data.TypedEncoding.Conv.ByteString.Lazy.Char8"
 --
+-- This list is not intended to be exhaustive, rather separate libraries
+-- can provide instances for other encodings and transformations.
+--
+-- = New encoding instance creation
+--
+-- To implement a new encoding import
+--
+-- * "Data.TypedEncoding.Instances.Support"
 --
 -- = Examples
 --
@@ -152,12 +144,12 @@ module Data.TypedEncoding (
     -- * @Encoding@ and basic combinators
     , Encoding (..)
     , _mkEncoding
-    , runEncoding
+    , runEncoding'
     , _runEncoding 
   
     -- * List of encodings
     , Encodings (..)
-    , runEncodings
+    , runEncodings'
     , _runEncodings
 
     -- * Similar to @Encoding@ and @Encodings@ but cover /Decoding/ and /Validation/

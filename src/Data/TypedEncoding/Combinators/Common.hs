@@ -27,7 +27,7 @@ import           Data.Proxy
 -- | Any valid transformation of encodings (encoding / decoding / recreation) can be 
 -- replayed on top of another encoding stack. 
 --
--- This subsumes various /encPart, decPart, recrPart/ combinators.
+-- This subsumes various /encodePart, decodePart, recreatePart/ combinators.
 aboveF :: forall (ts :: [Symbol]) xs ys f c str . (Functor f) =>
            (Enc xs c str -> f (Enc ys c str)) 
            -> Enc (Append xs ts) c str -> f (Enc (Append ys ts) c str)
