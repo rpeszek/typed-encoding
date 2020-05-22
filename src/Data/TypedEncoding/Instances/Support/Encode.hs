@@ -31,6 +31,10 @@ _implEncodingEx f = _mkEncoding $ implTranF (either (Left . EncodeEx p) Right . 
    where
         p = Proxy :: Proxy nm
 
+_implEncodingEncodeEx :: forall nm c str . (KnownSymbol nm) => (str -> Either EncodeEx str) -> Encoding (Either EncodeEx) nm (AlgNm nm) c str
+_implEncodingEncodeEx f = _mkEncoding $ implTranF f 
+
+
 _implEncodingConfEx :: forall nm err c str . (KnownSymbol nm, Show err) => (c -> str -> Either err str) -> Encoding (Either EncodeEx) nm (AlgNm nm) c str
 _implEncodingConfEx f = _mkEncoding $ implTranF' (\c -> either (Left . EncodeEx p) Right . f c) 
     where
@@ -50,4 +54,10 @@ implEncodingEx' :: forall alg nm err c str . (KnownSymbol nm, Show err) =>  (str
 implEncodingEx' f = UnsafeMkEncoding Proxy $ implTranF (either (Left . EncodeEx p) Right . f) 
    where
         p = Proxy :: Proxy nm
+
+implEncodingEncodeEx' :: forall alg nm c str . (KnownSymbol nm) =>  (str -> Either EncodeEx str) -> Encoding (Either EncodeEx) nm alg c str
+implEncodingEncodeEx' f = UnsafeMkEncoding Proxy $ implTranF f 
+   where
+        p = Proxy :: Proxy nm
+
 

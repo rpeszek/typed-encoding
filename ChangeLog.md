@@ -17,6 +17,7 @@
   - Modules under `Data.TypedEncoding.Combinators` merged into `Data.TypedEncoding.Instances`.
   - Modules under `Data.TypedEncoding.Internal` have been reorganized and moved outside of `Internal`. Various  changes that make the library easier to navigate. 
     for better navigation and discovery.
+  - some previously exported combinators (e.g. `implTranF`) have moved to `Data.TypedEncoding.Instances.Support.Unsafe` 
   - `ToEncString`, `FromEncString` have more type variables and function name but backward compatible functions
     have been provided.  
   - `Superset` typeclass removed, replaced with `IsSuperset` type family.

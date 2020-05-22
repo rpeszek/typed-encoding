@@ -65,7 +65,7 @@ instance (Ban s, Algorithm s "r-ban", IsStringR str) => Encode (Either EncodeEx)
 -- 
 -- >>> recreateFAll' @'["r-ban"] . toEncoding () $ "211-22-9934" :: Either RecreateEx (Enc '["r-ban:999-99-9999"] () T.Text)
 -- Right (UnsafeMkEnc Proxy () "211-22-9934")
-encFBan :: forall s t xs c str .
+encFBan :: forall s c str .
               (
                 IsStringR str
               , Ban s
@@ -99,7 +99,7 @@ instance (KnownSymbol s , Ban s, Algorithm s "r-ban", IsStringR str, RecreateErr
 -- Left "'G' not matching '-'"
 -- >>> verifyBoundedAlphaNum (Proxy :: Proxy "r-ban:FF-FF") (T.pack "13-234")
 -- Left "Input list has wrong size expecting 5 but length \"13-234\" == 6"
-verifyBoundedAlphaNum :: forall s a str . (KnownSymbol s, IsStringR str) => Proxy s -> str -> Either String str
+verifyBoundedAlphaNum :: forall s str . (KnownSymbol s, IsStringR str) => Proxy s -> str -> Either String str
 verifyBoundedAlphaNum p str = 
     if pattl == inpl 
     then case lefts match of

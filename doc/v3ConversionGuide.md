@@ -148,6 +148,7 @@ fromEncString :: forall nm a str  . (FromEncString Identity nm nm a str) => Enc 
  
 - `Displ String` instance (used in examples, has been made consistent with Text and ByteString)
  
+- some previously exported combinators (e.g. `implTranF`) have moved to `Data.TypedEncoding.Instances.Support.Unsafe` 
 - big re-org of internal module folder structure, however two _public_ modules remain unchanged:
 
 ```
