@@ -22,13 +22,14 @@ import           Data.TypedEncoding.Common.Types.Common
 -- >>> import qualified Data.Text as T
 
 
--- * UncheckedEnc for recreate, similar to CheckedEnc only not verified
+-- * UncheckedEnc for validation, similar to CheckedEnc but not verified
 
 -- | Represents some encoded string where encoding was not validated.
 --
 -- Similar to 'Data.TypedEncoding.Common.Types.CheckedEnc' but unlike
 -- @CheckedEnc@ it can contain payloads that have invalid encoding.
 -- 
+-- See 'Data.TypedEncoding.Combinators.Validate.check'
 data UncheckedEnc c str = MkUncheckedEnc [EncAnn] c str deriving (Show, Eq)
 
 toUncheckedEnc :: [EncAnn] -> c -> str -> UncheckedEnc c str

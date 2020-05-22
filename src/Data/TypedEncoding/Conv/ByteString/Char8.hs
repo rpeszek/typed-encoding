@@ -30,7 +30,7 @@ import           Data.TypedEncoding.Instances.Support
 -- ...
 --
 -- >>> displ $ pack (unsafeSetPayload () "Hello" :: Enc '["r-bar", "r-ASCII"] () String)
--- "MkEnc '[r-bar,r-ASCII] () (ByteString Hello)"
+-- "Enc '[r-bar,r-ASCII] () (ByteString Hello)"
 pack :: (Knds.LLast xs ~ t, IsSuperset "r-ASCII" t ~ 'True) => Enc xs c String -> Enc xs c B8.ByteString
 pack = unsafeChangePayload B8.pack
 

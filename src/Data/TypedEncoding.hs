@@ -1,5 +1,3 @@
-{-# LANGUAGE MultiParamTypeClasses #-}
-{-# LANGUAGE DataKinds #-}
 
 -- |
 -- = Overview
@@ -58,21 +56,21 @@
 -- * /validation/ is a partial identity (matching encoding)
 -- * /decoding/ is identity
 --
--- Examples: @"r-UTF8"@, @"r-ASCII"@, upper alpha-numeric bound /r-ban/ restrictions like @"r-999-999-9999"@
+-- Examples: @"r-UTF8"@, @"r-ASCII"@, upper alpha-numeric bound /r-ban/ restrictions like @"r-ban:999-999-9999"@
 --
 -- == "do-" transformations
 --
 -- * /encoding/ applies transformation to the string (could be partial)
 -- * /decoding/ - typically none
--- * /recreation/ - typically none but, if present, verifies the payload has expected data (e.g. only uppercase chars for "do-UPPER")
+-- * /validation/ - typically none but, if present, verifies the payload has expected data (e.g. only uppercase chars for "do-UPPER")
 --
 -- Examples: @"do-UPPER"@, @"do-lower"@, @"do-reverse"@
 --
 -- == "enc-" data encoding that is not "r-"
 --
 -- * /encoding/ applies encoding transformation to the string (could be partial)
--- * /decoding/ reverses the transformation (can be used as pure function)
--- * /recreation/ verifies that the payload has correctly encoded data
+-- * /decoding/ reverses the transformation (can be now be used as pure function)
+-- * /validation/ verifies that the payload has correctly encoded data
 --
 -- Examples: @"enc-B64"@
 -- 
@@ -84,7 +82,7 @@
 --
 -- Examples: 
 --
--- @"boolOr:(r-ban:FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF)(r-ban:FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF)"@ 
+-- @"boolOr:(r-ban:999-999-9999)(r-ban:(999) 999-9999)"@ 
 --
 -- "@boolNot:(r-ASCII)"
 --
@@ -99,7 +97,7 @@
 -- * "Data.TypedEncoding.Instances.Restriction.Misc" (replaces @Common@ from v0.2)
 -- * "Data.TypedEncoding.Instances.Restriction.ASCII" 
 -- * "Data.TypedEncoding.Instances.Restriction.UTF8" 
--- * "Data.TypedEncoding.Instances.Restriction.Bool" (moved from @Combinators@ to @Instances@ in v0.3)
+-- * "Data.TypedEncoding.Instances.Restriction.Bool" (experimental / early alpha version, moved from @Combinators@ to @Instances@ in v0.3)
 -- * "Data.TypedEncoding.Instances.Restriction.BoundedAlphaNums" (moved from @Combinators@ to @Instances@ in v0.3)
 -- * "Data.TypedEncoding.Instances.Do.Sample" 
 -- 
@@ -174,12 +172,12 @@ module Data.TypedEncoding (
     -- * Exceptions 
     , module Data.TypedEncoding.Common.Types.Exceptions
 
-    
+    -- * Other
     , module Data.TypedEncoding.Common.Types.Common
 
  ) where
 
-import           Data.TypedEncoding.Internal.Enc
+import           Data.TypedEncoding.Common.Types.Enc
 import           Data.TypedEncoding.Common.Types.Decoding
 import           Data.TypedEncoding.Common.Types.Validation
 

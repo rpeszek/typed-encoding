@@ -22,7 +22,7 @@ implTranF :: Functor f => (str -> f str) -> Enc enc1 conf str -> f (Enc enc2 con
 implTranF f  = implTranF' (const f)
 
 implTranF' :: Functor f =>  (conf -> str -> f str) -> Enc enc1 conf str -> f (Enc enc2 conf str)
-implTranF' f (MkEnc _ conf str) = MkEnc Proxy conf <$> f conf str
+implTranF' f (UnsafeMkEnc _ conf str) = UnsafeMkEnc Proxy conf <$> f conf str
 
 implTranP :: Applicative f => (str -> str) -> Enc enc1 conf str -> f (Enc enc2 conf str)
 implTranP f  = implTranF' (\c -> pure . f)

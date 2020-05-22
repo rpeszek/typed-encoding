@@ -31,7 +31,7 @@ import qualified Data.ByteString.Base64.Lazy as BL64
 -- >>> import Test.QuickCheck.Instances.ByteString()
 
 -----------------
--- Conversions --
+-- * Conversions
 -----------------
 
 acceptLenientS :: Enc ("enc-B64-len" ': ys) c B.ByteString -> Enc ("enc-B64" ': ys) c B.ByteString 
@@ -45,7 +45,7 @@ acceptLenientL = withUnsafeCoerce (BL64.encode . BL64.decodeLenient)
 --
 -- >>> let tstB64 = encodeAll . toEncoding () $ "Hello World" :: Enc '["enc-B64"] () B.ByteString
 -- >>> displ (flattenAs tstB64 :: Enc '["r-ASCII"] () B.ByteString)
--- "MkEnc '[r-ASCII] () (ByteString SGVsbG8gV29ybGQ=)"
+-- "Enc '[r-ASCII] () (ByteString SGVsbG8gV29ybGQ=)"
 instance FlattenAs "r-ASCII" "enc-B64-nontext" where
 instance FlattenAs "r-ASCII" "enc-B64" where
 

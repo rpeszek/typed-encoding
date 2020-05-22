@@ -83,7 +83,7 @@ tstIp = IpV4F 128 1 1 10
 -- in "Data.TypedEncoding.Instances.Restriction.Misc"
 --
 -- >>> toEncString @"r-IPv4" @IpV4 @T.Text tstIp
--- MkEnc Proxy () "128.1.1.10"
+-- UnsafeMkEnc Proxy () "128.1.1.10"
 --
 -- Implementation is a classic map reduce where reduce is done with help of
 -- 'EnT.foldEncStr'
@@ -91,7 +91,7 @@ tstIp = IpV4F 128 1 1 10
 -- >>> let fn a b = if b == "" then a else a <> "." <> b
 -- >>> let reduce = EnT.foldEncStr @'["r-IPv4"] @'["r-Word8-decimal"] () fn
 -- >>>  displ . reduce . fmap toEncString $ tstIp
--- "MkEnc '[r-IPv4] () (String 128.1.1.10)"
+-- "Enc '[r-IPv4] () (String 128.1.1.10)"
 --
 -- Note lack of type safety here, the same code would work just fine if we added
 -- 5th field to 'IpV4F' constructor.  
@@ -124,7 +124,7 @@ instance ToEncString Identity "r-IPv4" "r-IPv4" IpV4 T.Text where
 -- This is currently done using helper 'EnT.splitPayload' combinator. 
 --
 -- >>> EnT.splitPayload @ '["r-Word8-decimal"] (T.splitOn $ T.pack ".") $ enc 
--- [MkEnc Proxy () "128",MkEnc Proxy () "1",MkEnc Proxy () "1",MkEnc Proxy () "10"]
+-- [UnsafeMkEnc Proxy () "128",UnsafeMkEnc Proxy () "1",UnsafeMkEnc Proxy () "1",UnsafeMkEnc Proxy () "10"]
 -- 
 -- The conversion of a list to IpV4F needs handle errors but these errors 
 -- are considered unexpected.
@@ -207,7 +207,7 @@ tstEmail = SimplifiedEmailF {
 -- >>> check @'["enc-B64","r-ASCII"] @(Either RecreateEx) $ unchecked
 -- Nothing
 -- >>> check @'["enc-B64","r-UTF8"] @(Either RecreateEx) $ unchecked
--- Just (Right (MkEnc Proxy () "U29tZSBVVEY4IFRleHQ="))
+-- Just (Right (UnsafeMkEnc Proxy () "U29tZSBVVEY4IFRleHQ="))
 --
 -- Since the data is heterogeneous (each piece has a different encoding annotation), we need wrap the result in another plain ADT: 'CheckedEnc'.
 -- 
@@ -271,7 +271,7 @@ recreateEncoding = mapM encodefn
 -- But this one will:
 --
 -- >>> fromCheckedEnc @ '["enc-B64", "r-ASCII"]  $ piece
--- Just (MkEnc Proxy () "U29tZSBBU0NJSSBUZXh0")
+-- Just (UnsafeMkEnc Proxy () "U29tZSBBU0NJSSBUZXh0")
 --
 -- so we can apply the decoding on the selected piece 
 --

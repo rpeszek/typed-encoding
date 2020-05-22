@@ -47,7 +47,7 @@ check' = checkWithValidations @algs @nms @f validations
 
 
 recreateWithValidations :: forall algs nms f c str . (Monad f) => Validations f nms algs c str -> Enc ('[]::[Symbol]) c str -> f (Enc nms c str)
-recreateWithValidations vers str@(MkEnc _ _ pay) = 
+recreateWithValidations vers str@(UnsafeMkEnc _ _ pay) = 
         let str0 :: Enc nms c str = withUnsafeCoerce id str
         in withUnsafeCoerce (const pay) <$> runValidationChecks vers str0    
 

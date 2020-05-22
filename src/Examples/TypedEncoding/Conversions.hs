@@ -93,7 +93,7 @@ eHelloAsciiB = encodeFAll . toEncoding () $ "HeLlo world"
 -- ^ Example value to play with
 --
 -- >>>  encodeFAll . toEncoding () $ "HeLlo world" :: Either EncodeEx (Enc '["r-ASCII"] () B.ByteString) 
--- Right (MkEnc Proxy () "HeLlo world")
+-- Right (UnsafeMkEnc Proxy () "HeLlo world")
 
 Right helloAsciiB = eHelloAsciiB
 -- ^ above with either removed
@@ -107,7 +107,7 @@ helloAsciiT = EncTe.decodeUtf8 helloAsciiB
 -- Notice the encoding annotation is preserved.
 --
 -- >>> displ $ EncTe.decodeUtf8 helloAsciiB
--- "MkEnc '[r-ASCII] () (Text HeLlo world)"
+-- "Enc '[r-ASCII] () (Text HeLlo world)"
 
 
 -- * pack and unpack
@@ -117,7 +117,7 @@ helloZero = toEncoding () "Hello"
 -- ^ Consider 0-encoding of a 'String',  to move it to @Enc '[] () String@ one could try:
 --
 -- >>> displ . EncT.pack $ helloZero
--- "MkEnc '[] () (Text Hello)"
+-- "Enc '[] () (Text Hello)"
 --
 -- this works, but:
 -- 
@@ -134,7 +134,7 @@ helloZero = toEncoding () "Hello"
 -- @EncB8.pack@ will not compile unless the encoding is ASCII restricted, this works:
 -- 
 -- >>> fmap (displ . EncB8.pack) . encodeFAll @'["r-ASCII"] @(Either EncodeEx) $ helloZero
--- Right "MkEnc '[r-ASCII] () (ByteString Hello)"
+-- Right "Enc '[r-ASCII] () (ByteString Hello)"
 --
 -- And the result is a @ByteString@ with bonus annotation describing its content.
 
@@ -142,10 +142,10 @@ helloZero = toEncoding () "Hello"
 helloRestricted :: Either EncodeEx (Enc '["r-ban:zzzzz"] () B.ByteString)
 helloRestricted = fmap EncB8.pack . _runEncodings encodings $ toEncoding () "Hello"
 -- ^ more interestingly @EncB8.pack@ works fine on "r-" encodings that are subsets of "r-ASCII"
--- this example @"r-ban:zzzzz"@ restricts to 5 alapha-numeric charters all < @'z'@
+-- this example @"r-ban:zzzzz"@ restricts to 5 alpha-numeric charters all < @\'z\'@
 -- 
 -- >>> displ <$> helloRestricted
--- Right "MkEnc '[r-ban:zzzzz] () (ByteString Hello)"
+-- Right "Enc '[r-ban:zzzzz] () (ByteString Hello)"
 --
 -- Adding @"r-ASCII"@ annotation on this ByteString would have been redundant since @"r-ban:zzzzz"@ is more
 -- restrictive (see Supersets below).
@@ -153,7 +153,7 @@ helloRestricted = fmap EncB8.pack . _runEncodings encodings $ toEncoding () "Hel
 -- @unpack@, as expected will put us back in a String keeping the annotation
 --
 -- >>> fmap (displ . EncB8.unpack) helloRestricted
--- Right "MkEnc '[r-ban:zzzzz] () (String Hello)"
+-- Right "Enc '[r-ban:zzzzz] () (String Hello)"
 -- 
 
 
@@ -161,19 +161,19 @@ helloRestricted = fmap EncB8.pack . _runEncodings encodings $ toEncoding () "Hel
 
 helloUtf8B :: Enc '["r-UTF8"] () B.ByteString
 helloUtf8B = injectInto helloAsciiB
--- ^ To get UTF8 annotation, instead of doing this: 
+-- ^ To claim UTF8 on @helloAsciiB@, instead encoding again: 
 --
 -- >>> encodeFAll . toEncoding () $ "HeLlo world" :: Either EncodeEx (Enc '["r-UTF8"] () B.ByteString)
--- Right (MkEnc Proxy () "HeLlo world")
+-- Right (UnsafeMkEnc Proxy () "HeLlo world")
 -- 
--- We should be able to convert the ASCII version we already have.
+-- We should be able to convert the ASCII annotation directly.
 --
--- This is done using 'Superset' typeclass.
+-- This is done using 'IsSuperset' type family.
 --
 -- @injectInto@ method accepts proxy to specify superset to use.
 --
 -- >>> displ $ injectInto @ "r-UTF8" helloAsciiB
--- "MkEnc '[r-UTF8] () (ByteString HeLlo world)"
+-- "Enc '[r-UTF8] () (ByteString HeLlo world)"
 --
 -- Superset is intended for @"r-"@ annotations only, should not be used
 -- with general encodings like @"enc-B64"@, it assumes that decoding in the superset
@@ -188,19 +188,19 @@ helloUtf8B64B = encodePart @'["enc-B64"] helloUtf8B
 -- ^ We put Base64 on a ByteString which adheres to UTF8 layout
 --
 -- >>> displ $ encodePart @'["enc-B64"] helloUtf8B
--- "MkEnc '[enc-B64,r-UTF8] () (ByteString SGVMbG8gd29ybGQ=)"
+-- "Enc '[enc-B64,r-UTF8] () (ByteString SGVMbG8gd29ybGQ=)"
 
 helloUtf8B64T :: Enc '["enc-B64"] () T.Text
 helloUtf8B64T = EncT.utf8Demote . EncTe.decodeUtf8 $ helloUtf8B64B  
 -- ^ .. and copy it over to Text.
 --
 -- >>> displ $ EncTe.decodeUtf8 helloUtf8B64B
--- "MkEnc '[enc-B64,r-UTF8] () (Text SGVMbG8gd29ybGQ=)"
+-- "Enc '[enc-B64,r-UTF8] () (Text SGVMbG8gd29ybGQ=)"
 --
 -- but UTF8 would be redundant in Text so the "r-UTF8" can be dropped:
 --
 -- >>> displ . EncT.utf8Demote . EncTe.decodeUtf8 $ helloUtf8B64B
--- "MkEnc '[enc-B64] () (Text SGVMbG8gd29ybGQ=)"
+-- "Enc '[enc-B64] () (Text SGVMbG8gd29ybGQ=)"
 --
 -- Conversely moving back to ByteString we need to recover the annotation
 -- 
@@ -213,7 +213,7 @@ helloUtf8B64T = EncT.utf8Demote . EncTe.decodeUtf8 $ helloUtf8B64B
 -- This is not allowed! We need to add the redundant "r-UTF8" back:
 --
 -- >>> displ .  EncTe.encodeUtf8 . EncT.utf8Promote $ helloUtf8B64T
--- "MkEnc '[enc-B64,r-UTF8] () (ByteString SGVMbG8gd29ybGQ=)"
+-- "Enc '[enc-B64,r-UTF8] () (ByteString SGVMbG8gd29ybGQ=)"
 --
 -- To achieve type safety, our @encodeUtf8@ and @decodeUtf8@ require "r-UTF8" annotation. 
 -- But since @Text@ values can always emit @UTF8@ layout, we can simply add and remove
@@ -224,7 +224,7 @@ notTextB = encodeAll . toEncoding () $ "\195\177"
 -- ^ 'notTextB' a binary, one that does not even represent a valid UTF8.
 -- 
 -- >>> encodeAll . toEncoding () $ "\195\177" :: Enc '["enc-B64"] () B.ByteString
--- MkEnc Proxy () "w7E="
+-- UnsafeMkEnc Proxy () "w7E="
 --
 -- Decoding it to Text is prevented by the compiler
 --
@@ -248,7 +248,7 @@ lenientSomething :: Enc '["enc-B64-len"] () B.ByteString
 lenientSomething = recreateAll . toEncoding () $ "abc==CB"
 -- ^ 
 -- >>> recreateAll . toEncoding () $ "abc==CB" :: Enc '["enc-B64-len"] () B.ByteString
--- MkEnc Proxy () "abc==CB"
+-- UnsafeMkEnc Proxy () "abc==CB"
 --
 -- The rest of Haskell does lenient decoding, type safety allows this library to use it for recovery.
 -- lenient algorithms are not partial and automatically fix invalid input:
@@ -261,17 +261,17 @@ lenientSomething = recreateAll . toEncoding () $ "abc==CB"
 -- 'EnB64.acceptLenientS' allows to convert "enc-B64-len" to "enc-B64"
 --
 -- >>> displ $ EnB64.acceptLenientS lenientSomething
--- "MkEnc '[enc-B64] () (ByteString abc=)"
+-- "Enc '[enc-B64] () (ByteString abc=)"
 --
 -- This is now properly encoded data
 --
 -- >>> recreateFAll . toEncoding () $ "abc=" :: Either RecreateEx (Enc '["enc-B64"] () B.ByteString)
--- Right (MkEnc Proxy () "abc=")
+-- Right (UnsafeMkEnc Proxy () "abc=")
 --
 -- Except the content could be surprising
 --
 -- >>> decodeAll $ EnB64.acceptLenientS lenientSomething
--- MkEnc Proxy () "i\183"
+-- UnsafeMkEnc Proxy () "i\183"
 
 
 -- * Flattening

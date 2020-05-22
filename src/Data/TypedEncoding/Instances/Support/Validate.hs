@@ -51,9 +51,9 @@ validFromEnc' (UnsafeMkEncoding p fn) = UnsafeMkValidation p (encAsRecreateErr .
         encAsRecreateErr (Left (EncodeEx p err)) = recoveryErr $ RecreateEx p err
         encAsRecreateErr (Right r) = pure r 
         rfn :: forall (xs :: [Symbol]) . Enc (nm ': xs) c str -> Either EncodeEx (Enc xs c str)
-        rfn (MkEnc _ conf str)  =    
-            let re = fn $ MkEnc Proxy conf str
-            in  MkEnc Proxy conf . getPayload <$> re 
+        rfn (UnsafeMkEnc _ conf str)  =    
+            let re = fn $ UnsafeMkEnc Proxy conf str
+            in  UnsafeMkEnc Proxy conf . getPayload <$> re 
 
 
 

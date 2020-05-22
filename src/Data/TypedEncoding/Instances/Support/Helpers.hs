@@ -62,7 +62,7 @@ splitPayload :: forall (xs2 :: [Symbol]) (xs1 :: [Symbol]) c s1 s2 .
              (s1 -> [s2]) 
              -> Enc xs1 c s1 
              -> [Enc xs2 c s2]
-splitPayload f (MkEnc _ c s1) = map (MkEnc Proxy c) (f s1)
+splitPayload f (UnsafeMkEnc _ c s1) = map (UnsafeMkEnc Proxy c) (f s1)
    
 -- | Untyped version of 'splitPayload'
 splitSomePayload :: forall c s1 s2 . 

@@ -14,7 +14,7 @@
 module Data.TypedEncoding.Combinators.Encode.Experimental where
 
 import           Data.TypedEncoding.Combinators.Encode
-import           Data.TypedEncoding.Internal.Enc
+import           Data.TypedEncoding.Common.Types.Enc
 import           Data.TypedEncoding.Common.Types.Common
 import           Data.TypedEncoding.Common.Class.Util -- Append
 import           Data.TypedEncoding.Common.Class.Encode    

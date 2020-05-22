@@ -31,17 +31,17 @@ import           Data.Proxy
 aboveF :: forall (ts :: [Symbol]) xs ys f c str . (Functor f) =>
            (Enc xs c str -> f (Enc ys c str)) 
            -> Enc (Append xs ts) c str -> f (Enc (Append ys ts) c str)
-aboveF fn (MkEnc _ conf str) = 
-    let re :: f (Enc ys c str) = fn $ MkEnc Proxy conf str
-    in  MkEnc Proxy conf . getPayload <$> re
+aboveF fn (UnsafeMkEnc _ conf str) = 
+    let re :: f (Enc ys c str) = fn $ UnsafeMkEnc Proxy conf str
+    in  UnsafeMkEnc Proxy conf . getPayload <$> re
 
 
 above :: forall (ts :: [Symbol]) xs ys c str . 
            (Enc xs c str -> Enc ys c str) 
            -> Enc (Append xs ts) c str -> Enc (Append ys ts) c str
-above fn (MkEnc _ conf str) = 
-    let re ::Enc ys c str = fn $ MkEnc Proxy conf str
-    in  MkEnc Proxy conf . getPayload $ re
+above fn (UnsafeMkEnc _ conf str) = 
+    let re ::Enc ys c str = fn $ UnsafeMkEnc Proxy conf str
+    in  UnsafeMkEnc Proxy conf . getPayload $ re
 
 
 -- * Other 

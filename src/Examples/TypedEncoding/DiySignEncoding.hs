@@ -19,7 +19,7 @@
 -- Decoding cannot fail unless somehow underlying data has been corrupted.
 --
 -- Such integrity of data should be enforced at boundaries
--- (JSON instances, DB retrievals, etc).  This can be accomplished using provided 'RecreateF' typeclass.
+-- (JSON instances, DB retrievals, etc).  This can be accomplished using provided support for /Validation/ or using 'Data.TypedEncoding.Common.Types.UncheckedEnc.UncheckedEnc'.
 -- 
 -- This still is user decision, the errors during decoding process are considered unexpected 'UnexpectedDecodeErr'.
 -- In particular user can decide to use unsafe operations with the encoded type. See 'Examples.TypedEncoding.Unsafe'.
@@ -66,7 +66,7 @@ decodeSign t =
 -- | Encoded hello world example.
 --
 -- >>> helloSigned
--- MkEnc Proxy () "11:Hello World"
+-- UnsafeMkEnc Proxy () "11:Hello World"
 --
 -- >>> fromEncoding . decodeAll $ helloSigned 
 -- "Hello World"
@@ -99,7 +99,7 @@ hacker =
 -- Left (RecreateEx "my-sign" ("Corrupted Signature"))
 --
 -- >>> recreateFAll . toEncoding () $ payload :: Either RecreateEx (Enc '["my-sign"] () T.Text)
--- Right (MkEnc Proxy () "11:Hello World")
+-- Right (UnsafeMkEnc Proxy () "11:Hello World")
 
 
 -- | Because encoding function is pure we can create instance of EncodeF 

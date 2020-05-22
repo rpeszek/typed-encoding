@@ -41,7 +41,7 @@ Right exAsciiT = exAsciiTE
 -- >>> let payload = getPayload exAsciiT
 -- >>> let newPayload = payload <> " some extra stuff"
 -- >>> recreateFAll . toEncoding () $ newPayload :: Either RecreateEx (Enc '["r-ASCII"] () T.Text)
--- Right (MkEnc Proxy () "HELLO some extra stuff")
+-- Right (UnsafeMkEnc Proxy () "HELLO some extra stuff")
 --
 -- Alternatively, 'UncheckedEnc' type can be used in recreation, see 'Examples.TypedEncoding.Overview'
 -- 
@@ -58,9 +58,9 @@ modifiedAsciiT =  recreateFAll . toEncoding () . ( <> " some extra stuff") . get
 -- the internal payload.
 --  
 -- >>> exAsciiTE
--- Right (MkEnc Proxy () "HELLO")
+-- Right (UnsafeMkEnc Proxy () "HELLO")
 -- >>> exAsciiTE >>= pure . Unsafe.withUnsafe (fmap T.toLower)
--- Right (MkEnc Proxy () "hello")
+-- Right (UnsafeMkEnc Proxy () "hello")
 --
 -- Example uses of 'T.toLower' within encoded data
 -- this operation is safe for ASCII restriction
@@ -75,7 +75,7 @@ toLowerAscii = Unsafe.withUnsafe (fmap T.toLower) <$> exAsciiTE
 -- >>> let Right hELLO = exAsciiTE
 -- >>> let Right hello = toLowerAscii
 -- >>> displ $ Unsafe.runUnsafe ((<>) <$> Unsafe.Unsafe hELLO <*> Unsafe.Unsafe hello)
--- "MkEnc '[r-ASCII] () (Text HELLOhello)"
+-- "Enc '[r-ASCII] () (Text HELLOhello)"
 appendAscii :: Either EncodeEx (Enc '["r-ASCII"] () T.Text)
 appendAscii = do 
     hELLO <- exAsciiTE

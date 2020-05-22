@@ -18,12 +18,12 @@ withUnsafe :: (Unsafe e c s1 -> Unsafe e c s2) -> Enc e c s1 -> Enc e c s2
 withUnsafe f enc = runUnsafe . f $ Unsafe enc
 
 instance Functor (Unsafe enc conf) where
-    fmap f (Unsafe (MkEnc p c x)) = Unsafe (MkEnc p c (f x))
+    fmap f (Unsafe (UnsafeMkEnc p c x)) = Unsafe (UnsafeMkEnc p c (f x))
   
 instance Applicative (Unsafe enc ()) where
-    pure = Unsafe . MkEnc Proxy ()  
-    Unsafe (MkEnc p c1 f) <*> Unsafe (MkEnc _ c2 x) = Unsafe (MkEnc p () (f x))  
+    pure = Unsafe . UnsafeMkEnc Proxy ()  
+    Unsafe (UnsafeMkEnc p c1 f) <*> Unsafe (UnsafeMkEnc _ c2 x) = Unsafe (UnsafeMkEnc p () (f x))  
 
 instance Monad (Unsafe enc ()) where 
-    Unsafe (MkEnc _ _ x) >>= f = f x     
+    Unsafe (UnsafeMkEnc _ _ x) >>= f = f x     
 

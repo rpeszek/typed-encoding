@@ -1,13 +1,4 @@
 
-{-# LANGUAGE DataKinds #-}
-{-# LANGUAGE TypeOperators #-}
-{-# LANGUAGE FlexibleInstances #-}
-{-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE TypeFamilies #-}
-{-# LANGUAGE UndecidableInstances #-}
-{-# LANGUAGE TypeApplications #-}
-
 -- | Exports for instance creation.
 -- 
 -- Contains typical things needed when implementing
@@ -24,10 +15,9 @@ module Data.TypedEncoding.Instances.Support (
     , module Data.TypedEncoding.Instances.Support.Encode
     , module Data.TypedEncoding.Instances.Support.Decode
     , module Data.TypedEncoding.Instances.Support.Validate
+    , module Data.TypedEncoding.Combinators.Unsafe
     -- * Type level conveniences
     , module Data.TypedEncoding.Common.Util.TypeLits
-    , module Data.TypedEncoding.Combinators.Unsafe
-    --, module Data.TypedEncoding.Instances.Support.Unsafe
    ) where
 
 import           Data.TypedEncoding.Instances.Support.Common 

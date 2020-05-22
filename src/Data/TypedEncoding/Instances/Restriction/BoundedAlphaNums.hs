@@ -10,6 +10,7 @@
 -- {-# LANGUAGE KindSignatures  #-}
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE UndecidableInstances #-}
+{-# LANGUAGE ConstraintKinds #-}
 
 -- | 
 -- Restrictions @"r-ban:"@ cover commonly used fixed (short) size strings with restricted
@@ -49,24 +50,25 @@ import           Data.TypedEncoding.Instances.Support
 type family IsBan (s :: Symbol) :: Bool where
     IsBan s = AcceptEq ('Text "Not ban restriction encoding " ':<>: ShowType s ) (CmpSymbol (TakeUntil s ":") "r-ban")
 
+type Ban s = (KnownSymbol s, IsBan s ~ 'True)
+
 type instance IsSupersetOpen "r-ASCII" "r-ban" xs = 'True
 
 
-instance (KnownSymbol s , IsBan s ~ 'True, AlgNm s ~ "r-ban", IsStringR str) => Encode (Either EncodeEx) s "r-ban" c str where
+instance (Ban s, Algorithm s "r-ban", IsStringR str) => Encode (Either EncodeEx) s "r-ban" c str where
     encoding = encFBan
 
 
 -- |
 -- >>> runEncoding' encFBan . toEncoding () $ "C59F9FB7-4621-44D9-9020-CE37BF6E2BD1" :: Either EncodeEx (Enc '["r-ban:FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF"] () T.Text)
--- Right (MkEnc Proxy () "C59F9FB7-4621-44D9-9020-CE37BF6E2BD1")
+-- Right (UnsafeMkEnc Proxy () "C59F9FB7-4621-44D9-9020-CE37BF6E2BD1")
 -- 
 -- >>> recreateFAll' @'["r-ban"] . toEncoding () $ "211-22-9934" :: Either RecreateEx (Enc '["r-ban:999-99-9999"] () T.Text)
--- Right (MkEnc Proxy () "211-22-9934")
+-- Right (UnsafeMkEnc Proxy () "211-22-9934")
 encFBan :: forall s t xs c str .
               (
                 IsStringR str
-              , KnownSymbol s
-              , IsBan s ~ 'True
+              , Ban s
               , Algorithm s "r-ban"
               ) => 
               Encoding (Either EncodeEx) s "r-ban" c str
@@ -82,7 +84,7 @@ instance (KnownSymbol s, Restriction s, Algorithm s "r-ban", Applicative f) => D
 
 -- * Validation
 
-instance (KnownSymbol s , IsBan s ~ 'True, Algorithm s "r-ban", IsStringR str, RecreateErr f, Applicative f) => Validate f s "r-ban" c str where
+instance (KnownSymbol s , Ban s, Algorithm s "r-ban", IsStringR str, RecreateErr f, Applicative f) => Validate f s "r-ban" c str where
     validation = validFromEnc' @"r-ban" encFBan
 
 

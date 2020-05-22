@@ -15,7 +15,7 @@
 -- 
 -- >>> :set -XOverloadedStrings -XMultiParamTypeClasses -XDataKinds
 -- >>> encodeFAll . toEncoding () $ "Hello World" :: Either EncodeEx (Enc '["r-ASCII"] () T.Text)
--- Right (MkEnc Proxy () "Hello World")
+-- Right (UnsafeMkEnc Proxy () "Hello World")
 --
 -- >>> encodeFAll . toEncoding () $ "\194\160" :: Either EncodeEx (Enc '["r-ASCII"] () T.Text)
 -- Left (EncodeEx "r-ASCII" (NonAsciiChar '\194'))

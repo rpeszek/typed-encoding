@@ -25,13 +25,13 @@ unpack = unsafeChangePayload T.unpack
 -- | Text is automatically @"r-UTF8"@ encoded
 -- 
 -- >>> displ $ utf8Promote $ toEncoding () ("text" :: T.Text)
--- "MkEnc '[r-UTF8] () (Text text)"
+-- "Enc '[r-UTF8] () (Text text)"
 utf8Promote :: Enc xs c T.Text -> Enc (Snoc xs "r-UTF8") c T.Text
 utf8Promote = withUnsafeCoerce id
 
 -- | For 'T.Text' @"r-UTF8"@ is redundant
 --
 -- >>> displ . utf8Demote $ (unsafeSetPayload () "Hello" :: Enc '["r-UTF8"] () T.Text)
--- "MkEnc '[] () (Text Hello)"
+-- "Enc '[] () (Text Hello)"
 utf8Demote :: (UnSnoc xs ~ '(,) ys "r-UTF8") => Enc xs c T.Text -> Enc ys c T.Text
 utf8Demote = withUnsafeCoerce id

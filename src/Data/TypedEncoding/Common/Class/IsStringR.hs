@@ -5,7 +5,7 @@
 {-# LANGUAGE AllowAmbiguousTypes #-}
 {-# LANGUAGE FlexibleInstances #-}
 
--- | This Module will be removed in 0.3.x.x in favor of 
+-- | This Module will be removed in the future in favor of classes defined in
 -- "Data.TypedEncoding.Common.Class.Util.StringConstraints"
 module Data.TypedEncoding.Common.Class.IsStringR where
 

@@ -14,7 +14,7 @@
 
 module Data.TypedEncoding.Common.Types.CheckedEnc where
 
-import           Data.TypedEncoding.Internal.Enc
+import           Data.TypedEncoding.Common.Types.Enc
 import           Data.TypedEncoding.Common.Types.Common
 import           Data.TypedEncoding.Common.Class.Util
 import           Data.Proxy
@@ -32,7 +32,7 @@ import           Data.Proxy
 
 -- | Represents some validated encoded string. 
 --
--- @CheckedEnc@ is untyped version of 'Data.TypedEncoding.Internal.Enc.Enc'. 
+-- @CheckedEnc@ is untyped version of 'Data.TypedEncoding.Common.Types.Enc.Enc'. 
 -- @CheckedEnc@ contains verified encoded data, encoding is visible
 -- at the value level only.
 data CheckedEnc conf str = UnsafeMkCheckedEnc [EncAnn] conf str
@@ -48,7 +48,7 @@ getCheckedEncPayload :: CheckedEnc conf str -> ([EncAnn], str)
 getCheckedEncPayload (UnsafeMkCheckedEnc t _ s) = (t,s)
 
 toCheckedEnc :: forall xs c str . (SymbolList xs) => Enc xs c str -> CheckedEnc c str 
-toCheckedEnc (MkEnc p c s) = 
+toCheckedEnc (UnsafeMkEnc p c s) = 
         UnsafeMkCheckedEnc (symbolVals @ xs) c s   
 
 
@@ -56,7 +56,7 @@ fromCheckedEnc :: forall xs c str . SymbolList xs => CheckedEnc c str -> Maybe (
 fromCheckedEnc (UnsafeMkCheckedEnc xs c s) = 
     let p = Proxy :: Proxy xs
     in if symbolVals @ xs == xs
-       then Just $ MkEnc p c s
+       then Just $ UnsafeMkEnc p c s
        else Nothing
 
 ------------------------

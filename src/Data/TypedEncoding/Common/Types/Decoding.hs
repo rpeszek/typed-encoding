@@ -20,7 +20,7 @@ module Data.TypedEncoding.Common.Types.Decoding where
 import           Data.Proxy
 import           GHC.TypeLits
 
-import           Data.TypedEncoding.Internal.Enc
+import           Data.TypedEncoding.Common.Types.Enc
 import           Data.TypedEncoding.Common.Types.Common
 
 -- |

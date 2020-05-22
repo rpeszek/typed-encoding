@@ -2,25 +2,37 @@
 
 ## Anticipated future breaking changes
 
-- `EncodeFAll`, `DecodeFAll`, `RecreateFAll`, `EncodeF`, etc do not work well with more open 
-   encoding  annotation such as `"r-ban:soething"` they will be either changed or deprecated / replaced with constructions similar to `Encoder` in `Data.TypedEncoding.Internal.Class.Encoder`.
 - `Data.TypedEncoding.Internal.Class.IsStringR` expected to be be changed / replaced
-- functions used to create encoding instances or encoding combinators (e.g. `implEncodeP`) will get more constraints. 
-- (never ending) rework of internal module stucture to make it easier to navigate 
-- Instances and Combinators modules will be merged.
 - (post 0.3) "enc-B64" will be moved to a different package (more distant goal)
 
 ## Unreleased changes
 
-- breaking
-  - deprecated ByteString / Text conversion functions in `Data.TypedEncoding.Instances.Restriction.ASCII`, 
-    `Data.TypedEncoding.Instances.Restriction.ASCII` and `Data.TypedEncoding.Instances.Enc.Base64`
-    have been removed.
+- Breaking: Numerous changes on the implementation side, new version should be largely compatible on the call site except
+    for small differences in constraints and order for type variables (if `-XTypeApplications` is used).
+    See [v3 migration guide](doc/v3ConversionGuide.md).
+  - `EncodeFAll`, `DecodeFAll`, `RecreateFAll`, `EncodeF`, `DecodeF`, `RecreateF` replaced with
+     `EncodeAll`, `DecodeAll`, `ValidateAll`, `Encode`, `Decode`, `Validate`.
+  - functions used to create encoding instances or encoding combinators (e.g. `implEncodeP`) are now more precisely typed
   - `Displ String` instance (used in examples, has been made consistent with Text and ByteString)
-  - Modules moved: `Data.TypedEncoding.Combinators` merged into `Data.TypedEncoding.Instances`.
+  - Modules under `Data.TypedEncoding.Combinators` merged into `Data.TypedEncoding.Instances`.
+  - Modules under `Data.TypedEncoding.Internal` have been reorganized and moved outside of `Internal`. Various  changes that make the library easier to navigate. 
+    for better navigation and discovery.
+  - `ToEncString`, `FromEncString` have more type variables and function name but backward compatible functions
+    have been provided.  
+  - `Superset` typeclass removed, replaced with `IsSuperset` type family.
+  - Minor changes in `forall` variable order in combinators for `"r-bool:"` encodings.
+  - `Encoder` type removed, replaced by `Encodings`.
+  - `checkWithValidationsEnc` combinator renamed to `check`
+  - (Considered private) `MkCheckedEnc` constructor became `UnsafeMkCheckedEnc`
+  - (Considered private) `MkEnc` constructor became `UnsafeMkEnc`
+ 
+- new functionality
+  - new types and typeclasses are based on both encoding name and algorithm name allowing
+    typeclass definitions for open encodings like `"r-ban:"` that can contain arbitrary symbol literals. 
+  - new set of combinators grouped into `_` (compiler decided algorithm), `'` (program specifies algorithm), and
+    `algorithm name ~ encoding name` categories  
+  - `above` combinator subsumes partial encoding / decoding combinators 
 
-- new
-  - `above` combinator subsumes partial encoding / decoding combinators. 
 
 ## 0.2.2 
 

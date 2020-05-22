@@ -31,7 +31,6 @@ import           Data.Symbol.Ascii
 
 
 -- |
--- @since 0.3
 -- Replaces previous @Superset@ typeclass.
 --
 -- Subsets are useful for restriction encodings
@@ -46,6 +45,7 @@ import           Data.Symbol.Ascii
 --
 -- @IsSuperset bigger smaller@ reads as @bigger@ is a superset of @smaller@
 --
+-- @since 0.2.2.0
 type family IsSuperset (y :: Symbol) (x :: Symbol) :: Bool where
     IsSuperset "r-ASCII" "r-ASCII" = 'True
     IsSuperset "r-UTF8"  "r-ASCII" = 'True
@@ -57,7 +57,9 @@ type family IsSupersetOpen (y :: Symbol) (x :: Symbol) (xs :: [Symbol]) :: Bool
 -- |
 -- >>> let Right tstAscii = encodeFAll . toEncoding () $ "Hello World" :: Either EncodeEx (Enc '["r-ASCII"] () T.Text)
 -- >>> displ (injectInto @ "r-UTF8" tstAscii)
--- "MkEnc '[r-UTF8] () (Text Hello World)"
+-- "Enc '[r-UTF8] () (Text Hello World)"
+--
+-- @since 0.2.2.0
 injectInto :: forall y x xs c str . (IsSuperset y x ~ 'True) => Enc (x ': xs) c str ->  Enc (y ': xs) c str
 injectInto = withUnsafeCoerce id
 

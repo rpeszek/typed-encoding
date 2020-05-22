@@ -10,7 +10,7 @@
 -- | Combinators reexported in Data.TypedEncoding
 module Data.TypedEncoding.Combinators.Decode where
 
-import           Data.TypedEncoding.Internal.Enc
+import           Data.TypedEncoding.Common.Types.Enc
 import           Data.TypedEncoding.Common.Types.Decoding
 import           Data.TypedEncoding.Combinators.Common
 
@@ -64,9 +64,9 @@ decodeAll' = runIdentity . decodeFAll' @algs
 
 decodeFPart' :: forall algs xs xsf f c str . (Monad f, DecodeAll f xs algs c str) => Enc (Append xs xsf) c str -> f (Enc xsf c str)
 decodeFPart' = aboveF @xsf @xs @'[] (decodeFAll' @algs)  
--- decodeFPart' (MkEnc _ conf str) =   
---     let re :: f (Enc '[] c str) = decodeFAll' @algs @xs $ MkEnc Proxy conf str
---     in  MkEnc Proxy conf . getPayload <$> re
+-- decodeFPart' (UnsafeMkEnc _ conf str) =   
+--     let re :: f (Enc '[] c str) = decodeFAll' @algs @xs $ UnsafeMkEnc Proxy conf str
+--     in  UnsafeMkEnc Proxy conf . getPayload <$> re
 
 decodePart' :: forall algs xs xsf c str . (DecodeAll Identity xs algs c str) => Enc (Append xs xsf) c str -> Enc xsf c str   
 decodePart' = runIdentity . decodeFPart' @algs @xs

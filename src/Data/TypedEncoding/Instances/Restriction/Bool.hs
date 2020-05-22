@@ -15,7 +15,7 @@
 --
 -- @since 0.2.1.0
 -- 
--- /(Experimental)/ This module was not converted to v0.3.
+-- /(Experimental, early alpha development stage)/ This module was not converted to v0.3 style yet.
 --
 -- == Grammar
 -- 
@@ -26,9 +26,8 @@
 -- bool[UnaryOp]:(term)
 -- @
 --
--- Expected behavior is described next to corresponding combinator.
---
--- This is very much in beta state.
+-- Expected behavior is described next to the corresponding combinator.
+
 module Data.TypedEncoding.Instances.Restriction.Bool where 
 
 
@@ -97,10 +96,10 @@ encBoolOrRight = implChangeAnn
 -- :}
 -- 
 -- >>> tst1 
--- Right (MkEnc Proxy () "212")
+-- Right (UnsafeMkEnc Proxy () "212")
 --
 -- >>> tst2
--- Right (MkEnc Proxy () "1000000")
+-- Right (UnsafeMkEnc Proxy () "1000000")
 --
 -- >>> tst3
 -- Left (EncodeEx "r-Word8-decimal" ("Payload does not satisfy format Word8-decimal: 1000000"))
@@ -158,7 +157,7 @@ encBoolAnd fnl fnr en0 =
 -- :}
 -- 
 -- >>> tst1
--- Right (MkEnc Proxy () "234")
+-- Right (UnsafeMkEnc Proxy () "234")
 -- >>> tst2
 -- Left (EncodeEx "r-Word8-decimal" ("Payload does not satisfy format Word8-decimal: 100000"))
 encBoolAnd' :: forall s t1 t2 xs c str . (
@@ -215,7 +214,7 @@ encBoolNot fn en0 =
 -- :}
 --
 -- >>> tst1
--- Right (MkEnc Proxy () "334")
+-- Right (UnsafeMkEnc Proxy () "334")
 -- >>> tst2
 -- Left (EncodeEx "boolNot:(r-Word8-decimal)" ("Encoding r-Word8-decimal succeeded"))
 encBoolNot' :: forall s t xs c str . (
@@ -247,7 +246,6 @@ decBoolR :: forall f xs t s c str . (
 decBoolR = implTranP id 
 
 
--- | needs to be converted to v0.3 style
 recWithEncBoolR :: forall (s :: Symbol) xs c str . (NestedR s ~ 'True) 
                        => (Enc xs c str -> Either EncodeEx (Enc (s ': xs) c str)) 
                        -> Enc xs c str -> Either RecreateEx (Enc (s ': xs) c str)

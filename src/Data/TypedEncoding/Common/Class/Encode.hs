@@ -10,7 +10,7 @@
 
 module Data.TypedEncoding.Common.Class.Encode where
 
-import           Data.TypedEncoding.Internal.Enc
+import           Data.TypedEncoding.Common.Types.Enc
 
 
 -- | 
@@ -23,9 +23,13 @@ import           Data.TypedEncoding.Internal.Enc
 -- match with what is on the typeclass.
 --
 -- @alg@ is expected to be very statically defined and is needed to support more open instances such as @"r-ban"@.
+--
+-- @since 0.3.0.0
 class Encode f nm alg conf str where
     encoding :: Encoding f nm alg conf str
 
+-- |
+-- @since 0.3.0.0
 class EncodeAll f nms algs conf str where
     encodings :: Encodings f nms algs conf str
 

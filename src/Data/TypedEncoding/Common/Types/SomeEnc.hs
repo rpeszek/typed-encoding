@@ -15,7 +15,7 @@
 
 module Data.TypedEncoding.Common.Types.SomeEnc where
 
-import           Data.TypedEncoding.Internal.Enc
+import           Data.TypedEncoding.Common.Types.Enc
 import           Data.TypedEncoding.Common.Class.Util
 import           Data.TypedEncoding.Common.Types.SomeAnnotation
 import           Data.TypedEncoding.Common.Types.CheckedEnc
@@ -48,15 +48,15 @@ someToChecked se = withSomeEnc se toCheckedEnc
 -- | 
 -- >>> let tst = unsafeCheckedEnc ["TEST"] () "test"
 -- >>> displ $ checkedToSome tst
--- "Some (MkEnc '[TEST] () (String test))"
+-- "Some (Enc '[TEST] () (String test))"
 checkedToSome :: CheckedEnc conf str -> SomeEnc conf str
-checkedToSome (UnsafeMkCheckedEnc xs c s) = withSomeAnnotation (someAnnValue xs) (\p -> MkSomeEnc (MkEnc p c s))
+checkedToSome (UnsafeMkCheckedEnc xs c s) = withSomeAnnotation (someAnnValue xs) (\p -> MkSomeEnc (UnsafeMkEnc p c s))
 
 
 -- |
 -- >>> let enctest = unsafeSetPayload () "hello" :: Enc '["TEST"] () T.Text
 -- >>> displ $ MkSomeEnc enctest
--- "Some (MkEnc '[TEST] () (Text hello))"
+-- "Some (Enc '[TEST] () (Text hello))"
 instance (Show c, Displ str) => Displ (SomeEnc c str) where
     displ (MkSomeEnc en) = 
        "Some (" ++ displ en ++ ")"
