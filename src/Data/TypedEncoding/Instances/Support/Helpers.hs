@@ -93,7 +93,7 @@ verifyWithRead msg x =
        else Left $ "Payload does not satisfy format " ++ msg ++ ": " ++ s    
 
 
--- | Convenience function for checking if @str@ decodes properly
+-- | Convenience function for checking if @str@ decodes without error
 -- using @enc@ encoding markers and decoders that can pick decoder based
 -- on that marker
 verifyDynEnc :: forall s str err1 err2 enc a. (KnownSymbol s, Show err1, Show err2) => 
