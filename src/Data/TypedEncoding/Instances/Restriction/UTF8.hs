@@ -68,9 +68,12 @@ instance Encode (Either EncodeEx) "r-UTF8" "r-UTF8" c BL.ByteString where
 
 encUTF8B :: Encoding (Either EncodeEx) "r-UTF8" "r-UTF8" c B.ByteString
 encUTF8B = _implEncodingEx (fmap TE.encodeUtf8 . TE.decodeUtf8')
+{-# WARNING encUTF8B "This method was not optimized for performance." #-}
+
 
 encUTF8BL :: Encoding (Either EncodeEx) "r-UTF8" "r-UTF8" c BL.ByteString
 encUTF8BL = _implEncodingEx (fmap TEL.encodeUtf8 . TEL.decodeUtf8')
+{-# WARNING encUTF8BL "This method was not optimized for performance." #-}
 
 -- * Decoding
 

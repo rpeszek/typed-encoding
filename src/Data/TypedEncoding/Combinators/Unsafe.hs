@@ -9,6 +9,9 @@ import           Data.Proxy
 
 
 -- |
+-- Currently recommended way of recreating encoding from trusted input,
+-- if avoiding cost of "Data.TypedEncoding.Common.Types.Validation" is important
+--    
 -- @since 0.1.0.0 (moved)
 unsafeSetPayload :: conf -> str -> Enc enc conf str 
 unsafeSetPayload  = UnsafeMkEnc Proxy 

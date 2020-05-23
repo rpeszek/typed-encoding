@@ -63,6 +63,26 @@ type family IsSupersetOpen (y :: Symbol) (x :: Symbol) (xs :: [Symbol]) :: Bool
 injectInto :: forall y x xs c str . (IsSuperset y x ~ 'True) => Enc (x ': xs) c str ->  Enc (y ': xs) c str
 injectInto = withUnsafeCoerce id
 
+-- TODO consider expanding to 
+-- _injectInto ::forall y x xs c str . (IsSuperset y x ~ 'True) =>  Enc (x ': xs) c str ->  Enc (Replace x y xs) c str
+
+-- |
+-- IsSuperset is not intended for @"enc-"@ encodings. This class is.
+-- 
+-- It allows to specify constraints that say, for example, that /Base 64/ encodes into 
+-- a subset of /ASCII/.
+--
+-- @since 0.3.0.0
+class EncodingSuperset (enc :: Symbol) where
+    type EncSuperset enc :: Symbol
+
+    implEncInto :: forall xs c str . Enc (enc ': xs) c str -> Enc (EncSuperset enc ': enc ': xs) c str
+    implEncInto = withUnsafeCoerce id
+    
+{-# WARNING implEncInto "Using this method at the call site may not be backward compatible between minor version upgrades, use _encodesInto instead." #-}
+
+_encodesInto :: forall y enc xs c str r . (IsSuperset y r ~ 'True, EncodingSuperset enc, r ~ EncSuperset enc) => Enc (enc ': xs) c str -> Enc (y ': enc ': xs) c str
+_encodesInto = injectInto . implEncInto
 
 -- prop_Superset :: forall y x xs c str . (Superset y x, Eq str) => Enc (x ': xs) c str -> Bool
 -- prop_Superset x = getPayload x == (getPayload . inject @y @x $ x)

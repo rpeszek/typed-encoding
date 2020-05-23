@@ -5,11 +5,11 @@
 - `Data.TypedEncoding.Internal.Class.IsStringR` expected to be be changed / replaced
 - (post 0.3) "enc-B64" will be moved to a different package (more distant goal)
 
-## Unreleased changes
+## 0.3
 
 - Breaking: Numerous changes on the implementation side, new version should be largely compatible on the call site except
     for small differences in constraints and order for type variables (if `-XTypeApplications` is used).
-    See [v3 migration guide](doc/v3ConversionGuide.md).
+    See [v3 migration guide](https://github.com/rpeszek/typed-encoding/blob/master/doc/v3ConversionGuide.md).
   - `EncodeFAll`, `DecodeFAll`, `RecreateFAll`, `EncodeF`, `DecodeF`, `RecreateF` replaced with
      `EncodeAll`, `DecodeAll`, `ValidateAll`, `Encode`, `Decode`, `Validate`.
   - functions used to create encoding instances or encoding combinators (e.g. `implEncodeP`) are now more precisely typed
@@ -33,6 +33,7 @@
   - new set of combinators grouped into `_` (compiler decided algorithm), `'` (program specifies algorithm), and
     `algorithm name ~ encoding name` categories  
   - `above` combinator subsumes partial encoding / decoding combinators 
+  - `EncodingSuperset` class added
 
 
 ## 0.2.2 

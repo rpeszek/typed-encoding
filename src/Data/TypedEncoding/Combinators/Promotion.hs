@@ -30,7 +30,7 @@ import           Data.TypedEncoding.Combinators.Unsafe (withUnsafeCoerce)
 -- >>> import           Data.TypedEncoding.Instances.Restriction.ASCII ()
 -- >>> import           Data.Text as T
 
--- | remove redundant superset right after the top (at second last encoding position)
+-- | Remove redundant superset right after the top (at second last encoding position)
 --
 -- >>> displ $ demoteFlattenTop (unsafeSetPayload () "" :: Enc '["r-ASCII", "r-UTF8", "r-boo"] () T.Text)
 -- "Enc '[r-ASCII,r-boo] () (Text )"

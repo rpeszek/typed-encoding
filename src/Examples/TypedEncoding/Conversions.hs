@@ -38,7 +38,7 @@
 -- EncodeF SomeErr (Enc xs () Text) (Enc ("enc-B64" ': xs) () Text)    
 -- @
 -- 
--- Then @typed-encoding@ expects @pack@ @encodeF@ to commute:
+-- Then @typed-encoding@ expects @pack@ @encodeF@ to commute (if encoding instances exist):
 -- 
 -- @
 --  str     -- EncT.pack -->   txt
@@ -101,7 +101,7 @@ Right helloAsciiB = eHelloAsciiB
 helloAsciiT :: Enc '["r-ASCII"] () T.Text
 helloAsciiT = EncTe.decodeUtf8 helloAsciiB
 -- ^ 
--- We use a tween function to the popular 'Data.Text.Encoding.decodeUtf8' 
+-- We use a tween function of the popular 'Data.Text.Encoding.decodeUtf8' 
 -- from the @test@ package.
 --
 -- Notice the encoding annotation is preserved.
@@ -157,35 +157,11 @@ helloRestricted = fmap EncB8.pack . _runEncodings encodings $ toEncoding () "Hel
 -- 
 
 
--- * Supersets
-
-helloUtf8B :: Enc '["r-UTF8"] () B.ByteString
-helloUtf8B = injectInto helloAsciiB
--- ^ To claim UTF8 on @helloAsciiB@, instead encoding again: 
---
--- >>> encodeFAll . toEncoding () $ "HeLlo world" :: Either EncodeEx (Enc '["r-UTF8"] () B.ByteString)
--- Right (UnsafeMkEnc Proxy () "HeLlo world")
--- 
--- We should be able to convert the ASCII annotation directly.
---
--- This is done using 'IsSuperset' type family.
---
--- @injectInto@ method accepts proxy to specify superset to use.
---
--- >>> displ $ injectInto @ "r-UTF8" helloAsciiB
--- "Enc '[r-UTF8] () (ByteString HeLlo world)"
---
--- Superset is intended for @"r-"@ annotations only, should not be used
--- with general encodings like @"enc-B64"@, it assumes that decoding in the superset
--- can replace the decoding from injected subset.
-
-
-
 -- * More complex rules
 
 helloUtf8B64B :: Enc '["enc-B64", "r-UTF8"] () B.ByteString
 helloUtf8B64B = encodePart @'["enc-B64"] helloUtf8B 
--- ^ We put Base64 on a ByteString which adheres to UTF8 layout
+-- ^ We Base64 encode a ByteString which adheres to UTF8 layout
 --
 -- >>> displ $ encodePart @'["enc-B64"] helloUtf8B
 -- "Enc '[enc-B64,r-UTF8] () (ByteString SGVMbG8gd29ybGQ=)"
@@ -240,6 +216,53 @@ notTextB = encodeAll . toEncoding () $ "\195\177"
 -- 
 -- We can move it to Text but to do that we will need to forget the "enc-B64" annotation.
 -- This can be done, for example, using flattening (see below).
+
+
+-- * Supersets
+
+helloUtf8B :: Enc '["r-UTF8"] () B.ByteString
+helloUtf8B = injectInto helloAsciiB
+-- ^ To claim UTF8 on @helloAsciiB@, instead encoding again: 
+--
+-- >>> encodeFAll . toEncoding () $ "HeLlo world" :: Either EncodeEx (Enc '["r-UTF8"] () B.ByteString)
+-- Right (UnsafeMkEnc Proxy () "HeLlo world")
+-- 
+-- We should be able to convert the ASCII annotation directly.
+--
+-- This is done using 'IsSuperset' type family.
+--
+-- @injectInto@ method accepts proxy to specify superset to use.
+--
+-- >>> displ $ injectInto @ "r-UTF8" helloAsciiB
+-- "Enc '[r-UTF8] () (ByteString HeLlo world)"
+--
+-- Superset is intended for @"r-"@ annotations only, should not be used
+-- with general encodings like @"enc-B64"@, it assumes that decoding in the superset
+-- can replace the decoding from injected subset.
+
+
+notTextBB64Ascii :: Enc '["r-ASCII", "enc-B64"] () B.ByteString
+notTextBB64Ascii =  _encodesInto notTextB
+-- ^ /Base64/ encoding represents binary data in an ASCII string format.
+-- 
+-- In Haskell, we should be able to express this in types.
+--
+-- 'EncodingSuperset' class is what specifies this.
+--
+-- We can use it with '_encodesInto' combinator. 
+-- 'EncodingSuperset' should not be used directly at the calling site. 
+--
+-- >>>  displ (_encodesInto @"r-ASCII" $ notTextB)
+-- "Enc '[r-ASCII,enc-B64] () (ByteString w7E=)"
+--
+-- '_encodesInto' can be used with a superset of the encoding 
+-- character set as well making it more backward compatible 
+-- (the definition of @EncodingSuperset "enc-B64" could be made more precise without breaking the code).
+--
+-- >>>  displ (_encodesInto @"r-UTF8" $ notTextB)
+-- "Enc '[r-UTF8,enc-B64] () (ByteString w7E=)"
+--
+
 
 
 -- * Lenient recovery

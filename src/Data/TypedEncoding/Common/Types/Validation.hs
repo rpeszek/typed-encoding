@@ -14,6 +14,15 @@
 -- Internal definition of types
 --
 -- Validation types for @Enc@
+--
+-- See also
+--
+-- * "Data.TypedEncoding.Combinators.Validate"
+-- * "Data.TypedEncoding.Common.Class.Validate"
+--
+-- Use of 'Data.TypedEncoding.Combinators.Unsafe.unsafeSetPayload' currently recommended
+-- for recovering 'Enc' from trusted input sources (if avoiding cost of Validation is important).
+
 module Data.TypedEncoding.Common.Types.Validation where
 
 import           Data.Proxy

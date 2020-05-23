@@ -4,6 +4,7 @@
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE TypeFamilies #-}
 
 -- | Defines /Base64/ encoding
 module Data.TypedEncoding.Instances.Enc.Base64 where
@@ -25,7 +26,7 @@ import qualified Data.ByteString.Base64.Lazy as BL64
 
 
 -- $setup
--- >>> :set -XScopedTypeVariables -XKindSignatures -XMultiParamTypeClasses -XDataKinds -XPolyKinds -XPartialTypeSignatures -XFlexibleInstances
+-- >>> :set -XOverloadedStrings -XScopedTypeVariables -XKindSignatures -XMultiParamTypeClasses -XDataKinds -XPolyKinds -XPartialTypeSignatures -XFlexibleInstances -XTypeApplications
 -- >>> import Test.QuickCheck
 -- >>> import Test.QuickCheck.Instances.Text()
 -- >>> import Test.QuickCheck.Instances.ByteString()
@@ -49,6 +50,22 @@ acceptLenientL = withUnsafeCoerce (BL64.encode . BL64.decodeLenient)
 instance FlattenAs "r-ASCII" "enc-B64-nontext" where
 instance FlattenAs "r-ASCII" "enc-B64" where
 
+-- |
+-- This is not precise, actually /Base 64/ uses a subset of ASCII
+-- and that would require a new definition @"r-B64"@.
+--
+-- This instance likely to be changed / corrected in the future if @"r-B64"@ is defined.
+--
+-- >>> let tstB64 = encodeAll . toEncoding () $ "Hello World" :: Enc '["enc-B64"] () B.ByteString
+-- >>> displ (_encodesInto @"r-ASCII" $ tstB64)
+-- "Enc '[r-ASCII,enc-B64] () (ByteString SGVsbG8gV29ybGQ=)"
+--
+-- >>> displ (_encodesInto @"r-UTF8" $ tstB64)
+-- "Enc '[r-UTF8,enc-B64] () (ByteString SGVsbG8gV29ybGQ=)"
+--
+-- @since 0.3.0.0
+instance EncodingSuperset "enc-B64" where
+    type EncSuperset "enc-B64" = "r-ASCII"
 
 -- * Encoders
 
@@ -95,21 +112,21 @@ decB64BL = _implDecodingF (asUnexpected @"enc-B64" . BL64.decode)
 
 -- Kept for now but performance issues
 
--- | DEPRECATED (performance)
+-- | WARNING (performance)
 instance (UnexpectedDecodeErr f, Applicative f) => Decode f "enc-B64" "enc-B64" c T.Text where
     decoding = decB64T
 
 decB64T :: (UnexpectedDecodeErr f, Applicative f) => Decoding f "enc-B64" "enc-B64" c T.Text
 decB64T = _implDecodingF (asUnexpected @"enc-B64"  . fmap TE.decodeUtf8 . B64.decode . TE.encodeUtf8) 
-{-# DEPRECATED decB64T "Performance, manually control conversion to and from ByteString" #-}
+{-# WARNING decB64T "This method was not optimized for performance." #-}
 
--- | DEPRECATED (performance)
+-- | WARNING (performance)
 instance (UnexpectedDecodeErr f, Applicative f) => Decode f "enc-B64" "enc-B64" c TL.Text where
     decoding = decB64TL
 
 decB64TL :: (UnexpectedDecodeErr f, Applicative f) => Decoding f "enc-B64" "enc-B64" c TL.Text
 decB64TL = _implDecodingF (asUnexpected @"enc-B64"  . fmap TEL.decodeUtf8 . BL64.decode . TEL.encodeUtf8) 
-{-# DEPRECATED decB64TL "Performance, manually control conversion to and from ByteString" #-}
+{-# WARNING decB64TL "This method was not optimized for performance." #-}
 
 
 -- * Validation

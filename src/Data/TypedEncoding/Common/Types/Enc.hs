@@ -48,8 +48,10 @@ data Enc nms conf str where
     -- | 
     -- @since 0.3.0.0 renamed from MkEnc 
     --
-    -- Constructor is to be treated as Unsafe to Encode and Decode instance implementations
-    -- particular encoding instances may expose smart constructors for limited data types
+    -- Use of this constructor should be kept to a minimum. 
+    --
+    -- Use of 'Data.TypedEncoding.Combinators.Unsafe.unsafeSetPayload' currently recommended
+    -- for recovering 'Enc' from trusted input sources (if avoiding cost of "Data.TypedEncoding.Common.Types.Validation" is important).
     UnsafeMkEnc :: Proxy nms -> conf -> str -> Enc nms conf str
     deriving (Show, Eq) 
 
