@@ -27,13 +27,14 @@ import           Data.TypedEncoding.Unsafe (withUnsafe)
 -- >>> import qualified Data.ByteString.Char8 as B8
 -- >>> import Data.Char
 -- >>> import Data.Either
+-- >>> import Data.TypedEncoding
 -- >>> import Data.TypedEncoding.Conv.Text
 -- >>> let emptyUTF8B = unsafeSetPayload () "" :: Enc '["r-UTF8"] () B.ByteString  
 -- >>> :{
 -- instance Arbitrary (Enc '["r-UTF8"] () B.ByteString) where 
 --      arbitrary =  fmap (fromRight emptyUTF8B) 
 --                   . flip suchThat isRight 
---                   . fmap (encodeFAll @(Either EncodeEx) @'["r-UTF8"] @(). toEncoding ()) $ arbitrary 
+--                   . fmap (encodeFAll @'["r-UTF8"] @(Either EncodeEx) @(). toEncoding ()) $ arbitrary 
 -- instance Arbitrary (Enc '["r-UTF8"] () T.Text) where 
 --      arbitrary =  fmap (unsafeSetPayload ()) 
 --                         arbitrary 
@@ -52,12 +53,12 @@ import           Data.TypedEncoding.Unsafe (withUnsafe)
 -- With given constraints 'decodeUtf8' and 'encodeUtf8' can be used on subsets of @"r-UTF8"@
 --
 -- >>> displ . decodeUtf8 $ (unsafeSetPayload () "Hello" :: Enc '["r-ASCII"] () B.ByteString)
--- "MkEnc '[r-ASCII] () (Text Hello)"
+-- "Enc '[r-ASCII] () (Text Hello)"
 --
 -- "r-UTF8" is redundant:
 --
 -- >>> displ . utf8Demote . decodeUtf8 $ (unsafeSetPayload () "Hello" :: Enc '["r-UTF8"] () B.ByteString)
--- "MkEnc '[] () (Text Hello)"
+-- "Enc '[] () (Text Hello)"
 --
 -- @decodeUtf8@ and  @encodeUtf8@ form isomorphism
 -- 
@@ -74,6 +75,6 @@ decodeUtf8 = withUnsafe (fmap TE.decodeUtf8)
 
 -- |
 -- >>> displ $ encodeUtf8 $ utf8Promote $ toEncoding () ("text" :: T.Text)
--- "MkEnc '[r-UTF8] () (ByteString text)"
+-- "Enc '[r-UTF8] () (ByteString text)"
 encodeUtf8 :: forall xs c t.  (LLast xs ~ t, IsSuperset "r-UTF8" t ~ 'True) => Enc xs c T.Text -> Enc xs c B.ByteString 
 encodeUtf8 = withUnsafe (fmap TE.encodeUtf8)

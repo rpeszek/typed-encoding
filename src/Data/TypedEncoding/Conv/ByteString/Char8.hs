@@ -9,9 +9,8 @@
 module Data.TypedEncoding.Conv.ByteString.Char8 where
 
 import qualified Data.ByteString.Char8 as B8
-import           Data.TypedEncoding.Internal.Types.Enc (Enc, unsafeChangePayload)
-import qualified Data.TypedEncoding.Internal.Util.TypeLits as Knds
-import           Data.TypedEncoding
+import qualified Data.TypedEncoding.Common.Util.TypeLits as Knds
+import           Data.TypedEncoding.Instances.Support
 
 -- $setup
 -- >>> :set -XDataKinds -XTypeApplications -XOverloadedStrings
@@ -31,7 +30,7 @@ import           Data.TypedEncoding
 -- ...
 --
 -- >>> displ $ pack (unsafeSetPayload () "Hello" :: Enc '["r-bar", "r-ASCII"] () String)
--- "MkEnc '[r-bar,r-ASCII] () (ByteString Hello)"
+-- "Enc '[r-bar,r-ASCII] () (ByteString Hello)"
 pack :: (Knds.LLast xs ~ t, IsSuperset "r-ASCII" t ~ 'True) => Enc xs c String -> Enc xs c B8.ByteString
 pack = unsafeChangePayload B8.pack
 

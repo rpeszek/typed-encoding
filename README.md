@@ -87,15 +87,16 @@ Bridge work:
 
 - [typed-encoding-encoding](https://github.com/rpeszek/typed-encoding-encoding) bridges [encoding](https://github.com/dmwit/encoding) package
 
-## Plans, some TODOs
+## News 
 
-- lensifying conversions 
-- better implementation type safety
+- v0.3 has numerous changes and improvements. 
 
 ## Tested with
+
 - stack (1.9.3) lts-14.27 (ghc-8.6.5)
 - needs ghc >= 8.2.2, base >=4.10 for GHC.TypeLits support
 
 ## Known issues
+
 - running test suite: cabal has problems with doctest, use stack  
    https://github.com/haskell/cabal/issues/6087   

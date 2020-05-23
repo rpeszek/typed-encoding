@@ -5,3 +5,5 @@
 *.tar.gz
 Temp*
 dist-newstyle/
+settings.json
+out/

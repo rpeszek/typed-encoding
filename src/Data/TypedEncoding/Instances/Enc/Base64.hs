@@ -4,12 +4,14 @@
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE TypeFamilies #-}
 
 -- | Defines /Base64/ encoding
 module Data.TypedEncoding.Instances.Enc.Base64 where
 
 import           Data.TypedEncoding
 import           Data.TypedEncoding.Instances.Support
+import           Data.TypedEncoding.Instances.Support.Unsafe
 
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Lazy as BL
@@ -21,72 +23,17 @@ import qualified Data.Text.Lazy.Encoding as TEL
 import qualified Data.ByteString.Base64 as B64
 import qualified Data.ByteString.Base64.Lazy as BL64
 
--- import qualified Data.ByteString.Base64.URL as B64URL
--- import qualified Data.ByteString.Base64.URL.Lazy as BL64URL
+
 
 -- $setup
--- >>> :set -XScopedTypeVariables -XKindSignatures -XMultiParamTypeClasses -XDataKinds -XPolyKinds -XPartialTypeSignatures -XFlexibleInstances
+-- >>> :set -XOverloadedStrings -XScopedTypeVariables -XKindSignatures -XMultiParamTypeClasses -XDataKinds -XPolyKinds -XPartialTypeSignatures -XFlexibleInstances -XTypeApplications
 -- >>> import Test.QuickCheck
 -- >>> import Test.QuickCheck.Instances.Text()
 -- >>> import Test.QuickCheck.Instances.ByteString()
 
 -----------------
--- Conversions --
+-- * Conversions
 -----------------
-
--- | 
--- DEPRECATED use 'Data.TypedEncoding.Conv.Text.Encoding.decodeUtf8'
--- and 'Data.TypedEncoding.Conv.Text.utf8Demote'
--- 
--- Will be removed in 0.3.x.x
---
--- See warning in 'Data.TypedEncoding.Instances.Restriction.ASCII.byteString2TextS'
-byteString2TextS :: Enc ("enc-B64" ': "r-UTF8" ': ys) c B.ByteString -> Enc ("enc-B64" ': ys) c T.Text 
-byteString2TextS = withUnsafeCoerce TE.decodeUtf8
-
--- | 
--- DEPRECATED use 'Data.TypedEncoding.Conv.Text.Lazy.Encoding.decodeUtf8'
--- and 'Data.TypedEncoding.Conv.Text.utf8Demote'
---
--- Will be removed in 0.3.x.x
---
--- See warning in 'Data.TypedEncoding.Instances.Restriction.ASCII.byteString2TextS'
-byteString2TextL :: Enc ("enc-B64" ': "r-UTF8" ': ys) c BL.ByteString -> Enc ("enc-B64" ': ys) c TL.Text 
-byteString2TextL = withUnsafeCoerce TEL.decodeUtf8
-
--- DEPRECATED use 'Data.TypedEncoding.Conv.Text.Encoding.encodeUtf8'
--- and 'Data.TypedEncoding.Conv.Text.utf8Promote'
--- 
--- Will be removed in 0.3.x.x
-text2ByteStringS :: Enc ("enc-B64" ': ys) c T.Text -> Enc ("enc-B64" ': "r-UTF8" ': ys) c B.ByteString 
-text2ByteStringS = withUnsafeCoerce TE.encodeUtf8
-
--- DEPRECATED use 'Data.TypedEncoding.Conv.Text.Lazy.Encoding.encodeUtf8'
--- and 'Data.TypedEncoding.Conv.Text.utf8Promote'
--- 
--- Will be removed in 0.3.x.x
-text2ByteStringL  :: Enc ("enc-B64" ': ys) c TL.Text -> Enc ("enc-B64" ': "r-UTF8" ': ys) c BL.ByteString 
-text2ByteStringL  = withUnsafeCoerce TEL.encodeUtf8
-
-
--- | B64 encoded bytestring can be converted to Text as "enc-B64-nontext" preventing it from 
--- being B64-decoded directly to Text
-byteString2TextS' :: Enc ("enc-B64" ': ys) c B.ByteString -> Enc ("enc-B64-nontext" ': ys) c T.Text 
-byteString2TextS' = withUnsafeCoerce TE.decodeUtf8
-
--- DEPRECATED 
-byteString2TextL' :: Enc ("enc-B64" ': ys) c BL.ByteString -> Enc ("enc-B64-nontext" ': ys) c TL.Text 
-byteString2TextL' = withUnsafeCoerce TEL.decodeUtf8
-
--- DEPRECATED 
-text2ByteStringS' :: Enc ("enc-B64-nontext" ': ys) c T.Text -> Enc ("enc-B64" ': ys) c B.ByteString 
-text2ByteStringS' = withUnsafeCoerce TE.encodeUtf8
-
--- DEPRECATED 
-text2ByteStringL'  :: Enc ("enc-B64-nontext" ': ys) c TL.Text -> Enc ("enc-B64" ': ys) c BL.ByteString 
-text2ByteStringL'  = withUnsafeCoerce TEL.encodeUtf8
-
-
 
 acceptLenientS :: Enc ("enc-B64-len" ': ys) c B.ByteString -> Enc ("enc-B64" ': ys) c B.ByteString 
 acceptLenientS = withUnsafeCoerce (B64.encode . B64.decodeLenient)
@@ -99,82 +46,110 @@ acceptLenientL = withUnsafeCoerce (BL64.encode . BL64.decodeLenient)
 --
 -- >>> let tstB64 = encodeAll . toEncoding () $ "Hello World" :: Enc '["enc-B64"] () B.ByteString
 -- >>> displ (flattenAs tstB64 :: Enc '["r-ASCII"] () B.ByteString)
--- "MkEnc '[r-ASCII] () (ByteString SGVsbG8gV29ybGQ=)"
+-- "Enc '[r-ASCII] () (ByteString SGVsbG8gV29ybGQ=)"
 instance FlattenAs "r-ASCII" "enc-B64-nontext" where
 instance FlattenAs "r-ASCII" "enc-B64" where
 
--- DEPRECATED will be removed
+-- |
+-- This is not precise, actually /Base 64/ uses a subset of ASCII
+-- and that would require a new definition @"r-B64"@.
 --
--- dangerous, with new approach.
--- Supersets are for "r-" types only
-instance Superset "r-ASCII" "enc-B64-nontext" where
-instance Superset "r-ASCII" "enc-B64" where
+-- This instance likely to be changed / corrected in the future if @"r-B64"@ is defined.
+--
+-- >>> let tstB64 = encodeAll . toEncoding () $ "Hello World" :: Enc '["enc-B64"] () B.ByteString
+-- >>> displ (_encodesInto @"r-ASCII" $ tstB64)
+-- "Enc '[r-ASCII,enc-B64] () (ByteString SGVsbG8gV29ybGQ=)"
+--
+-- >>> displ (_encodesInto @"r-UTF8" $ tstB64)
+-- "Enc '[r-UTF8,enc-B64] () (ByteString SGVsbG8gV29ybGQ=)"
+--
+-- @since 0.3.0.0
+instance EncodingSuperset "enc-B64" where
+    type EncSuperset "enc-B64" = "r-ASCII"
 
------------------
--- Encodings   --
------------------
+-- * Encoders
 
-instance Encodings (Either EncodeEx) xs grps c B.ByteString => Encodings (Either EncodeEx) ("enc-B64" ': xs) ("enc-B64" ': grps) c B.ByteString where
-    encodings = encodeFEncoder @(Either EncodeEx) @"enc-B64" @"enc-B64"
+instance Applicative f => Encode f "enc-B64" "enc-B64" c B.ByteString where
+    encoding = encB64B
 
-instance Applicative f => EncodeF f (Enc xs c B.ByteString) (Enc ("enc-B64" ': xs) c B.ByteString) where
-    encodeF = implEncodeP B64.encode 
-        
--- | Effectful instance for corruption detection.
+encB64B :: Applicative f => Encoding f "enc-B64" "enc-B64" c B.ByteString
+encB64B = _implEncodingP B64.encode
+
+instance Applicative f => Encode f "enc-B64" "enc-B64" c BL.ByteString where
+    encoding = encB64BL
+
+encB64BL :: Applicative f => Encoding f "enc-B64" "enc-B64" c BL.ByteString
+encB64BL = _implEncodingP BL64.encode
+
+
+-- | This instance will likely be removed in future versions (performance concerns)
+instance Applicative f => Encode f "enc-B64" "enc-B64" c T.Text where
+    encoding = endB64T
+
+-- | This function will likely be removed in future versions (performance concerns)
+endB64T :: Applicative f => Encoding f "enc-B64" "enc-B64" c T.Text
+endB64T = _implEncodingP (TE.decodeUtf8 . B64.encode . TE.encodeUtf8)  
+
+-- * Decoders
+
+instance (UnexpectedDecodeErr f, Applicative f) => Decode f "enc-B64" "enc-B64" c B.ByteString where
+    decoding = decB64B
+
+-- | Effectful decoding for corruption detection.
 -- This protocol is used, for example, in emails. 
 -- It is a well known encoding and hackers will have no problem 
 -- making undetectable changes, but error handling at this stage
 -- could verify that email was corrupted.
-instance (UnexpectedDecodeErr f, Applicative f) => DecodeF f (Enc ("enc-B64" ': xs) c B.ByteString) (Enc xs c B.ByteString) where
-    decodeF = implDecodeF (asUnexpected @"enc-B64" . B64.decode) 
+decB64B :: (UnexpectedDecodeErr f, Applicative f) => Decoding f "enc-B64" "enc-B64" c B.ByteString
+decB64B = _implDecodingF (asUnexpected @"enc-B64" . B64.decode)
 
-instance (RecreateErr f, Applicative f) => RecreateF f (Enc xs c B.ByteString) (Enc ("enc-B64" ': xs) c B.ByteString) where
-    checkPrevF = implCheckPrevF (asRecreateErr @"enc-B64" .  B64.decode) 
+instance (UnexpectedDecodeErr f, Applicative f) => Decode f "enc-B64" "enc-B64" c BL.ByteString where
+    decoding = decB64BL
 
-instance Applicative f => RecreateF f (Enc xs c B.ByteString) (Enc ("enc-B64-len" ': xs) c B.ByteString) where
-    checkPrevF = implTranP id
+decB64BL :: (UnexpectedDecodeErr f, Applicative f) => Decoding f "enc-B64" "enc-B64" c BL.ByteString
+decB64BL = _implDecodingF (asUnexpected @"enc-B64" . BL64.decode)
 
-instance Applicative f => EncodeF f  (Enc xs c BL.ByteString) (Enc ("enc-B64" ': xs) c BL.ByteString) where
-    encodeF = implEncodeP BL64.encode 
 
-instance (UnexpectedDecodeErr f, Applicative f) => DecodeF f  (Enc ("enc-B64" ': xs) c BL.ByteString) (Enc xs c BL.ByteString) where
-    decodeF = implDecodeF (asUnexpected @"enc-B64"  . BL64.decode)
+-- Kept for now but performance issues
 
-instance (RecreateErr f, Applicative f) => RecreateF f (Enc xs c BL.ByteString) (Enc ("enc-B64" ': xs) c BL.ByteString) where
-    checkPrevF = implCheckPrevF (asRecreateErr @"enc-B64" .  BL64.decode) 
+-- | WARNING (performance)
+instance (UnexpectedDecodeErr f, Applicative f) => Decode f "enc-B64" "enc-B64" c T.Text where
+    decoding = decB64T
 
-instance Applicative f => RecreateF f (Enc xs c BL.ByteString) (Enc ("enc-B64-len" ': xs) c BL.ByteString) where
-    checkPrevF = implTranP id
+decB64T :: (UnexpectedDecodeErr f, Applicative f) => Decoding f "enc-B64" "enc-B64" c T.Text
+decB64T = _implDecodingF (asUnexpected @"enc-B64"  . fmap TE.decodeUtf8 . B64.decode . TE.encodeUtf8) 
+{-# WARNING decB64T "This method was not optimized for performance." #-}
 
--- B64URL currently not supported
--- instance Applicative f => EncodeF f (Enc xs c B.ByteString) (Enc ("enc-B64URL" ': xs) c B.ByteString) where
---     encodeF = implEncodeP B64URL.encode 
--- instance DecodeF (Either String) (Enc ("enc-B64URL" ': xs) c B.ByteString) (Enc xs c B.ByteString) where
---     decodeF = implDecodeF B64URL.decode 
--- instance DecodeF Identity (Enc ("enc-B64URL" ': xs) c B.ByteString) (Enc xs c B.ByteString) where
---     decodeF = implTranP B64URL.decodeLenient 
+-- | WARNING (performance)
+instance (UnexpectedDecodeErr f, Applicative f) => Decode f "enc-B64" "enc-B64" c TL.Text where
+    decoding = decB64TL
 
--- instance Applicative f => EncodeF f (Enc xs c BL.ByteString) (Enc ("enc-B64URL" ': xs) c BL.ByteString) where
---     encodeF = implEncodeP BL64URL.encode 
--- instance DecodeF (Either String) (Enc ("enc-B64URL" ': xs) c BL.ByteString) (Enc xs c BL.ByteString) where
---     decodeF = implDecodeF BL64URL.decode 
--- instance DecodeF Identity (Enc ("enc-B64URL" ': xs) c BL.ByteString) (Enc xs c BL.ByteString) where
---     decodeF = implTranP BL64URL.decodeLenient 
+decB64TL :: (UnexpectedDecodeErr f, Applicative f) => Decoding f "enc-B64" "enc-B64" c TL.Text
+decB64TL = _implDecodingF (asUnexpected @"enc-B64"  . fmap TEL.decodeUtf8 . BL64.decode . TEL.encodeUtf8) 
+{-# WARNING decB64TL "This method was not optimized for performance." #-}
 
-instance Applicative f => EncodeF f (Enc xs c T.Text) (Enc ("enc-B64" ': xs) c T.Text) where
-    encodeF = implEncodeP (TE.decodeUtf8 . B64.encode . TE.encodeUtf8)   
 
-instance (UnexpectedDecodeErr f, Applicative f) => DecodeF f (Enc ("enc-B64" ': xs) c T.Text) (Enc xs c T.Text) where
-    decodeF = implDecodeF (asUnexpected @"enc-B64"  . fmap TE.decodeUtf8 . B64.decode . TE.encodeUtf8) 
+-- * Validation
 
-instance (RecreateErr f, Applicative f) => RecreateF f (Enc xs c T.Text) (Enc ("enc-B64" ': xs) c T.Text) where
-    checkPrevF = implCheckPrevF (asRecreateErr @"enc-B64" . fmap TE.decodeUtf8 .  B64.decode . TE.encodeUtf8) 
+instance (RecreateErr f, Applicative f) => Validate f "enc-B64" "enc-B64" c B.ByteString where
+    validation = validFromDec decB64B
 
-instance Applicative f => EncodeF f (Enc xs c TL.Text) (Enc ("enc-B64" ': xs) c TL.Text) where
-    encodeF = implEncodeP (TEL.decodeUtf8 . BL64.encode . TEL.encodeUtf8)   
+instance (RecreateErr f, Applicative f) => Validate f "enc-B64" "enc-B64" c BL.ByteString where
+    validation = validFromDec decB64BL
 
-instance (UnexpectedDecodeErr f, Applicative f) => DecodeF f (Enc ("enc-B64" ': xs) c TL.Text) (Enc xs c TL.Text) where
-    decodeF = implDecodeF (asUnexpected @"enc-B64"  . fmap TEL.decodeUtf8 . BL64.decode . TEL.encodeUtf8) 
+instance (RecreateErr f, Applicative f) => Validate f "enc-B64" "enc-B64" c T.Text where
+    validation = validFromDec decB64T
 
-instance (RecreateErr f, Applicative f) => RecreateF f (Enc xs c TL.Text) (Enc ("enc-B64" ': xs) c TL.Text) where
-    checkPrevF = implCheckPrevF (asRecreateErr @"enc-B64" . fmap TEL.decodeUtf8 .  BL64.decode . TEL.encodeUtf8) 
+instance (RecreateErr f, Applicative f) => Validate f "enc-B64" "enc-B64" c TL.Text where
+    validation = validFromDec decB64TL
+
+-- | Lenient decoding does not fail
+instance Applicative f => Validate f "enc-B64-len" "enc-B64-len" c B.ByteString where
+    validation = mkValidation $ implTranP id
+
+-- | Lenient decoding does not fail
+instance Applicative f => Validate f "enc-B64-len" "enc-B64-len" c BL.ByteString where
+    validation = mkValidation $ implTranP id
+
+
+

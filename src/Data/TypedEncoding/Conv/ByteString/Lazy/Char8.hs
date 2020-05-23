@@ -9,9 +9,8 @@
 module Data.TypedEncoding.Conv.ByteString.Lazy.Char8 where
 
 import qualified Data.ByteString.Lazy.Char8 as BL8
-import           Data.TypedEncoding.Internal.Types.Enc (Enc, unsafeChangePayload)
-import qualified Data.TypedEncoding.Internal.Util.TypeLits as Knds
-import           Data.TypedEncoding
+import qualified Data.TypedEncoding.Common.Util.TypeLits as Knds
+import           Data.TypedEncoding.Instances.Support
 
 -- $setup
 -- >>> :set -XDataKinds -XTypeApplications -XOverloadedStrings
