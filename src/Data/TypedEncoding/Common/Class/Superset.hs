@@ -52,6 +52,8 @@ type family IsSuperset (y :: Symbol) (x :: Symbol) :: Bool where
     IsSuperset "r-UTF8"  "r-UTF8" = 'True
     IsSuperset y x = IsSupersetOpen y (TakeUntil x ":") (ToList x)
 
+-- |
+-- @since 0.2.2.0
 type family IsSupersetOpen (y :: Symbol) (x :: Symbol) (xs :: [Symbol]) :: Bool
 
 -- |

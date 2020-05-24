@@ -38,7 +38,7 @@
 -- EncodeF SomeErr (Enc xs () Text) (Enc ("enc-B64" ': xs) () Text)    
 -- @
 -- 
--- Then @typed-encoding@ expects @pack@ @encodeF@ to commute (if encoding instances exist):
+-- Then /typed-encoding/ expects @pack@ @encodeF@ to commute (if encoding instances exist):
 -- 
 -- @
 --  str     -- EncT.pack -->   txt
@@ -102,7 +102,7 @@ helloAsciiT :: Enc '["r-ASCII"] () T.Text
 helloAsciiT = EncTe.decodeUtf8 helloAsciiB
 -- ^ 
 -- We use a tween function of the popular 'Data.Text.Encoding.decodeUtf8' 
--- from the @test@ package.
+-- from the /text/ package.
 --
 -- Notice the encoding annotation is preserved.
 --
@@ -128,15 +128,18 @@ helloZero = toEncoding () "Hello"
 -- ...
 --
 -- this does not compile.  And it should not. @pack@ from "Data.ByteString.Char8" is error prone.
--- It is not an injection as it only considers first 7 bits of information from each 'Char'.  
--- I doubt that there are any code examples of its intentional use on a String that is not ASCII. 
--- 
--- @EncB8.pack@ will not compile unless the encoding is ASCII restricted, this works:
+-- It is not an injection as it only considers first 8 bits of information from each 'Char'.  
+-- I doubt that there are any code examples of its intentional use on a String that has chars @> \'\255\'@.
+--
+-- Current version of pack @EncB8.pack@ will not compile unless the encoding is ASCII restricted (@< \'\128\'@).
+-- This works:
 -- 
 -- >>> fmap (displ . EncB8.pack) . encodeFAll @'["r-ASCII"] @(Either EncodeEx) $ helloZero
 -- Right "Enc '[r-ASCII] () (ByteString Hello)"
 --
 -- And the result is a @ByteString@ with bonus annotation describing its content.
+--
+-- Future versions are likely to relax this restriction to a more permissive "r-" annotation that allows for any char @<= \'\255\'@
 
 
 helloRestricted :: Either EncodeEx (Enc '["r-ban:zzzzz"] () B.ByteString)

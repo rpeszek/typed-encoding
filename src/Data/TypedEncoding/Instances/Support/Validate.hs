@@ -25,9 +25,13 @@ import           Data.Proxy
 
 -- * Validation
 
+-- |
+-- @since 0.3.0.0
 validFromDec :: forall nm f c str . (KnownSymbol nm, RecreateErr f, Applicative f) => Decoding (Either UnexpectedDecodeEx) nm nm c str -> Validation f nm nm c str  
 validFromDec = validFromDec' @nm @nm 
 
+-- |
+-- @since 0.3.0.0
 validFromDec' :: forall alg nm f c str . (KnownSymbol nm, RecreateErr f, Applicative f) => Decoding (Either UnexpectedDecodeEx) nm alg c str -> Validation f nm alg c str  
 validFromDec' (UnsafeMkDecoding p fn) = UnsafeMkValidation p (decAsRecreateErr . fn)
    where 
@@ -35,15 +39,19 @@ validFromDec' (UnsafeMkDecoding p fn) = UnsafeMkValidation p (decAsRecreateErr .
         decAsRecreateErr (Left (UnexpectedDecodeEx p err)) = recoveryErr $ RecreateEx p err
         decAsRecreateErr (Right r) = pure r
 
-
+-- |
+-- @since 0.3.0.0
 validR :: forall nm f c str . (Restriction nm, KnownSymbol nm, RecreateErr f, Applicative f) => Encoding (Either EncodeEx) nm nm c str -> Validation f nm nm c str  
 validR = validFromEnc' @nm @nm 
 
 -- | Can cause slow compilation if used
+-- 
+-- @since 0.3.0.0
 validR' :: forall nm f c str alg . (Restriction nm, Algorithm nm alg, KnownSymbol nm, RecreateErr f, Applicative f) =>  Encoding (Either EncodeEx) nm alg c str -> Validation f nm alg c str  
 validR' = validFromEnc' @alg @nm 
 
-
+-- |
+-- @since 0.3.0.0
 validFromEnc' :: forall alg nm f c str . (KnownSymbol nm, RecreateErr f, Applicative f) => Encoding (Either EncodeEx) nm alg c str -> Validation f nm alg c str  
 validFromEnc' (UnsafeMkEncoding p fn) = UnsafeMkValidation p (encAsRecreateErr . rfn) 
    where

@@ -35,23 +35,36 @@ import           Data.Proxy
 -- @CheckedEnc@ is untyped version of 'Data.TypedEncoding.Common.Types.Enc.Enc'. 
 -- @CheckedEnc@ contains verified encoded data, encoding is visible
 -- at the value level only.
-data CheckedEnc conf str = UnsafeMkCheckedEnc [EncAnn] conf str
+--
+-- @since 0.2.0.0 
+data CheckedEnc conf str = UnsafeMkCheckedEnc [EncAnn] conf str -- ^ @since 0.3.0.0
+                                                                -- Constructor renamed from previous versions
+
      deriving (Show, Eq) 
 
+-- |
+-- @since 0.2.0.0
 unsafeCheckedEnc:: [EncAnn] -> c -> s -> CheckedEnc c s
 unsafeCheckedEnc = UnsafeMkCheckedEnc
 
+-- |
+-- @since 0.2.0.0
 getCheckedPayload :: CheckedEnc conf str -> str
 getCheckedPayload = snd . getCheckedEncPayload
 
+-- |
+-- @since 0.2.0.0
 getCheckedEncPayload :: CheckedEnc conf str -> ([EncAnn], str) 
 getCheckedEncPayload (UnsafeMkCheckedEnc t _ s) = (t,s)
 
+-- |
+-- @since 0.2.0.0
 toCheckedEnc :: forall xs c str . (SymbolList xs) => Enc xs c str -> CheckedEnc c str 
 toCheckedEnc (UnsafeMkEnc p c s) = 
         UnsafeMkCheckedEnc (symbolVals @ xs) c s   
 
-
+-- |
+-- @since 0.2.0.0
 fromCheckedEnc :: forall xs c str . SymbolList xs => CheckedEnc c str -> Maybe (Enc xs c str)
 fromCheckedEnc (UnsafeMkCheckedEnc xs c s) = 
     let p = Proxy :: Proxy xs

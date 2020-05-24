@@ -1,16 +1,18 @@
 {-# LANGUAGE DataKinds #-}
-{-# LANGUAGE KindSignatures #-}
+--{-# LANGUAGE KindSignatures #-}
 {-# LANGUAGE PolyKinds #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE OverloadedStrings #-}
+--{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE PartialTypeSignatures #-}
-{-# LANGUAGE TypeApplications #-}
+--{-# LANGUAGE TypeApplications #-}
 
 -- | 'UTF-8' encoding
+--
+-- @since 0.1.0.0
 module Data.TypedEncoding.Instances.Restriction.UTF8 where
 
 import           Data.TypedEncoding.Instances.Support
@@ -59,9 +61,18 @@ prxyUtf8 = Proxy :: Proxy "r-UTF8"
 --
 -- Following test uses 'verEncoding' helper that checks that bytes are encoded as Right iff they are valid UTF8 bytes
 --
--- prop> \(b :: B.ByteString) -> verEncoding b (fmap (fromEncoding . decodeAll . proxiedId (Proxy :: Proxy (Enc '["r-UTF8"] _ _))) . (encodeFAll :: _ -> Either EncodeEx _). toEncoding () $ b)
+-- >>> :{ 
+-- quickCheck $ \(b :: B.ByteString) -> verEncoding b $ fmap (
+--          fromEncoding 
+--          . decodeAll @'["r-UTF8"]
+--          ) . encodeFAll @'["r-UTF8"] @(Either EncodeEx)
+--          . toEncoding () $ b
+-- :}
+-- +++ OK, passed 100 tests.
+
 instance Encode (Either EncodeEx) "r-UTF8" "r-UTF8" c B.ByteString where
     encoding = encUTF8B
+  
 
 instance Encode (Either EncodeEx) "r-UTF8" "r-UTF8" c BL.ByteString where
     encoding = encUTF8BL :: Encoding (Either EncodeEx) "r-UTF8" "r-UTF8" c BL.ByteString

@@ -9,6 +9,10 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 
 -- | Common /restriction/ "r-" instances
+--
+-- Before v0.3 @Data.TypedEncoding.Instances.Restriction.Common@
+--
+-- @since 0.2.0.0
 module Data.TypedEncoding.Instances.Restriction.Misc where
 
 import           Data.Word

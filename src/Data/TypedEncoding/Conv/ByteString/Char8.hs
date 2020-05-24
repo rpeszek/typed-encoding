@@ -22,6 +22,8 @@ import           Data.TypedEncoding.Instances.Support
 --
 -- Because of how @ByteString.Char8.pack@ works, the first encoding (last in the list) must restrict character set to a subset of @ASCII@. 
 --
+-- Currently this uses (an over-conservative) @"r-ASCII"@ superset constraint, in the future, this could be relaxed to a superset of /ASCII/, e.g. /r-CHAR8/ when one is in place.
+--
 -- >>> :t pack (undefined :: Enc '["r-bar", "r-foo"] () String)
 -- ...
 -- ... error:
@@ -39,3 +41,5 @@ pack = unsafeChangePayload B8.pack
 -- See 'pack'
 unpack :: (Knds.LLast xs ~ t, IsSuperset "r-ASCII" t ~ 'True) => Enc xs c B8.ByteString -> Enc xs c String
 unpack = unsafeChangePayload B8.unpack      
+
+-- TODO consider adding "r-CHAR8"

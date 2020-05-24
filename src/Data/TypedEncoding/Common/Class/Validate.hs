@@ -35,16 +35,21 @@ instance (ValidateAll f nms algs conf str, Validate f nm alg conf str) => Valida
 
 
 -- | Recovery errors are expected unless Recovery allows Identity instance
+--
+-- @since 0.1.0.0
 class RecreateErr f where 
     recoveryErr :: RecreateEx -> f a
 
 instance RecreateErr (Either RecreateEx) where
     recoveryErr = Left  
 
+-- |
+-- @since 0.2.1.0
 asRecreateErr_ :: (RecreateErr f, Applicative f, Show err, KnownSymbol x) => Proxy x -> Either err a -> f a
 asRecreateErr_ p (Left err) = recoveryErr $ RecreateEx p err
 asRecreateErr_ _ (Right r) = pure r
 
-
+-- |
+-- @since 0.1.0.0 
 asRecreateErr :: forall x f err a . (RecreateErr f, Applicative f, Show err, KnownSymbol x) => Either err a -> f a
 asRecreateErr = asRecreateErr_ (Proxy :: Proxy x)

@@ -38,6 +38,8 @@ import qualified Data.Text.Lazy as TL
 -- Note: ByteString is not a valid instance, ByteString "r-ASCII", or "r-UTF8" would
 -- be needed.
 -- @B.unpack $ B.pack "\160688" == "\176"@
+--
+-- @since 0.2.0.0
 class IsStringR a where
     toString :: a -> String
 

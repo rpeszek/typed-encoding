@@ -7,6 +7,8 @@
 {-# LANGUAGE TypeFamilies #-}
 
 -- | Defines /Base64/ encoding
+--
+-- @since 0.1.0.0
 module Data.TypedEncoding.Instances.Enc.Base64 where
 
 import           Data.TypedEncoding
@@ -35,9 +37,13 @@ import qualified Data.ByteString.Base64.Lazy as BL64
 -- * Conversions
 -----------------
 
+-- |
+-- @since 0.1.0.0 
 acceptLenientS :: Enc ("enc-B64-len" ': ys) c B.ByteString -> Enc ("enc-B64" ': ys) c B.ByteString 
 acceptLenientS = withUnsafeCoerce (B64.encode . B64.decodeLenient)
 
+-- |
+-- @since 0.1.0.0 
 acceptLenientL :: Enc ("enc-B64-len" ': ys) c BL.ByteString -> Enc ("enc-B64" ': ys) c BL.ByteString 
 acceptLenientL = withUnsafeCoerce (BL64.encode . BL64.decodeLenient)
 
@@ -47,7 +53,12 @@ acceptLenientL = withUnsafeCoerce (BL64.encode . BL64.decodeLenient)
 -- >>> let tstB64 = encodeAll . toEncoding () $ "Hello World" :: Enc '["enc-B64"] () B.ByteString
 -- >>> displ (flattenAs tstB64 :: Enc '["r-ASCII"] () B.ByteString)
 -- "Enc '[r-ASCII] () (ByteString SGVsbG8gV29ybGQ=)"
+--
+-- @since 0.1.0.0 
 instance FlattenAs "r-ASCII" "enc-B64-nontext" where
+
+-- |
+-- @since 0.1.0.0 
 instance FlattenAs "r-ASCII" "enc-B64" where
 
 -- |
@@ -69,20 +80,30 @@ instance EncodingSuperset "enc-B64" where
 
 -- * Encoders
 
+-- |
+-- @since 0.3.0.0 
 instance Applicative f => Encode f "enc-B64" "enc-B64" c B.ByteString where
     encoding = encB64B
 
+-- |
+-- @since 0.3.0.0 
 encB64B :: Applicative f => Encoding f "enc-B64" "enc-B64" c B.ByteString
 encB64B = _implEncodingP B64.encode
 
+-- |
+-- @since 0.3.0.0 
 instance Applicative f => Encode f "enc-B64" "enc-B64" c BL.ByteString where
     encoding = encB64BL
 
+-- |
+-- @since 0.3.0.0 
 encB64BL :: Applicative f => Encoding f "enc-B64" "enc-B64" c BL.ByteString
 encB64BL = _implEncodingP BL64.encode
 
 
 -- | This instance will likely be removed in future versions (performance concerns)
+--
+-- @since 0.3.0.0
 instance Applicative f => Encode f "enc-B64" "enc-B64" c T.Text where
     encoding = endB64T
 
@@ -92,6 +113,8 @@ endB64T = _implEncodingP (TE.decodeUtf8 . B64.encode . TE.encodeUtf8)
 
 -- * Decoders
 
+-- |
+-- @since 0.3.0.0 
 instance (UnexpectedDecodeErr f, Applicative f) => Decode f "enc-B64" "enc-B64" c B.ByteString where
     decoding = decB64B
 
@@ -100,12 +123,18 @@ instance (UnexpectedDecodeErr f, Applicative f) => Decode f "enc-B64" "enc-B64" 
 -- It is a well known encoding and hackers will have no problem 
 -- making undetectable changes, but error handling at this stage
 -- could verify that email was corrupted.
+--
+-- @since 0.3.0.0
 decB64B :: (UnexpectedDecodeErr f, Applicative f) => Decoding f "enc-B64" "enc-B64" c B.ByteString
 decB64B = _implDecodingF (asUnexpected @"enc-B64" . B64.decode)
 
+-- |
+-- @since 0.3.0.0 
 instance (UnexpectedDecodeErr f, Applicative f) => Decode f "enc-B64" "enc-B64" c BL.ByteString where
     decoding = decB64BL
 
+-- |
+-- @since 0.3.0.0 
 decB64BL :: (UnexpectedDecodeErr f, Applicative f) => Decoding f "enc-B64" "enc-B64" c BL.ByteString
 decB64BL = _implDecodingF (asUnexpected @"enc-B64" . BL64.decode)
 
@@ -113,17 +142,25 @@ decB64BL = _implDecodingF (asUnexpected @"enc-B64" . BL64.decode)
 -- Kept for now but performance issues
 
 -- | WARNING (performance)
+--
+-- @since 0.3.0.0
 instance (UnexpectedDecodeErr f, Applicative f) => Decode f "enc-B64" "enc-B64" c T.Text where
     decoding = decB64T
 
+-- |
+-- @since 0.3.0.0 
 decB64T :: (UnexpectedDecodeErr f, Applicative f) => Decoding f "enc-B64" "enc-B64" c T.Text
 decB64T = _implDecodingF (asUnexpected @"enc-B64"  . fmap TE.decodeUtf8 . B64.decode . TE.encodeUtf8) 
 {-# WARNING decB64T "This method was not optimized for performance." #-}
 
 -- | WARNING (performance)
+--
+-- @since 0.3.0.0 
 instance (UnexpectedDecodeErr f, Applicative f) => Decode f "enc-B64" "enc-B64" c TL.Text where
     decoding = decB64TL
 
+-- |
+-- @since 0.3.0.0 
 decB64TL :: (UnexpectedDecodeErr f, Applicative f) => Decoding f "enc-B64" "enc-B64" c TL.Text
 decB64TL = _implDecodingF (asUnexpected @"enc-B64"  . fmap TEL.decodeUtf8 . BL64.decode . TEL.encodeUtf8) 
 {-# WARNING decB64TL "This method was not optimized for performance." #-}
@@ -131,23 +168,35 @@ decB64TL = _implDecodingF (asUnexpected @"enc-B64"  . fmap TEL.decodeUtf8 . BL64
 
 -- * Validation
 
+-- |
+-- @since 0.3.0.0 
 instance (RecreateErr f, Applicative f) => Validate f "enc-B64" "enc-B64" c B.ByteString where
     validation = validFromDec decB64B
 
+-- |
+-- @since 0.3.0.0 
 instance (RecreateErr f, Applicative f) => Validate f "enc-B64" "enc-B64" c BL.ByteString where
     validation = validFromDec decB64BL
 
+-- |
+-- @since 0.3.0.0 
 instance (RecreateErr f, Applicative f) => Validate f "enc-B64" "enc-B64" c T.Text where
     validation = validFromDec decB64T
 
+-- |
+-- @since 0.3.0.0 
 instance (RecreateErr f, Applicative f) => Validate f "enc-B64" "enc-B64" c TL.Text where
     validation = validFromDec decB64TL
 
 -- | Lenient decoding does not fail
+-- 
+-- @since 0.3.0.0 
 instance Applicative f => Validate f "enc-B64-len" "enc-B64-len" c B.ByteString where
     validation = mkValidation $ implTranP id
 
 -- | Lenient decoding does not fail
+-- 
+-- @since 0.3.0.0 
 instance Applicative f => Validate f "enc-B64-len" "enc-B64-len" c BL.ByteString where
     validation = mkValidation $ implTranP id
 

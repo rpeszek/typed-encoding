@@ -30,14 +30,22 @@ import           Data.TypedEncoding.Common.Types.Common
 -- @CheckedEnc@ it can contain payloads that have invalid encoding.
 -- 
 -- See 'Data.TypedEncoding.Combinators.Validate.check'
+-- 
+-- @since 0.2.0.0  
 data UncheckedEnc c str = MkUncheckedEnc [EncAnn] c str deriving (Show, Eq)
 
+-- |
+-- @since 0.2.0.0 
 toUncheckedEnc :: [EncAnn] -> c -> str -> UncheckedEnc c str
 toUncheckedEnc = MkUncheckedEnc
 
+-- |
+-- @since 0.2.0.0 
 getUncheckedEncAnn :: UncheckedEnc c str -> [EncAnn]
 getUncheckedEncAnn (MkUncheckedEnc ann _ _) = ann
 
+-- |
+-- @since 0.2.0.0 
 verifyAnn :: forall xs c str . SymbolList xs => UncheckedEnc c str -> Either String (UncheckedEnc c str)
 verifyAnn x@(MkUncheckedEnc xs _ _) = 
     let p = Proxy :: Proxy xs

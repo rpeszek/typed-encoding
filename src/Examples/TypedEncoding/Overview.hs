@@ -68,7 +68,7 @@ helloB64 = encodeAll . toEncoding () $ "Hello World"
 -- >>> fmap displ . runEncodings' @'["enc-B64","enc-B64"] @'["enc-B64","enc-B64"] @Identity encodings . toEncoding () $ ("Hello World" :: B.ByteString)
 -- Identity "Enc '[enc-B64,enc-B64] () (ByteString U0dWc2JHOGdWMjl5YkdRPQ==)"
 --
--- This is how @typed-encoding@ works, the "Data.TypedEncoding.Common.Class.Encode.EncodeAll"
+-- This is how /typed-encoding/ works, the "Data.TypedEncoding.Common.Class.Encode.EncodeAll"
 -- constraint can be used to get access to list to encodings required by the symbol annotation. 
 -- 'runEncodings'' executes all the necessary transformations.
 --

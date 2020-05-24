@@ -38,11 +38,14 @@ import           GHC.TypeLits
 --
 -- Encodes @a@ as @Enc '[xs]@ specifying algorithm @alg@ and using effect @f@ 
 --
+-- @since 0.2.0.0 
 class (KnownSymbol nm, KnownSymbol ann) => ToEncString f nm ann a str where
     toEncF :: a -> f (Enc '[nm] () str)
 
 -- | 
 -- Reverse of 'ToEncString' decodes encoded string back to @a@
+--
+-- @since 0.2.0.0 
 class (KnownSymbol nm, KnownSymbol ann) => FromEncString f nm ann a str where
     fromEncF :: Enc '[nm] () str -> f a
 
@@ -57,7 +60,8 @@ class (KnownSymbol nm, KnownSymbol ann) => FromEncString f nm ann a str where
 -- 
 -- Now encoded data has form @Enc '["r-ASCII"] c str@ 
 -- and there is no danger of it begin incorrectly decoded.
-
+--
+-- @since 0.1.0.0
 class FlattenAs (y :: Symbol) (x :: Symbol) where
     flattenAs ::  Enc (x ': xs) c str ->  Enc '[y] c str
     flattenAs = withUnsafeCoerce id

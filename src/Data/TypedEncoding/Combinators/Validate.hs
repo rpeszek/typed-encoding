@@ -7,7 +7,11 @@
 {-# LANGUAGE AllowAmbiguousTypes #-}
 {-# LANGUAGE TypeApplications #-}
 
--- | Combinators reexported in Data.TypedEncoding
+-- | Combinators re-exported in Data.TypedEncoding.
+-- 
+-- Decoding combinators that are backward compatible to v0.2 versions.
+--
+-- @since 0.3.0.0
 module Data.TypedEncoding.Combinators.Validate where
 
 import           Data.TypedEncoding.Combinators.Common

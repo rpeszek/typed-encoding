@@ -46,7 +46,7 @@ Transformations can be
 - applied or undone partially (if encoding is reversible)
 
 One of more interesting uses of this library are encoding restrictions.   
-(Arbitrary) bounded alpha-numeric (`r-ban`) restrictions 
+(Arbitrary) bounded alpha-numeric (`"r-ban"`) restrictions 
 and a simple annotation Boolean algebra are both provided.
 
 ```Haskell
@@ -79,9 +79,9 @@ https://hackage.haskell.org/package/typed-encoding
 
 My approach will be to write specific encodings (e.g. _HTTP_) or wrap encodings from other packages using separate "bridge" projects.
 
-Currently `typed-encoding` depends on
+Currently /typed-encoding/ depends on
 
-- `base64-bytestring` because it was my driving example, this is likely to move out to a separate bridge project at some point. 
+- /base64-bytestring/ because it was my driving example, this is likely to move out to a separate bridge project at some point. 
 
 Bridge work:
 

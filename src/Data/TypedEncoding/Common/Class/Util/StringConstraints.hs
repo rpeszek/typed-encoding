@@ -10,7 +10,8 @@
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE AllowAmbiguousTypes #-}
 
--- | Future replacement for "Data.TypedEncoding.Common.Class.IsStringR"
+-- | 
+-- 'ToStrInj' and 'ToStrIso' are future replacement for "Data.TypedEncoding.Common.Class.IsStringR" (currently not used).
 module Data.TypedEncoding.Common.Class.Util.StringConstraints where
 
 import qualified Data.List as L
@@ -46,6 +47,8 @@ import qualified Data.ByteString.Lazy.Char8 as BL8
 --
 -- This class is separated from @ToStrIso@ to allow instances from /smaller/ types
 -- the can inject into the 'String' type.
+--
+-- @since 0.3.0.0
 class ToStrInj str from where
     toString :: from -> str
 
@@ -84,6 +87,8 @@ instance ToStrInj String String where
 -- @
 --  fromString . toString == id
 -- @
+--
+-- @since 0.3.0.0
 class ToStrInj str from => ToStrIso str from where
 
 prop_fromStringToString :: forall s . (IsString s, ToStrIso String s, Eq s) => s -> Bool
@@ -102,6 +107,8 @@ instance ToStrIso String String where
 -- |
 -- Used to find exceptions that violated "r-" encoding
 -- Expected to be used to check encoding of ASCII-7 so Text and ByteString are compatible.
+--
+-- @since 0.3.0.0
 class Char8Find str where
     find :: (Char -> Bool) -> str -> Maybe Char
 

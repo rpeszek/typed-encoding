@@ -9,6 +9,11 @@
 {-# LANGUAGE AllowAmbiguousTypes #-}
 {-# LANGUAGE TypeApplications #-}
 
+-- | Combinators reexported in Data.TypedEncoding.
+-- 
+-- Decoding combinators that are backward compatible to v0.2 versions.
+--
+-- @since 0.3.0.0
 module Data.TypedEncoding.Combinators.Encode where
 
 import           Data.TypedEncoding.Common.Types.Enc

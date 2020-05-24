@@ -11,7 +11,8 @@
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE AllowAmbiguousTypes #-}
 
--- | v0.2 like (backward compatible) combinators for covering to and from encoded string.
+-- | 
+-- v0.2 like (backward compatible) combinators for covering to and from encoded string.
 --
 -- @since 0.3.0.0
 

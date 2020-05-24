@@ -5,6 +5,12 @@
 - `Data.TypedEncoding.Internal.Class.IsStringR` expected to be be changed / replaced
 - (post 0.3) "enc-B64" will be moved to a different package (more distant goal)
 
+## 0.3.0.1
+
+- Documentation changes / corrections
+- New _doctest_ tests
+- Haddock coverage and @since flags
+
 ## 0.3
 
 - Breaking: Numerous changes on the implementation side, new version should be largely compatible on the call site except

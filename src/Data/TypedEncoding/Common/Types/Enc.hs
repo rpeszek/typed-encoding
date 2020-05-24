@@ -55,6 +55,8 @@ data Enc nms conf str where
     UnsafeMkEnc :: Proxy nms -> conf -> str -> Enc nms conf str
     deriving (Show, Eq) 
 
+-- TODO should Enc be a Functor in conf?
+
 -- |
 -- >>> let disptest = UnsafeMkEnc Proxy () "hello" :: Enc '["TEST"] () T.Text
 -- >>> displ disptest

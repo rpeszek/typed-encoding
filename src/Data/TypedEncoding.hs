@@ -103,7 +103,7 @@
 -- 
 -- ... and needed conversions. 
 --
--- Conversion combinator module structure is similar to one found in @text@ and @bytestring@ packages
+-- Conversion combinator module structure is similar to one found in /text/ and /bytestring/ packages
 -- And can be found (since 0.2.2) in
 --
 -- * "Data.TypedEncoding.Conv.Text"
