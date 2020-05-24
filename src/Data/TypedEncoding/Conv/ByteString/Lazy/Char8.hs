@@ -16,14 +16,11 @@ import           Data.TypedEncoding.Instances.Support
 -- >>> :set -XDataKinds -XTypeApplications -XOverloadedStrings
 
 -- | 
--- Type safe version of 'BL8.pack'.
---
--- :t pack (undefined :: Enc '["r-bar", "r-ASCII"] () String)
--- :t pack (undefined :: Enc '["r-bar", "r-foo"] () String)
+-- Lazy version of 'Data.TypedEncoding.Conv.ByteString.Char8.pack'.
 pack :: (Knds.LLast xs ~ t, IsSuperset "r-ASCII" t ~ 'True) => Enc xs c String -> Enc xs c BL8.ByteString
 pack = unsafeChangePayload BL8.pack
 
 -- | 
--- Type safe version of 'BL8.unpack'.
+-- Lazy version of 'Data.TypedEncoding.Conv.ByteString.Char8.unpack'.
 unpack :: (Knds.LLast xs ~ t, IsSuperset "r-ASCII" t ~ 'True) => Enc xs c BL8.ByteString -> Enc xs c String
 unpack = unsafeChangePayload BL8.unpack          

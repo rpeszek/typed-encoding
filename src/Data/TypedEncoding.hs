@@ -104,16 +104,9 @@
 -- ... and needed conversions. 
 --
 -- Conversion combinator module structure is similar to one found in /text/ and /bytestring/ packages
--- And can be found (since 0.2.2) in
+-- Please see comments in "Data.TypedEncoding.Conv" for more information.
 --
--- * "Data.TypedEncoding.Conv.Text"
--- * "Data.TypedEncoding.Conv.Text.Encoding"
--- * "Data.TypedEncoding.Conv.Text.Lazy"    
--- * "Data.TypedEncoding.Conv.Text.Lazy.Encoding"
--- * "Data.TypedEncoding.Conv.ByteString.Char8"
--- * "Data.TypedEncoding.Conv.ByteString.Lazy.Char8"
---
--- This list is not intended to be exhaustive, rather separate libraries
+-- The instance list is not intended to be exhaustive, rather separate libraries
 -- can provide instances for other encodings and transformations.
 --
 -- = New encoding instance creation

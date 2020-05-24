@@ -58,6 +58,15 @@ phone' :: Enc '["boolOr:(r-ban:999-999-9999)(r-ban:(999) 999-9999)"] () T.Text
 phone' = ...
 ```
 
+## Goals and limitations
+
+The main goal is to provide improved type safety for programs that use string encodings and 
+transformations.  _Not to provide encoding implementation type safety_. 
+_Encoding and string manipulation libraries are typically well established and tested, type safety is really needed at the usage site, not at the implementation site_.
+
+This library approach is to fight issues with (value level) strings using (type level) strings. Using `Symbol`-s effectively forces us to play the orphan instances game.   
+One of the long term goals is for this library to provide combinator alternatives to typeclass polymorphism so that the orphan instances are more of a convenience and not the necessity.  
+
 
 ## Examples 
 
