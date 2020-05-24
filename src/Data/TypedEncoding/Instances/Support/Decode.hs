@@ -9,6 +9,8 @@
 {-# LANGUAGE FlexibleContexts #-}
 
 -- | v0.2 style decoding combinators
+-- 
+-- @since 0.3.0.0
 module Data.TypedEncoding.Instances.Support.Decode where
 
 import           Data.TypedEncoding.Instances.Support.Unsafe

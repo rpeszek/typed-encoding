@@ -1,11 +1,5 @@
 {-# LANGUAGE GADTs #-}
 {-# LANGUAGE ScopedTypeVariables #-}
--- {-# LANGUAGE PolyKinds #-}
--- {-# LANGUAGE DataKinds #-}
--- {-# LANGUAGE TypeOperators #-}
--- {-# LANGUAGE FlexibleInstances #-}
--- {-# LANGUAGE StandaloneDeriving #-}
--- {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE AllowAmbiguousTypes #-}
 {-# LANGUAGE RankNTypes #-}
 
@@ -29,12 +23,18 @@ import           Data.TypedEncoding.Common.Types.CheckedEnc
 
 -- | Existentially quantified quantified @Enc@
 -- effectively isomorphic to 'CheckedEnc'
+--
+-- @since 0.2.0.0
 data SomeEnc conf str where
     MkSomeEnc :: SymbolList xs => Enc xs conf str -> SomeEnc conf str
-    
+
+-- |
+-- @since 0.2.0.0   
 withSomeEnc :: SomeEnc conf str -> (forall xs . SymbolList xs => Enc xs conf str -> r) -> r
 withSomeEnc (MkSomeEnc enc) f = f enc
 
+-- |
+-- @since 0.2.0.0 
 toSome :: SymbolList xs => Enc xs conf str -> SomeEnc conf str
 toSome = MkSomeEnc
 
@@ -42,6 +42,8 @@ toSome = MkSomeEnc
 -- >>> let enctest = unsafeSetPayload () "hello" :: Enc '["TEST"] () T.Text
 -- >>> someToChecked . MkSomeEnc $ enctest
 -- UnsafeMkCheckedEnc ["TEST"] () "hello"
+-- 
+-- @since 0.2.0.0 
 someToChecked :: SomeEnc conf str -> CheckedEnc conf str
 someToChecked se = withSomeEnc se toCheckedEnc
 
@@ -49,6 +51,8 @@ someToChecked se = withSomeEnc se toCheckedEnc
 -- >>> let tst = unsafeCheckedEnc ["TEST"] () "test"
 -- >>> displ $ checkedToSome tst
 -- "Some (Enc '[TEST] () (String test))"
+-- 
+-- @since 0.2.0.0 s
 checkedToSome :: CheckedEnc conf str -> SomeEnc conf str
 checkedToSome (UnsafeMkCheckedEnc xs c s) = withSomeAnnotation (someAnnValue xs) (\p -> MkSomeEnc (UnsafeMkEnc p c s))
 

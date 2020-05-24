@@ -27,7 +27,8 @@
 -- @
 --
 -- Expected behavior is described next to the corresponding combinator.
-
+--
+-- @since 0.2.2.0
 module Data.TypedEncoding.Instances.Restriction.Bool where 
 
 

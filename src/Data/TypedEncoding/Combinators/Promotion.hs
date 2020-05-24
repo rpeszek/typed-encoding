@@ -35,7 +35,7 @@ import           Data.TypedEncoding.Combinators.Unsafe (withUnsafeCoerce)
 -- >>> displ $ demoteFlattenTop (unsafeSetPayload () "" :: Enc '["r-ASCII", "r-UTF8", "r-boo"] () T.Text)
 -- "Enc '[r-ASCII,r-boo] () (Text )"
 --
--- @since 0.2.2.0 (moved)
+-- @since 0.2.2.0 
 demoteFlattenTop :: forall y x xs c str . (IsSuperset y x ~ 'True) => Enc (x ': y ': xs) c str ->  Enc (x ': xs) c str
 demoteFlattenTop = withUnsafeCoerce id
 
@@ -44,7 +44,7 @@ demoteFlattenTop = withUnsafeCoerce id
 -- >>> displ $ promoteUnFlattenTop @"r-UTF8" (unsafeSetPayload () "" :: Enc '["r-ASCII", "r-boo"] () T.Text)
 -- "Enc '[r-ASCII,r-UTF8,r-boo] () (Text )"
 --
--- @since 0.2.2.0 (moved)
+-- @since 0.2.2.0
 promoteUnFlattenTop :: forall y x xs c str . (IsSuperset y x ~ 'True) => Enc (x ': xs) c str -> Enc (x ': y ': xs) c str
 promoteUnFlattenTop = withUnsafeCoerce id
 
@@ -53,7 +53,7 @@ promoteUnFlattenTop = withUnsafeCoerce id
 -- >>> displ $ demoteRemoveTop (unsafeSetPayload () "" :: Enc '["r-UTF8", "r-ASCII", "r-boo"] () T.Text)
 -- "Enc '[r-ASCII,r-boo] () (Text )"
 --
--- @since 0.2.2.0 (moved)
+-- @since 0.2.2.0 
 demoteRemoveTop :: forall y x xs c str . (IsSuperset y x ~ 'True) => Enc (y ': x ' : xs) c str ->  Enc (x ': xs) c str
 demoteRemoveTop = withUnsafeCoerce id
 
@@ -62,7 +62,7 @@ demoteRemoveTop = withUnsafeCoerce id
 -- >>> displ $ promoteAddTop @"r-UTF8" (unsafeSetPayload () "" :: Enc '["r-ASCII", "r-boo"] () T.Text)
 -- "Enc '[r-UTF8,r-ASCII,r-boo] () (Text )"
 --
--- @since 0.2.2.0 (moved)
+-- @since 0.2.2.0 
 promoteAddTop :: forall y x xs c str . (IsSuperset y x ~ 'True) => Enc (x ': xs) c str -> Enc (y ': x ' : xs) c str 
 promoteAddTop = withUnsafeCoerce id
 
@@ -71,7 +71,7 @@ promoteAddTop = withUnsafeCoerce id
 -- >>> displ $ demoteRemoveBot (unsafeSetPayload () "" :: Enc '["r-boo", "r-ASCII", "r-UTF8"] () T.Text)
 -- "Enc '[r-boo,r-ASCII] () (Text )"
 --
--- @since 0.2.2.0 (moved)
+-- @since 0.2.2.0 
 demoteRemoveBot :: (UnSnoc xs ~ '(,) ys y, UnSnoc ys ~ '(,) zs x, IsSuperset y x ~ 'True) => Enc xs c str -> Enc ys c str
 demoteRemoveBot = withUnsafeCoerce id
 
@@ -87,7 +87,7 @@ promoteAddBot = withUnsafeCoerce id
 -- >>> displ $ demoteFlattenBot (unsafeSetPayload () "" :: Enc '["r-boo", "r-UTF8", "r-ASCII"] () T.Text)
 -- "Enc '[r-boo,r-ASCII] () (Text )"
 --
--- @since 0.2.2.0 (moved)
+-- @since 0.2.2.0 
 demoteFlattenBot :: (UnSnoc xs ~ '(,) ys x, UnSnoc ys ~ '(,) zs y, IsSuperset y x ~ 'True) => Enc xs c str -> Enc (Snoc zs x) c str
 demoteFlattenBot = withUnsafeCoerce id
 
@@ -96,6 +96,6 @@ demoteFlattenBot = withUnsafeCoerce id
 -- >>> displ $ promoteUnFlattenBot @"r-UTF8" (unsafeSetPayload () "" :: Enc '["r-boo", "r-ASCII"] () T.Text)
 -- "Enc '[r-boo,r-UTF8,r-ASCII] () (Text )"
 --
--- @since 0.2.2.0 (moved)
+-- @since 0.2.2.0 
 promoteUnFlattenBot :: forall y x xs c str ys . (UnSnoc xs ~ '(,) ys x,  IsSuperset y x ~ 'True) => Enc xs c str -> Enc (Snoc (Snoc ys y) x) c str
 promoteUnFlattenBot = withUnsafeCoerce id

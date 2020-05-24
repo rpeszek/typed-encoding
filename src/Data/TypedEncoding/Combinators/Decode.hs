@@ -7,7 +7,11 @@
 {-# LANGUAGE AllowAmbiguousTypes #-}
 {-# LANGUAGE TypeApplications #-}
 
--- | Combinators reexported in Data.TypedEncoding
+-- | Combinators reexported in Data.TypedEncoding.
+-- 
+-- Decoding combinators that are backward compatible to v0.2 versions.
+--
+-- @since 0.3.0.0
 module Data.TypedEncoding.Combinators.Decode where
 
 import           Data.TypedEncoding.Common.Types.Enc
@@ -20,7 +24,7 @@ import           Data.Functor.Identity
 import           GHC.TypeLits
 
 
--- * Convenience combinators which mimic pre-v0.3 type signatures. These assume that @algs@ are the same as @nms@
+-- * Convenience combinators which mimic v0.2 combinators signatures. These assume that @algs@ are the same as @nms@
 
 decodeF :: forall nm xs f c str . (Decode f nm nm c str) => Enc (nm ': xs) c str -> f (Enc xs c str)
 decodeF = decodeF' @nm @nm
@@ -45,7 +49,7 @@ decodePart = decodePart' @xs @xs
 
 
 
--- * Convenience combinators which mimic pre-v0.3 type signatures. These do not try to figure out @algs@ or assume much about them
+-- * Convenience combinators which mimic v0.2 type signatures. These do not try to figure out @algs@ or assume much about them
 
 decodeF' :: forall alg nm xs f c str . (Decode f nm alg c str) => Enc (nm ': xs) c str -> f (Enc xs c str)
 decodeF' = runDecoding (decoding @f @nm @alg)

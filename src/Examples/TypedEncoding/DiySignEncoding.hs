@@ -102,15 +102,19 @@ hacker =
 -- Right (UnsafeMkEnc Proxy () "11:Hello World")
 
 
--- | Because encoding function is pure we can create instance of EncodeF 
--- that is polymorphic in effect @f@. This is done using 'EnT.implTranP' combinator.
+-- | Because encoding function is pure we can create instance of 'Encode' 
+-- that is polymorphic in effect @f@. 
+--
+-- This is done using 'EnT.implTranP' combinator.
 instance Applicative f => Encode f "my-sign" "my-sign" c T.Text where
    encoding = EnT._implEncodingP encodeSign    
 
 -- | Decoding allows effectful @f@ to allow for troubleshooting and unsafe payload changes.
 --
 -- Implementation simply uses 'EnT.implDecodingF' combinator on the 'asUnexpected' composed with decoding function.
+--
 -- 'UnexpectedDecodeErr' has Identity instance allowing for decoding that assumes errors are not possible.
+--
 -- For debugging purposes or when unsafe changes to "my-sign" @Error UnexpectedDecodeEx@ instance can be used.
 instance (UnexpectedDecodeErr f, Applicative f) => Decode f "my-sign" "my-sign" c T.Text where
     decoding = decMySign 
@@ -119,6 +123,7 @@ decMySign :: (UnexpectedDecodeErr f, Applicative f) => Decoding f "my-sign" "my-
 decMySign = EnT.implDecodingF (asUnexpected @"my-sign" . decodeSign) 
 
 -- | Recreation allows effectful @f@ to check for tampering with data.
+--
 -- Implementation simply uses 'EnT.validFromDec' combinator on the recovery function.
 instance (RecreateErr f, Applicative f) => Validate f "my-sign" "my-sign" c T.Text where
     validation = EnT.validFromDec decMySign

@@ -27,7 +27,8 @@ import           Data.TypedEncoding.Common.Types.Common
 -- Similar to 'Data.TypedEncoding.Common.Types.Enc.Encoding'
 --
 -- Used to create instances of decoding.
-
+--
+-- @since 0.3.0.0
 data Decoding f (nm :: Symbol) (alg :: Symbol) conf str where
     -- | Consider this constructor as private or use it with care
     --
@@ -40,16 +41,22 @@ data Decoding f (nm :: Symbol) (alg :: Symbol) conf str where
     UnsafeMkDecoding :: Proxy nm -> (forall (xs :: [Symbol]) . Enc (nm ': xs) conf str -> f (Enc xs conf str)) -> Decoding f nm alg conf str
 
 -- | Type safe smart constructor
--- (See also 'Data.TypedEncoding.Common.Types.Enc._mkEncoding')      
+-- (See also 'Data.TypedEncoding.Common.Types.Enc._mkEncoding')  
+--
+-- @since 0.3.0.0    
 mkDecoding :: forall f (nm :: Symbol) conf str . (forall (xs :: [Symbol]) . Enc (nm ': xs) conf str -> f (Enc xs conf str)) -> Decoding f nm (AlgNm nm) conf str
 mkDecoding = UnsafeMkDecoding Proxy
 
+-- |
+-- @since 0.3.0.0
 runDecoding :: forall alg nm f xs conf str . Decoding f nm alg conf str -> Enc (nm ': xs) conf str -> f (Enc xs conf str)
 runDecoding (UnsafeMkDecoding _ fn) = fn
 
 -- | Same as 'runDecoding" but compiler figures out algorithm name
 --
 -- Using it can slowdown compilation
+--
+-- @since 0.3.0.0  
 _runDecoding :: forall nm f xs conf str alg . (AlgNm nm ~ alg) => Decoding f nm alg conf str -> Enc (nm ': xs) conf str -> f (Enc xs conf str)
 _runDecoding = runDecoding @(AlgNm nm)
 
@@ -58,12 +65,16 @@ _runDecoding = runDecoding @(AlgNm nm)
 --
 -- Similarly to 'Data.TypedEncoding.Common.Types.Enc.Encodings' can be used with a typeclass
 -- 'Data.TypedDecoding.Internal.Class.Decode.DecodeAll'
+--
+-- @since 0.3.0.0  
 data Decodings f (nms :: [Symbol]) (algs :: [Symbol]) conf str where
     -- | constructor is to be treated as Unsafe to Encode and Decode instance implementations
     -- particular encoding instances may expose smart constructors for limited data types
     ZeroD :: Decodings f '[] '[] conf str
     ConsD ::  Decoding f nm alg conf str -> Decodings f nms algs conf str -> Decodings f (nm ': nms) (alg ': algs) conf str
 
+-- |
+-- @since 0.3.0.0
 runDecodings :: forall algs nms f c str . (Monad f) => Decodings f nms algs c str -> Enc nms c str -> f (Enc ('[]::[Symbol]) c str)
 runDecodings ZeroD enc0 = pure enc0
 runDecodings (ConsD fn xs) enc = 
@@ -72,5 +83,7 @@ runDecodings (ConsD fn xs) enc =
 
 
 -- | At possibly big compilation cost, have compiler figure out algorithm names.
+--
+-- @since 0.3.0.0  
 _runDecodings :: forall nms f c str algs . (Monad f, algs ~ AlgNmMap nms) => Decodings f nms algs c str -> Enc nms c str -> f (Enc ('[]::[Symbol]) c str)
 _runDecodings = runDecodings @(AlgNmMap nms)

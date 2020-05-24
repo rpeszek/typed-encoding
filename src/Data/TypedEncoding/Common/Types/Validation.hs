@@ -39,11 +39,15 @@ import           Data.TypedEncoding.Common.Types.Common
 -- For "enc-" encodings this will typically be decoding step.
 -- 
 -- For "r-" encodings this will typically be encoding step.
+--
+-- @since 0.3.0.0
 data Validation f (nm :: Symbol) (alg :: Symbol) conf str where
     UnsafeMkValidation :: Proxy nm -> (forall (xs :: [Symbol]) . Enc (nm ': xs) conf str -> f (Enc xs conf str)) -> Validation f nm alg conf str
 
 -- | Type safe smart constructor
 -- adding the type family @(AlgNm nm)@ restriction to UnsafeMkValidation slows down compilation, especially in tests.      
+--
+-- @since 0.3.0.0
 mkValidation :: forall f (nm :: Symbol) conf str . (forall (xs :: [Symbol]) . Enc (nm ': xs) conf str -> f (Enc xs conf str)) -> Validation f nm (AlgNm nm) conf str
 mkValidation = UnsafeMkValidation Proxy
 
@@ -53,6 +57,8 @@ runValidation (UnsafeMkValidation _ fn) = fn
 -- | Same as 'runValidation" but compiler figures out algorithm name
 --
 -- Using it can slowdown compilation
+--
+-- @since 0.3.0.0
 _runValidation :: forall nm f xs conf str alg . (AlgNm nm ~ alg) => Validation f nm alg conf str -> Enc (nm ': xs) conf str -> f (Enc xs conf str)
 _runValidation = runValidation @(AlgNm nm)
 
@@ -61,6 +67,8 @@ _runValidation = runValidation @(AlgNm nm)
 --
 -- Similarly to 'Validation' it can be used with a typeclass
 -- 'Data.TypedValidation.Internal.Class.Encode.EncodeAll'
+--
+-- @since 0.3.0.0
 data Validations f (nms :: [Symbol]) (algs :: [Symbol]) conf str where
     -- | constructor is to be treated as Unsafe to Encode and Decode instance implementations
     -- particular encoding instances may expose smart constructors for limited data types
@@ -69,6 +77,8 @@ data Validations f (nms :: [Symbol]) (algs :: [Symbol]) conf str where
 
 -- | This basically puts payload in decoded state.
 -- More useful combinators are in "Data.TypedEncoding.Combinators.Validate"
+--
+-- @since 0.3.0.0
 runValidationChecks :: forall algs nms f c str . (Monad f) => Validations f nms algs c str -> Enc nms c str -> f (Enc ('[]::[Symbol]) c str)
 runValidationChecks ZeroV enc0 = pure enc0
 runValidationChecks (ConsV fn xs) enc = 

@@ -139,7 +139,7 @@ helloZero = toEncoding () "Hello"
 --
 -- And the result is a @ByteString@ with bonus annotation describing its content.
 --
--- Future versions are likely to relax this restriction to a more permissive "r-" type that allows for any char @<= \'\255\'@
+-- Future versions are likely to relax this restriction to a more permissive "r-" annotation that allows for any char @<= \'\255\'@
 
 
 helloRestricted :: Either EncodeEx (Enc '["r-ban:zzzzz"] () B.ByteString)

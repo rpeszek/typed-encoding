@@ -11,6 +11,10 @@
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE AllowAmbiguousTypes #-}
 
+-- | This module should be merged with 
+-- "Data.TypedEncoding.Common.Util.TypeLits"
+--
+-- Since both provide type level helpers
 module Data.TypedEncoding.Common.Class.Util where
 
 import           Data.TypedEncoding.Common.Types.Common
@@ -29,6 +33,8 @@ import           GHC.TypeLits
 
 -- * Symbol List
 
+-- |
+-- @since 0.2.0.0
 class SymbolList (xs::[Symbol]) where 
     symbolVals :: [String]
 
@@ -47,6 +53,8 @@ symbolVals_ _ = symbolVals @xs
 -- * Display 
 
 -- | Human friendly version of Show
+--
+-- @since 0.2.0.0
 class Displ x where 
     displ :: x -> String
 
@@ -76,12 +84,19 @@ instance (SymbolList xs) => Displ (Proxy xs) where
 
 -- * Other
 
--- | TODO should this be imported from somewhere?
+-- TODO should this be imported from somewhere?
+
+-- |
+-- Type level list append
+-- 
+-- @since 0.1.0.0
 type family Append (xs :: [k]) (ys :: [k]) :: [k] where
     Append '[] xs = xs
     Append (y ': ys) xs = y ': Append ys xs
 
 -- | Polymorphic data payloads used to encode/decode
+--
+-- @since 0.1.0.0
 class HasA a c where
     has :: c -> a
 
