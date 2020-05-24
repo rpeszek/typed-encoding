@@ -19,10 +19,10 @@ import           Data.TypedEncoding.Instances.Restriction.ASCII ()
 import           Data.TypedEncoding.Unsafe (withUnsafe)
 
 
-
+-- | Lazy version of 'Data.TypedEncoding.Conv.Text.Encoding.decodeUtf8'
 decodeUtf8 :: forall xs c t. (LLast xs ~ t, IsSuperset "r-UTF8" t ~ 'True) => Enc xs c BL.ByteString -> Enc xs c TL.Text 
 decodeUtf8 = withUnsafe (fmap TEL.decodeUtf8)
 
-
+-- | Lazy version of 'Data.TypedEncoding.Conv.Text.Encoding.encodeUtf8'
 encodeUtf8 :: forall xs c t.  (LLast xs ~ t, IsSuperset "r-UTF8" t ~ 'True) => Enc xs c TL.Text -> Enc xs c BL.ByteString 
 encodeUtf8 = withUnsafe (fmap TEL.encodeUtf8)

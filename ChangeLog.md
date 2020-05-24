@@ -4,6 +4,13 @@
 
 - `Data.TypedEncoding.Internal.Class.IsStringR` expected to be be changed / replaced
 - (post 0.3) "enc-B64" will be moved to a different package (more distant goal)
+- Improved constrains in `Data.TypedEncoding.Conv` modules
+
+## 0.3.0.2
+
+- Added documentation to `Data.TypedEncoding.Conv` outlining current limitations, challenges of conversions.
+- Improved readme
+
 
 ## 0.3.0.1
 

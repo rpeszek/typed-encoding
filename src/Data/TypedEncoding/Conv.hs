@@ -1,0 +1,81 @@
+
+
+-- |
+-- Conversion combinator module structure is similar to one found in /text/ and /bytestring/ packages
+-- And can be found nested under this module:
+--
+-- * "Data.TypedEncoding.Conv.Text"
+-- * "Data.TypedEncoding.Conv.Text.Encoding"
+-- * "Data.TypedEncoding.Conv.Text.Lazy"    
+-- * "Data.TypedEncoding.Conv.Text.Lazy.Encoding"
+-- * "Data.TypedEncoding.Conv.ByteString.Char8"
+-- * "Data.TypedEncoding.Conv.ByteString.Lazy.Char8"
+--
+-- Two goals of conversions are:
+--
+-- * provide a way to easily convert encoded data directly between /text/ and /bytestring/ types.
+-- * provide added type safety for string conversions
+--
+-- == Enc conversions 
+-- 
+-- Consider defining a conversion function @:: Enc xs c str1 -> f (Enc xs c str2)@.
+--
+-- One challenge is how do we know that @xs@ is a valid encoding stack also for @str2@?
+-- Should we constrain that?      
+--
+-- This is made even more difficult because this library plays (has to) games with orphan instances.
+--
+-- The other challenge is how to ensure that if the destination decides to partially or fully decode, then
+-- it will do so without errors and the decoding will be meaningful.
+--
+-- Current definition is not optimal, it was selected because it works with a wide range of
+-- encodings (all @"r-"@ encodings, all non-@"r-"@ encodings available in this version of the library).
+-- However, future versions should try to improve on this.    
+--
+-- == Type Safety
+--
+-- Consider the following diagram(s) of popular /text/ and /bytestring/ conversion functions:
+--
+-- @
+--  String -> B8.pack ->   ByteString
+--   ^                    ^     |
+--   |                    | encodeUtf8
+--  id                    |     |
+--   |               decodeUtf8 |
+--   v                    |     v
+--  String -> T.pack ->     Text
+-- @
+--
+-- and the reverse of these:
+--
+-- @
+--  String <- B8.unpack <- ByteString
+--   ^                      ^     |
+--   |                      | encodeUtf8
+--  id                      |     |
+--   |                 decodeUtf8 |
+--   v                      |     v
+--  String <- T.unpack  <-    Text
+-- @
+--
+-- These diagrams actually do not commute.  This makes it easy to code bugs
+-- that are hard to find and hard to troubleshoot.
+--
+-- Well, they actually do commute on a subset of @String@ / @Text@ values:
+--
+-- @
+-- Enc '["r-ASCII"] c String
+-- Enc '["r-ASCII"] c ByteString
+-- Enc '["r-ASCII"] c Text
+-- @ 
+--
+-- This is because /UTF8/ is backward compatible with /ASCII(-7)/ and we speak /UTF8/ when
+-- converting and and from @Text@.
+-- 
+-- This is the reason why this version of /typed-encoding/ decided on using
+-- "r-ASCII" to constrain when wrapping @B8.pack@ and @B8.unpack@ in 
+-- "Data.TypedEncoding.Conv.ByteString.Char8"
+--
+-- This approach seems to be limiting and future versions will work on relaxing it.
+
+module Data.TypedEncoding.Conv where
