@@ -26,7 +26,6 @@ pack :: (
 pack = unsafeChangePayload T.pack
 
 -- | This assumes that each of the encodings in @xs@ work work equivalently in @String@ and @Text@. 
--- TODO v0.4 for a full commuting I need to add "r-UNICODE.D76" back
 unpack :: (
           Knds.UnSnoc xs ~ '(,) ys y
          , Superset "r-UNICODE.D76" y 

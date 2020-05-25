@@ -61,6 +61,7 @@ import           Data.TypedEncoding
 import           Data.TypedEncoding.Instances.Enc.Base64 () 
 import           Data.TypedEncoding.Instances.Restriction.ASCII ()
 import           Data.TypedEncoding.Instances.Restriction.UTF8 ()
+import           Data.TypedEncoding.Instances.Restriction.D76 ()
 
 import qualified Data.TypedEncoding.Conv.Text as EncT 
 import qualified Data.TypedEncoding.Conv.Text.Encoding as EncTe -- (decodeUtf8)
@@ -110,10 +111,6 @@ helloAsciiT = EncTe.decodeUtf8 helloAsciiB
 -- "Enc '[r-ASCII] () (Text HeLlo world)"
 
 
--- * pack and unpack
-
--- TODO v0.4
-
 helloZero :: Enc ('[] :: [Symbol]) () String
 helloZero = toEncoding () "Hello"
 -- ^ Consider 0-encoding of a 'String',  to move it to @Enc '[] () ByteString@ one could try:
@@ -128,7 +125,7 @@ helloZero = toEncoding () "Hello"
 -- It is not an injection as it only considers first 8 bits of information from each 'Char'.  
 -- I doubt that there are any code examples of its intentional use on a String that has chars @> \'\255\'@.
 --
--- Current version of pack @EncB8.pack@ will not compile unless the encoding is ASCII restricted (@< \'\128\'@).
+-- @EncB8.pack@ will not compile unless the encoding has "r-CHAR8" as its superset.
 -- This works:
 -- 
 -- >>> fmap (displ . EncB8.pack) . encodeFAll @'["r-ASCII"] @(Either EncodeEx) $ helloZero
@@ -136,9 +133,14 @@ helloZero = toEncoding () "Hello"
 --
 -- And the result is a @ByteString@ with bonus annotation describing its content.
 --
--- Future versions are likely to relax this restriction to a more permissive "r-" annotation that allows for any char @<= \'\255\'@
+-- Similar game is played for @Text@:
+--
+-- >>> fmap (displ . EncT.d76Demote . EncT.pack) . encodeFAll @'["r-UNICODE.D76"] @(Either EncodeEx) $ helloZero
+-- Right "Enc '[] () (Text Hello)"
+--
+-- See "Data.TypedEncoding.Conv" for more information on this.
 
--- TODO v0.4 need text pack
+
 
 helloRestricted :: Either EncodeEx (Enc '["r-ban:zzzzz"] () B.ByteString)
 helloRestricted = fmap EncB8.pack . _runEncodings encodings $ toEncoding () "Hello"
