@@ -106,7 +106,8 @@ instance ToStrIso String String where
 
 -- |
 -- Used to find exceptions that violated "r-" encoding
--- Expected to be used to check encoding of ASCII-7 so Text and ByteString are compatible.
+-- Expected to be used to check encoding of ASCII-7 so Text and ByteString are compatible
+-- or to check 0-255 range restrictions. 
 --
 -- @since 0.3.0.0
 class Char8Find str where
@@ -141,3 +142,22 @@ instance Char8Find B.ByteString where
 
 instance Char8Find BL.ByteString where
     find = BL8.find         
+
+
+
+-- -- |
+-- -- Finds character in @str@.
+-- -- @str@ is expected to represent full char range all the way to @'\x10FFFF'@
+-- --
+-- -- @since 0.3.1.0
+-- class CharFind str where
+--     findChar :: (Char -> Bool) -> str -> Maybe Char
+
+-- instance CharFind String where
+--     findChar = L.find
+
+-- instance CharFind T.Text where
+--     findChar = T.find
+
+-- instance CharFind TL.Text where
+--     findChar = TL.find         

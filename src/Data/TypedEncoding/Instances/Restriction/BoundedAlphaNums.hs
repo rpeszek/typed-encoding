@@ -97,15 +97,16 @@ instance (KnownSymbol s , Ban s, Algorithm s "r-ban", IsStringR str, RecreateErr
 -- Left "'G' not boulded by 'F'"
 -- >>> verifyBoundedAlphaNum (Proxy :: Proxy "r-ban:FF-FF") (T.pack "13G3E")
 -- Left "'G' not matching '-'"
--- >>> verifyBoundedAlphaNum (Proxy :: Proxy "r-ban:FF-FF") (T.pack "13-234")
--- Left "Input list has wrong size expecting 5 but length \"13-234\" == 6"
+-- >>> verifyBoundedAlphaNum (Proxy :: Proxy "r-ban:FFяFF") (T.pack "13я234")
+-- Left "Not ASCII char in annotation '\\1103'"
+-- 
 verifyBoundedAlphaNum :: forall s str . (KnownSymbol s, IsStringR str) => Proxy s -> str -> Either String str
-verifyBoundedAlphaNum p str = 
-    if pattl == inpl 
-    then case lefts match of
-        (e: _) -> Left e
+verifyBoundedAlphaNum p str =         
+    case (lefts match, notAscii, pattl == inpl) of
+        (_, Just ch, _) -> Left $ "Not ASCII char in annotation " ++ show ch
+        (_, _, False) -> Left $ "Input list has wrong size expecting " ++ show pattl ++ " but length " ++ show input ++ " == " ++ show inpl   
+        (e: _, _, _) -> Left e
         _ -> Right str
-    else Left $ "Input list has wrong size expecting " ++ show pattl ++ " but length " ++ show input ++ " == " ++ show inpl   
     where 
         patt = L.drop (L.length ("r-ban:" :: String)) . symbolVal $ p
         input = toString str
@@ -113,7 +114,7 @@ verifyBoundedAlphaNum p str =
         inpl = L.length input 
         
         match = L.zipWith fn input patt
-
+        notAscii = L.find (not . isAscii) patt
 
         fn ci cp = case (isAlphaNum ci, isAlphaNum cp, ci <= cp, ci == cp) of
             (True, True, True, _) -> Right ()

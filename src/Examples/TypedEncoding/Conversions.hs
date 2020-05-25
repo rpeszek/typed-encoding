@@ -61,9 +61,11 @@ import           Data.TypedEncoding
 import           Data.TypedEncoding.Instances.Enc.Base64 () 
 import           Data.TypedEncoding.Instances.Restriction.ASCII ()
 import           Data.TypedEncoding.Instances.Restriction.UTF8 ()
+import           Data.TypedEncoding.Instances.Restriction.D76 ()
+import           Data.TypedEncoding.Instances.Restriction.ByteRep ()
 
 import qualified Data.TypedEncoding.Conv.Text as EncT 
-import qualified Data.TypedEncoding.Conv.Text.Encoding as EncTe (decodeUtf8)
+import qualified Data.TypedEncoding.Conv.Text.Encoding as EncTe -- (decodeUtf8)
 
 import qualified Data.Text as T
 import qualified Data.ByteString as B
@@ -110,28 +112,23 @@ helloAsciiT = EncTe.decodeUtf8 helloAsciiB
 -- "Enc '[r-ASCII] () (Text HeLlo world)"
 
 
--- * pack and unpack
+-- * @pack@ from String
 
 helloZero :: Enc ('[] :: [Symbol]) () String
 helloZero = toEncoding () "Hello"
--- ^ Consider 0-encoding of a 'String',  to move it to @Enc '[] () String@ one could try:
+-- ^ Consider 0-encoding of a 'String',  to move it to @Enc '[] () ByteString@ one could try:
 --
--- >>> displ . EncT.pack $ helloZero
--- "Enc '[] () (Text Hello)"
---
--- this works, but:
--- 
 -- >>> EncB8.pack helloZero
 -- ...
 -- ... error: 
--- ... Empty Symbol list not allowed
+-- ... Empty list, no last element
 -- ...
 --
 -- this does not compile.  And it should not. @pack@ from "Data.ByteString.Char8" is error prone.
 -- It is not an injection as it only considers first 8 bits of information from each 'Char'.  
 -- I doubt that there are any code examples of its intentional use on a String that has chars @> \'\255\'@.
 --
--- Current version of pack @EncB8.pack@ will not compile unless the encoding is ASCII restricted (@< \'\128\'@).
+-- @EncB8.pack@ will not compile unless the encoding has "r-CHAR8" as its superset.
 -- This works:
 -- 
 -- >>> fmap (displ . EncB8.pack) . encodeFAll @'["r-ASCII"] @(Either EncodeEx) $ helloZero
@@ -139,13 +136,18 @@ helloZero = toEncoding () "Hello"
 --
 -- And the result is a @ByteString@ with bonus annotation describing its content.
 --
--- Future versions are likely to relax this restriction to a more permissive "r-" annotation that allows for any char @<= \'\255\'@
+-- Similar game is played for @Text@:
+--
+-- >>> fmap (displ . EncT.d76Demote . EncT.pack) . encodeFAll @'["r-UNICODE.D76"] @(Either EncodeEx) $ helloZero
+-- Right "Enc '[] () (Text Hello)"
+--
+-- See "Data.TypedEncoding.Conv" for more information on this.
 
 
 helloRestricted :: Either EncodeEx (Enc '["r-ban:zzzzz"] () B.ByteString)
 helloRestricted = fmap EncB8.pack . _runEncodings encodings $ toEncoding () "Hello"
 -- ^ more interestingly @EncB8.pack@ works fine on "r-" encodings that are subsets of "r-ASCII"
--- this example @"r-ban:zzzzz"@ restricts to 5 alpha-numeric charters all < @\'z\'@
+-- this example @"r-ban:zzzzz"@ restricts to 5 alpha-numeric charters all @< \'z\'@
 -- 
 -- >>> displ <$> helloRestricted
 -- Right "Enc '[r-ban:zzzzz] () (ByteString Hello)"
@@ -159,6 +161,9 @@ helloRestricted = fmap EncB8.pack . _runEncodings encodings $ toEncoding () "Hel
 -- Right "Enc '[r-ban:zzzzz] () (String Hello)"
 -- 
 
+byteRep :: Either EncodeEx (Enc '["r-ByteRep"] () B.ByteString)
+byteRep = fmap EncB8.pack . _runEncodings encodings $ toEncoding () "\254"
+-- ^ For low level use of @Char@ instead of @Word8@, "r-ByteRep" represents anything under @256@.
 
 -- * More complex rules
 

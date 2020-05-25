@@ -41,6 +41,13 @@ type family AcceptEq (msg :: ErrorMessage) (c :: Ordering) :: Bool where
     AcceptEq msg _ =  TypeError msg
 
 -- !
+-- @since 0.4.0.0
+type family OrdBool (c :: Ordering) :: Bool where
+    OrdBool EQ = 'True
+    OrdBool _  =  'False
+
+
+-- !
 -- @since 0.2.1.0
 type family And (b1 :: Bool) (b2 :: Bool) :: Bool where
     And 'True 'True = 'True
@@ -51,6 +58,12 @@ type family And (b1 :: Bool) (b2 :: Bool) :: Bool where
 type family Or (b1 :: Bool) (b2 :: Bool) :: Bool where
     Or 'False 'False = 'False
     Or _ _ = 'True
+
+-- !
+-- @since 0.2.1.0
+type family If (b1 :: Bool) (a :: k) (b :: k) :: k where
+    If 'True a _ = a
+    If 'False _ b = b
 
 -- !
 -- @since 0.2.1.0
@@ -166,6 +179,7 @@ type family LLast (s :: [Symbol]) :: Symbol where
     LLast (_ ': xs) = LLast xs
 
 
+
 -- |
 -- >>> :kind! Concat (Snoc '["1","2","3"] "4") 
 -- ...
@@ -191,3 +205,5 @@ type family UnSnoc (s :: [k]) :: ([k], k) where
 
 type family UnSnocHelper (s :: k) (t :: ([k], k)) :: ([k], k) where 
    UnSnocHelper y ('(,) xs x) = '(,) (y ': xs) x   
+
+   
