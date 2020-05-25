@@ -80,3 +80,10 @@ type family IsROrEmpty (s :: Symbol) :: Bool where
     IsROrEmpty "" = True
     IsROrEmpty x  = IsR x
 
+-- | 
+-- >>> :kind! RemoveRs '["r-UPPER", "enc-test", "r-lower", "do-UPPER"]
+-- ...
+-- = '["enc-test", "do-UPPER"]
+type family RemoveRs (s :: [Symbol]) :: [Symbol] where
+    RemoveRs '[] = '[]
+    RemoveRs (x ': xs) = If (OrdBool (CmpSymbol "r-" (Take 2 x))) (RemoveRs xs) (x ': RemoveRs xs) 

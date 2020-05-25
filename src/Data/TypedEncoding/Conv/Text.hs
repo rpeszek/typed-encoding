@@ -1,12 +1,14 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE PolyKinds #-} -- removes need to annotate kinds as [Symbol]
+{-# LANGUAGE FlexibleContexts #-}
 
 -- | Text encoding combinators specific to 'T.Text'
 -- @since 0.2.2.0
 module Data.TypedEncoding.Conv.Text where
 
 import qualified Data.Text as T
+import qualified Data.TypedEncoding.Common.Util.TypeLits as Knds
 import           Data.TypedEncoding.Instances.Support
 
 
@@ -15,7 +17,12 @@ import           Data.TypedEncoding.Instances.Support
 
 
 -- | This assumes that each of the encodings in @xs@ work work equivalently in @String@ and @Text@. 
-pack :: Enc xs c String -> Enc xs c T.Text
+pack :: (
+          Knds.UnSnoc xs ~ '(,) ys y
+         , IsSuperset "r-UNICODE.D76" y ~ 'True
+         , encs ~ RemoveRs ys
+         , AllEncodeInto "r-UNICODE.D76" encs
+          ) => Enc xs c String -> Enc xs c T.Text
 pack = unsafeChangePayload T.pack
 
 -- | This assumes that each of the encodings in @xs@ work work equivalently in @String@ and @Text@. 

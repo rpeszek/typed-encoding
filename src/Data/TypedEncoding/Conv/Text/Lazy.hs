@@ -4,13 +4,20 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE PolyKinds #-} -- removes need to annotate kinds as [Symbol]
+{-# LANGUAGE FlexibleContexts #-}
 
 module Data.TypedEncoding.Conv.Text.Lazy where
 
 import qualified Data.Text.Lazy as TL
+import qualified Data.TypedEncoding.Common.Util.TypeLits as Knds
 import           Data.TypedEncoding.Instances.Support
 
-pack :: Enc xs c String -> Enc xs c TL.Text
+pack :: (
+          Knds.UnSnoc xs ~ '(,) ys y
+         , IsSuperset "r-UNICODE.D76" y ~ 'True
+         , encs ~ RemoveRs ys
+         , AllEncodeInto "r-UNICODE.D76" encs
+        ) => Enc xs c String -> Enc xs c TL.Text
 pack = unsafeChangePayload TL.pack
 
 unpack :: Enc xs c TL.Text -> Enc xs c String

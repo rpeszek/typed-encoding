@@ -78,6 +78,12 @@ instance FlattenAs "r-ASCII" "enc-B64" where
 instance EncodingSuperset "enc-B64" where
     type EncSuperset "enc-B64" = "r-ASCII"
 
+-- |
+-- >>> tstChar8Encodable @ '["enc-B64-len", "enc-B64"]
+-- "I am CHAR8 encodable"
+instance EncodingSuperset "enc-B64-len" where
+    type EncSuperset "enc-B64-len" = "r-ASCII"
+
 -- * Encoders
 
 -- |

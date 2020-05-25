@@ -112,19 +112,16 @@ helloAsciiT = EncTe.decodeUtf8 helloAsciiB
 
 -- * pack and unpack
 
+-- TODO v0.4
+
 helloZero :: Enc ('[] :: [Symbol]) () String
 helloZero = toEncoding () "Hello"
--- ^ Consider 0-encoding of a 'String',  to move it to @Enc '[] () String@ one could try:
+-- ^ Consider 0-encoding of a 'String',  to move it to @Enc '[] () ByteString@ one could try:
 --
--- >>> displ . EncT.pack $ helloZero
--- "Enc '[] () (Text Hello)"
---
--- this works, but:
--- 
 -- >>> EncB8.pack helloZero
 -- ...
 -- ... error: 
--- ... Empty Symbol list not allowed
+-- ... Empty list, no last element
 -- ...
 --
 -- this does not compile.  And it should not. @pack@ from "Data.ByteString.Char8" is error prone.
@@ -141,6 +138,7 @@ helloZero = toEncoding () "Hello"
 --
 -- Future versions are likely to relax this restriction to a more permissive "r-" annotation that allows for any char @<= \'\255\'@
 
+-- TODO v0.4 need text pack
 
 helloRestricted :: Either EncodeEx (Enc '["r-ban:zzzzz"] () B.ByteString)
 helloRestricted = fmap EncB8.pack . _runEncodings encodings $ toEncoding () "Hello"

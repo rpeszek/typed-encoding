@@ -50,7 +50,17 @@ type family IsSuperset (y :: Symbol) (x :: Symbol) :: Bool where
     IsSuperset "r-ASCII" "r-ASCII" = 'True
     IsSuperset "r-UTF8"  "r-ASCII" = 'True
     IsSuperset "r-UTF8"  "r-UTF8" = 'True
+    IsSuperset "r-CHAR8" "r-ASCII" = 'True  -- "r-CHAR8" is phantom, no explicit instances so it does not need reflexive case
+    IsSuperset "r-CHAR8" x = Or (IsSuperset "r-ASCII" x) (IsSupersetOpen "r-CHAR8" (TakeUntil x ":") (ToList x))
+    IsSuperset "r-UNICODE.D76" "r-UNICODE.D76" = 'True 
+    IsSuperset "r-UNICODE.D76" "r-ASCII" = 'True 
+    IsSuperset "r-UNICODE.D76" x = Or (IsSuperset "r-CHAR8" x) (IsSupersetOpen "r-UNICODE.D76" (TakeUntil x ":") (ToList x))
     IsSuperset y x = IsSupersetOpen y (TakeUntil x ":") (ToList x)
+
+-- TODO conv add property testing isSuperset
+-- TODO
+-- backward compatible r-CHAR8
+-- IsSuperset "r-CHAR8" x = Or (IsSuperset "r-ASCII" x) (IsSupersetOpen "r-CHAR8" (TakeUntil x ":") (ToList x))
 
 -- |
 -- @since 0.2.2.0
@@ -89,3 +99,27 @@ _encodesInto = injectInto . implEncInto
 -- prop_Superset :: forall y x xs c str . (Superset y x, Eq str) => Enc (x ': xs) c str -> Bool
 -- prop_Superset x = getPayload x == (getPayload . inject @y @x $ x)
 
+
+-- | 
+-- Aggregate version of 'EncodingSuperset' 
+--
+-- @since 0.4.0.0
+class AllEncodeInto (superset :: Symbol) (encnms :: [Symbol]) where
+     
+instance {-# OVERLAPPING #-}  AllEncodeInto "r-CHAR8" '[] 
+instance (AllEncodeInto "r-CHAR8" xs, IsSuperset "r-CHAR8" r ~ 'True, EncodingSuperset enc, r ~ EncSuperset enc) => AllEncodeInto "r-CHAR8" (enc ': xs)
+
+instance {-# OVERLAPPING #-}  AllEncodeInto "r-UNICODE.D76" '[] 
+instance (AllEncodeInto "r-UNICODE.D76" xs, IsSuperset "r-UNICODE.D76" r ~ 'True, EncodingSuperset enc, r ~ EncSuperset enc) => AllEncodeInto "r-UNICODE.D76" (enc ': xs)
+
+instance {-# OVERLAPPING #-}  AllEncodeInto "r-UTF8" '[] 
+instance (AllEncodeInto "r-UTF8" xs, IsSuperset "r-UTF8" r ~ 'True, EncodingSuperset enc, r ~ EncSuperset enc) => AllEncodeInto "r-UTF8" (enc ': xs)
+
+tstChar8Encodable :: forall nms . AllEncodeInto "r-CHAR8" nms => String
+tstChar8Encodable = "I am CHAR8 encodable"
+
+tstD76Encodable :: forall nms . AllEncodeInto "r-UNICODE.D76" nms => String
+tstD76Encodable = "I can be a valid text"
+
+tstUTF8Encodable :: forall nms . AllEncodeInto "r-UTF8" nms => String
+tstUTF8Encodable = "I am a valid UTF8"
