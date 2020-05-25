@@ -14,7 +14,7 @@ import           Data.TypedEncoding.Instances.Support
 
 pack :: (
           Knds.UnSnoc xs ~ '(,) ys y
-         , IsSuperset "r-UNICODE.D76" y ~ 'True
+         , Superset "r-UNICODE.D76" y 
          , encs ~ RemoveRs ys
          , AllEncodeInto "r-UNICODE.D76" encs
         ) => Enc xs c String -> Enc xs c TL.Text

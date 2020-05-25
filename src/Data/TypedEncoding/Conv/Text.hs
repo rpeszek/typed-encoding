@@ -19,14 +19,20 @@ import           Data.TypedEncoding.Instances.Support
 -- | This assumes that each of the encodings in @xs@ work work equivalently in @String@ and @Text@. 
 pack :: (
           Knds.UnSnoc xs ~ '(,) ys y
-         , IsSuperset "r-UNICODE.D76" y ~ 'True
+         , Superset "r-UNICODE.D76" y 
          , encs ~ RemoveRs ys
          , AllEncodeInto "r-UNICODE.D76" encs
           ) => Enc xs c String -> Enc xs c T.Text
 pack = unsafeChangePayload T.pack
 
 -- | This assumes that each of the encodings in @xs@ work work equivalently in @String@ and @Text@. 
-unpack :: Enc xs c T.Text -> Enc xs c String
+-- TODO v0.4 for a full commuting I need to add "r-UNICODE.D76" back
+unpack :: (
+          Knds.UnSnoc xs ~ '(,) ys y
+         , Superset "r-UNICODE.D76" y 
+         , encs ~ RemoveRs ys
+         , AllEncodeInto "r-UNICODE.D76" encs
+          ) => Enc xs c T.Text -> Enc xs c String
 unpack = unsafeChangePayload T.unpack 
 
 -- | 
@@ -49,3 +55,10 @@ utf8Promote = withUnsafeCoerce id
 -- "Enc '[] () (Text Hello)"
 utf8Demote :: (UnSnoc xs ~ '(,) ys "r-UTF8") => Enc xs c T.Text -> Enc ys c T.Text
 utf8Demote = withUnsafeCoerce id
+
+
+d76Promote :: Enc xs c T.Text -> Enc (Snoc xs "r-UNICODE.D76") c T.Text
+d76Promote = withUnsafeCoerce id
+
+d76Demote :: (UnSnoc xs ~ '(,) ys "r-UNICODE.D76") => Enc xs c T.Text -> Enc ys c T.Text
+d76Demote = withUnsafeCoerce id

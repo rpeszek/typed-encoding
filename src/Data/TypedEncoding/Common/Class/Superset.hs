@@ -11,6 +11,7 @@
 -- {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE GADTs #-}
 {-# LANGUAGE AllowAmbiguousTypes #-}
+{-# LANGUAGE ConstraintKinds #-}
 
 module Data.TypedEncoding.Common.Class.Superset where
 
@@ -45,6 +46,9 @@ import           Data.Symbol.Ascii
 --
 -- @IsSuperset bigger smaller@ reads as @bigger@ is a superset of @smaller@
 --
+-- Note, no IsSuperset "r-UNICODE.D76" "r-CHAR8" even though the numeric range of D76 includes all CHAR8 bytes.
+-- This is more 'nominal' decision that prevents certain unwanted conversions from being possible.
+--
 -- @since 0.2.2.0
 type family IsSuperset (y :: Symbol) (x :: Symbol) :: Bool where
     IsSuperset "r-ASCII" "r-ASCII" = 'True
@@ -65,6 +69,8 @@ type family IsSuperset (y :: Symbol) (x :: Symbol) :: Bool where
 -- |
 -- @since 0.2.2.0
 type family IsSupersetOpen (y :: Symbol) (x :: Symbol) (xs :: [Symbol]) :: Bool
+
+type Superset big small = (IsSuperset big small ~ 'True)
 
 -- |
 -- >>> let Right tstAscii = encodeFAll . toEncoding () $ "Hello World" :: Either EncodeEx (Enc '["r-ASCII"] () T.Text)

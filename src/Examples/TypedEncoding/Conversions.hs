@@ -63,7 +63,7 @@ import           Data.TypedEncoding.Instances.Restriction.ASCII ()
 import           Data.TypedEncoding.Instances.Restriction.UTF8 ()
 
 import qualified Data.TypedEncoding.Conv.Text as EncT 
-import qualified Data.TypedEncoding.Conv.Text.Encoding as EncTe (decodeUtf8)
+import qualified Data.TypedEncoding.Conv.Text.Encoding as EncTe -- (decodeUtf8)
 
 import qualified Data.Text as T
 import qualified Data.ByteString as B

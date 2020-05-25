@@ -19,7 +19,7 @@ import           Data.TypedEncoding.Instances.Support
 -- Lazy version of 'Data.TypedEncoding.Conv.ByteString.Char8.pack'.
 pack :: (
      Knds.UnSnoc xs ~ '(,) ys y
-    , IsSuperset "r-CHAR8" y ~ 'True
+    , Superset "r-CHAR8" y 
     , encs ~ RemoveRs ys
     , AllEncodeInto "r-CHAR8" encs
     ) => Enc xs c String -> Enc xs c BL8.ByteString
@@ -29,7 +29,7 @@ pack = unsafeChangePayload BL8.pack
 -- Lazy version of 'Data.TypedEncoding.Conv.ByteString.Char8.unpack'.
 unpack :: (
           Knds.UnSnoc xs ~ '(,) ys y
-        , IsSuperset "r-CHAR8" y ~ 'True
+        , Superset "r-CHAR8" y
         , encs ~ RemoveRs ys
         , AllEncodeInto "r-CHAR8" encs
        ) => Enc xs c BL8.ByteString -> Enc xs c String

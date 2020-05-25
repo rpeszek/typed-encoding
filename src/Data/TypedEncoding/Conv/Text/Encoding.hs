@@ -82,7 +82,7 @@ import           Data.TypedEncoding.Unsafe (withUnsafe)
 -- @since 0.4.0.0
 decodeUtf8 :: forall xs c t y ys encs. (
           Knds.UnSnoc xs ~ '(,) ys y
-         , IsSuperset "r-UTF8" y ~ 'True
+         , Superset "r-UTF8" y
          , encs ~ RemoveRs ys
          , AllEncodeInto "r-UTF8" encs
         ) => Enc xs c B.ByteString -> Enc xs c T.Text 
@@ -99,7 +99,7 @@ decodeUtf8 = withUnsafe (fmap TE.decodeUtf8)
 -- @since 0.4.0.0
 encodeUtf8 :: forall xs c t y ys encs.   (
           Knds.UnSnoc xs ~ '(,) ys y
-         , IsSuperset "r-UTF8" y ~ 'True
+         , Superset "r-UTF8" y 
          , encs ~ RemoveRs ys
          , AllEncodeInto "r-UTF8" encs
         ) => Enc xs c T.Text -> Enc xs c B.ByteString 

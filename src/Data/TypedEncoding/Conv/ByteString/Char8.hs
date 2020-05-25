@@ -41,7 +41,7 @@ import           Data.TypedEncoding.Instances.Support
 --  @since 0.4.0.0
 pack :: (
     Knds.UnSnoc xs ~ '(,) ys y
-    , IsSuperset "r-CHAR8" y ~ 'True
+    , Superset "r-CHAR8" y
     , encs ~ RemoveRs ys
     , AllEncodeInto "r-CHAR8" encs
     ) => Enc xs c String -> Enc xs c B8.ByteString
@@ -59,7 +59,7 @@ pack = unsafeChangePayload B8.pack
 -- @since 0.4.0.0
 unpack :: (
           Knds.UnSnoc xs ~ '(,) ys y
-         , IsSuperset "r-CHAR8" y ~ 'True
+         , Superset "r-CHAR8" y
          , encs ~ RemoveRs ys
          , AllEncodeInto "r-CHAR8" encs
           ) => Enc xs c B8.ByteString -> Enc xs c String
