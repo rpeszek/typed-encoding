@@ -12,12 +12,14 @@
   - Stronger (more precise) constraints on all functions `Data.TypedEncoding.Conv`
   - Compilation errors emitted from `IsSuperset` are different
   - "r-ban" now only allows ASCII, errors out otherwise
-
+   
 - New
-  - "r-CHAR8" phantom r-type 
+  - `"r-CHAR8"` phantom r-type 
   - Superset modified for "r-CHAR8"
-  - "r-UNICODE.D76" /text/ chars restriction and Superset modifications
+  - `"r-UNICODE.D76"` /text/ chars restriction and Superset modifications
   - `Superset` constraint added back (different than in 0.2)
+  - properties for `Superset` testing
+  - `"r-ByteRep"` annotation used as a marker of low level use of `Char` instead of `Word8` for `ByteString` work.
 
 - Fixes:
   - `Data.TypedEncoding.Instances.Restriction.BoundedAlphaNums` `"r-ban"` now verifies `Superset "r-ASCII"`

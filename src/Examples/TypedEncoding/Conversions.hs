@@ -62,6 +62,7 @@ import           Data.TypedEncoding.Instances.Enc.Base64 ()
 import           Data.TypedEncoding.Instances.Restriction.ASCII ()
 import           Data.TypedEncoding.Instances.Restriction.UTF8 ()
 import           Data.TypedEncoding.Instances.Restriction.D76 ()
+import           Data.TypedEncoding.Instances.Restriction.ByteRep ()
 
 import qualified Data.TypedEncoding.Conv.Text as EncT 
 import qualified Data.TypedEncoding.Conv.Text.Encoding as EncTe -- (decodeUtf8)
@@ -111,6 +112,8 @@ helloAsciiT = EncTe.decodeUtf8 helloAsciiB
 -- "Enc '[r-ASCII] () (Text HeLlo world)"
 
 
+-- * @pack@ from String
+
 helloZero :: Enc ('[] :: [Symbol]) () String
 helloZero = toEncoding () "Hello"
 -- ^ Consider 0-encoding of a 'String',  to move it to @Enc '[] () ByteString@ one could try:
@@ -141,11 +144,10 @@ helloZero = toEncoding () "Hello"
 -- See "Data.TypedEncoding.Conv" for more information on this.
 
 
-
 helloRestricted :: Either EncodeEx (Enc '["r-ban:zzzzz"] () B.ByteString)
 helloRestricted = fmap EncB8.pack . _runEncodings encodings $ toEncoding () "Hello"
 -- ^ more interestingly @EncB8.pack@ works fine on "r-" encodings that are subsets of "r-ASCII"
--- this example @"r-ban:zzzzz"@ restricts to 5 alpha-numeric charters all < @\'z\'@
+-- this example @"r-ban:zzzzz"@ restricts to 5 alpha-numeric charters all @< \'z\'@
 -- 
 -- >>> displ <$> helloRestricted
 -- Right "Enc '[r-ban:zzzzz] () (ByteString Hello)"
@@ -159,6 +161,9 @@ helloRestricted = fmap EncB8.pack . _runEncodings encodings $ toEncoding () "Hel
 -- Right "Enc '[r-ban:zzzzz] () (String Hello)"
 -- 
 
+byteRep :: Either EncodeEx (Enc '["r-ByteRep"] () B.ByteString)
+byteRep = fmap EncB8.pack . _runEncodings encodings $ toEncoding () "\254"
+-- ^ For low level use of @Char@ instead of @Word8@, "r-ByteRep" represents anything under @256@.
 
 -- * More complex rules
 

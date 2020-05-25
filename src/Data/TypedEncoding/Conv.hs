@@ -117,6 +117,12 @@
 -- to end up being encoded in @Text@.  This is just one example of added type level security that 
 -- /type-encoding/ provides.
 --
+-- Currently, "r-CHAR8" is intended as upper bound on "r-" encodings. There is no way
+-- to encode to it via standard encoding mechanism. However, it @Char@ is often used instead of @Word8@
+-- for low level @ByteString@ programming. This is supported using @"r-ByteRep"@ annotation which 
+-- can be used as @Superset "r-CHAR8" "r-ByteRep"@, this allows for @EncB8@ conversions to work.
+-- Again, there is no @Superset "r-UNICODE.D76" "r-ByteRep"@ so these cannot be converted to @Text@.
+--
 --
 -- == @Enc@ conversions 
 -- 

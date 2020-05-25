@@ -8,7 +8,7 @@
 {-# LANGUAGE UndecidableInstances #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeFamilies #-}
--- {-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE GADTs #-}
 {-# LANGUAGE AllowAmbiguousTypes #-}
 {-# LANGUAGE ConstraintKinds #-}
@@ -17,10 +17,17 @@ module Data.TypedEncoding.Common.Class.Superset where
 
 import           Data.TypedEncoding.Common.Util.TypeLits
 
-import           Data.TypedEncoding.Common.Types (Enc(..) )
+import           Data.TypedEncoding.Common.Types (Enc(..)
+                                                  , EncodeEx(..)
+                                                  , Encoding
+                                                  , getPayload 
+                                                  , runEncoding'
+                                                  , toEncoding
+                                                  , AlgNm)
 import           Data.TypedEncoding.Combinators.Unsafe (withUnsafeCoerce)
 import           GHC.TypeLits
 import           Data.Symbol.Ascii
+import           Data.Either (isLeft)
 
 
 -- $setup
@@ -55,14 +62,13 @@ type family IsSuperset (y :: Symbol) (x :: Symbol) :: Bool where
     IsSuperset "r-UTF8"  "r-ASCII" = 'True
     IsSuperset "r-UTF8"  "r-UTF8" = 'True
     IsSuperset "r-CHAR8" "r-ASCII" = 'True  -- "r-CHAR8" is phantom, no explicit instances so it does not need reflexive case
+    IsSuperset "r-CHAR8" "r-ByteRep" = 'True
     IsSuperset "r-CHAR8" x = Or (IsSuperset "r-ASCII" x) (IsSupersetOpen "r-CHAR8" (TakeUntil x ":") (ToList x))
     IsSuperset "r-UNICODE.D76" "r-UNICODE.D76" = 'True 
     IsSuperset "r-UNICODE.D76" "r-ASCII" = 'True 
     IsSuperset "r-UNICODE.D76" x = Or (IsSuperset "r-CHAR8" x) (IsSupersetOpen "r-UNICODE.D76" (TakeUntil x ":") (ToList x))
     IsSuperset y x = IsSupersetOpen y (TakeUntil x ":") (ToList x)
 
--- TODO conv add property testing isSuperset
--- TODO
 -- backward compatible r-CHAR8
 -- IsSuperset "r-CHAR8" x = Or (IsSuperset "r-ASCII" x) (IsSupersetOpen "r-CHAR8" (TakeUntil x ":") (ToList x))
 
@@ -84,6 +90,32 @@ injectInto = withUnsafeCoerce id
 -- TODO consider expanding to 
 -- _injectInto ::forall y x xs c str . (IsSuperset y x ~ 'True) =>  Enc (x ': xs) c str ->  Enc (Replace x y xs) c str
 
+
+-- |
+-- Test for Supersets defined in this module
+--
+-- Actual tests in the project /test/ suite.
+propSuperset' :: forall algb algs b s str . (Superset b s, Eq str) 
+                 => 
+                 Encoding (Either EncodeEx) b algb () str 
+                 -> Encoding (Either EncodeEx) s algs () str 
+                 -> str 
+                 -> Bool
+propSuperset' encb encs str = 
+    case (isLeft rb, isLeft rs) of 
+        (True, False) -> False
+        (False, False) -> pb == ps
+        _ -> True
+
+    where 
+        rb = runEncoding' @algb encb . toEncoding () $ str 
+        rs = runEncoding' @algs encs . toEncoding () $ str 
+        pb = either (const str) id $ getPayload <$> rb
+        ps = either (const str) id $ getPayload <$> rs
+        
+propSuperset_ :: forall b s str algb algs. (Superset b s, Eq str, AlgNm b ~ algb, AlgNm s ~ algs) => Encoding (Either EncodeEx) b algb () str -> Encoding (Either EncodeEx) s algs () str -> str -> Bool
+propSuperset_ = propSuperset' @algb @algs
+
 -- |
 -- IsSuperset is not intended for @"enc-"@ encodings. This class is.
 -- 
@@ -102,9 +134,31 @@ class EncodingSuperset (enc :: Symbol) where
 _encodesInto :: forall y enc xs c str r . (IsSuperset y r ~ 'True, EncodingSuperset enc, r ~ EncSuperset enc) => Enc (enc ': xs) c str -> Enc (y ': enc ': xs) c str
 _encodesInto = injectInto . implEncInto
 
--- prop_Superset :: forall y x xs c str . (Superset y x, Eq str) => Enc (x ': xs) c str -> Bool
--- prop_Superset x = getPayload x == (getPayload . inject @y @x $ x)
+-- |
+-- validates superset restriction
+-- 
+-- Actual tests in the project /test/ suite.
+propEncodesInto' :: forall algb algr b r str . (EncodingSuperset b, r ~ EncSuperset b, Eq str) => Encoding (Either EncodeEx) b algb () str -> Encoding (Either EncodeEx) r algr () str -> str -> Bool
+propEncodesInto' encb encr str = 
+    case rb of
+        Left _ -> True
+        Right enc -> case runEncoding' @algr encr . toEncoding () $ getPayload enc of
+            Right _ -> True
+            Left _ -> False  
+    where
+        rb = runEncoding' @algb encb . toEncoding () $ str 
 
+propEncodesInto_ :: forall b r str algb algr. (
+    EncodingSuperset b
+    , r ~ EncSuperset b
+    , Eq str
+    , AlgNm b ~ algb
+    , AlgNm r ~ algr
+    ) => Encoding (Either EncodeEx) b algb () str 
+       -> Encoding (Either EncodeEx) r algr () str 
+       -> str 
+       -> Bool
+propEncodesInto_ = propEncodesInto' @algb @algr
 
 -- | 
 -- Aggregate version of 'EncodingSuperset' 

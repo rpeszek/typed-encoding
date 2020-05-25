@@ -13,6 +13,8 @@
 --
 -- Note, no IsSuperset "r-UNICODE.D76" "r-CHAR8" mapping even though the numeric range of D76 includes all CHAR8 bytes.
 -- This is more 'nominal' decision that prevents certain unwanted conversions from being possible.
+--
+-- Similarly no IsSuperset "r-UNICODE.D76" "r-ByteRep", this annotation acts as a guard to what can go into @Text@.
 -- 
 -- @since 0.4.0.0
 module Data.TypedEncoding.Instances.Restriction.D76 where

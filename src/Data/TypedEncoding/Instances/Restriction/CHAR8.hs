@@ -8,9 +8,10 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 
 -- | 
--- Checks if all chars are @< \'\256\'@
 --
 -- Should not be used directly, only as superset
+--
+-- Checks if all chars are @< \'\256\'@
 --
 -- Encoding functions are here for test support only, no instances
 --
@@ -19,6 +20,7 @@ module Data.TypedEncoding.Instances.Restriction.CHAR8 where
 
 import           Data.TypedEncoding.Instances.Support
 import           Data.TypedEncoding.Common.Class.Util.StringConstraints
+import           Data.TypedEncoding.Instances.Restriction.ByteRep (encImpl, CharOutOfRange (..))
 
 import           Data.TypedEncoding.Internal.Util (explainBool)
 import           Data.Char
@@ -29,40 +31,13 @@ import           Data.Char
 
 
 -----------------
--- Encodings  --
+-- Test Encodings  --
 -----------------
 
-data CharOutOfRange = CharOutOfRange Int Char deriving (Eq, Show)
+testEncChar8Char :: Encoding (Either EncodeEx) "r-CHAR8" "r-CHAR8" c Char 
+testEncChar8Char = _implEncodingEx (\c -> explainBool (CharOutOfRange 255) (c, (> 255) . ord $ c))    
 
--- * Encoding @"r-CHAR8"@
+testEncCHAR8 :: Char8Find str =>  Encoding (Either EncodeEx) "r-CHAR8" "r-CHAR8" c str
+testEncCHAR8 = _implEncodingEx @"r-CHAR8" (encImpl 255)
 
--- instance Encode (Either EncodeEx) "r-CHAR8" "r-CHAR8" c Char where
---     encoding = encChar8Char    
-
--- instance CharFind str => Encode (Either EncodeEx) "r-CHAR8" "r-CHAR8" c str where
---     encoding = encCHAR8
-
-encChar8Char :: Encoding (Either EncodeEx) "r-CHAR8" "r-CHAR8" c Char 
-encChar8Char = _implEncodingEx (\c -> explainBool (CharOutOfRange 255) (c, (> 255) . ord $ c))    
-
-encCHAR8 :: CharFind str =>  Encoding (Either EncodeEx) "r-CHAR8" "r-CHAR8" c str
-encCHAR8 = _implEncodingEx @"r-CHAR8" (encImpl 255)
-
-
--- * Decoding @"r-CHAR8"@
-
--- instance (Applicative f) => Decode f "r-CHAR8" "r-CHAR8" c str where
---     decoding = decAnyR
-    
--- instance (CharFind str, RecreateErr f, Applicative f) => Validate f "r-CHAR8" "r-CHAR8" () str where
---     validation = validR encCHAR8
-
-
--- * Implementation 
-
--- 255 for CHAR8
-encImpl :: CharFind str => Int -> str -> Either CharOutOfRange str
-encImpl bound str = case findChar ((> bound) . ord) str of 
-    Nothing -> Right str
-    Just ch -> Left $ CharOutOfRange bound ch
 
