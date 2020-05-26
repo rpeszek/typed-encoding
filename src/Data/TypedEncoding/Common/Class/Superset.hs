@@ -163,6 +163,10 @@ propEncodesInto_ = propEncodesInto' @algb @algr
 -- | 
 -- Aggregate version of 'EncodingSuperset' 
 --
+-- This is not ideal but easy to implement.
+-- The issue is that this assumes restricted co-domain which is what often happens
+-- but often does not,  e.g. it will not work well with id transformation.
+--
 -- @since 0.4.0.0
 class AllEncodeInto (superset :: Symbol) (encnms :: [Symbol]) where
      
