@@ -1,12 +1,14 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE PolyKinds #-} -- removes need to annotate kinds as [Symbol]
+{-# LANGUAGE FlexibleContexts #-}
 
 -- | Text encoding combinators specific to 'T.Text'
 -- @since 0.2.2.0
 module Data.TypedEncoding.Conv.Text where
 
 import qualified Data.Text as T
+import qualified Data.TypedEncoding.Common.Util.TypeLits as Knds
 import           Data.TypedEncoding.Instances.Support
 
 
@@ -15,11 +17,21 @@ import           Data.TypedEncoding.Instances.Support
 
 
 -- | This assumes that each of the encodings in @xs@ work work equivalently in @String@ and @Text@. 
-pack :: Enc xs c String -> Enc xs c T.Text
+pack :: (
+          Knds.UnSnoc xs ~ '(,) ys y
+         , Superset "r-UNICODE.D76" y 
+         , encs ~ RemoveRs ys
+         , AllEncodeInto "r-UNICODE.D76" encs
+          ) => Enc xs c String -> Enc xs c T.Text
 pack = unsafeChangePayload T.pack
 
 -- | This assumes that each of the encodings in @xs@ work work equivalently in @String@ and @Text@. 
-unpack :: Enc xs c T.Text -> Enc xs c String
+unpack :: (
+          Knds.UnSnoc xs ~ '(,) ys y
+         , Superset "r-UNICODE.D76" y 
+         , encs ~ RemoveRs ys
+         , AllEncodeInto "r-UNICODE.D76" encs
+          ) => Enc xs c T.Text -> Enc xs c String
 unpack = unsafeChangePayload T.unpack 
 
 -- | 
@@ -42,3 +54,10 @@ utf8Promote = withUnsafeCoerce id
 -- "Enc '[] () (Text Hello)"
 utf8Demote :: (UnSnoc xs ~ '(,) ys "r-UTF8") => Enc xs c T.Text -> Enc ys c T.Text
 utf8Demote = withUnsafeCoerce id
+
+
+d76Promote :: Enc xs c T.Text -> Enc (Snoc xs "r-UNICODE.D76") c T.Text
+d76Promote = withUnsafeCoerce id
+
+d76Demote :: (UnSnoc xs ~ '(,) ys "r-UNICODE.D76") => Enc xs c T.Text -> Enc ys c T.Text
+d76Demote = withUnsafeCoerce id

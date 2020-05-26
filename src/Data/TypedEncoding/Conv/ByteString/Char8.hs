@@ -18,18 +18,14 @@ import           Data.TypedEncoding.Instances.Support
 -- | 
 -- Type safer version of 'Data.ByteString.Char8.pack'.
 -- 
--- This assumes that each of the encodings in @xs@ work work equivalently in @String@ and @ByteString@.
---
--- This function assumes that encoding stack @xs@ does not shift characters outside of Char8 range.  
--- This is obviously true for all "r-" types
--- it is also true for any "enc-" and "do-" encodings currently available in this package. However, is possible to define a "do-" or "enc-" encodings that violate that. 
--- Future versions of /type-encoding/ are likely 
--- to introduce constraints to guard this aspect of the type safety better. 
+-- This assumes that each of the encodings in @xs@ work equivalently in @String@ and @ByteString@.
 --
 -- This function also (currently) does not insist that @xs@ is a valid encoding stack for @ByteString@. 
 -- This will be reexamined in the future, possibly offering alternatives with different safety levels.
 --
--- Currently this uses (an over-conservative) @"r-ASCII"@ superset constraint.
+-- Expected encoding stack @xs@ needs to have @"r-" as last element and it needs to be more restrictive 
+-- than "r-CHAR8" (String cannot have chars @> 255@).  Otherwise any encodings other than "r-" need to 
+-- encode into "r-CHAR8".
 --
 -- See "Data.TypedEncoding.Conv" for more detailed discussion.
 --
@@ -37,14 +33,18 @@ import           Data.TypedEncoding.Instances.Support
 -- ...
 -- ... error:
 -- ... Couldn't match type ...
--- ... "r-ASCII" "r-foo" ...
 -- ...
 --
 -- >>> displ $ pack (unsafeSetPayload () "Hello" :: Enc '["r-bar", "r-ASCII"] () String)
 -- "Enc '[r-bar,r-ASCII] () (ByteString Hello)"
 --
--- @since 0.2.2.0
-pack :: (Knds.LLast xs ~ t, IsSuperset "r-ASCII" t ~ 'True) => Enc xs c String -> Enc xs c B8.ByteString
+--  @since 0.4.0.0
+pack :: (
+    Knds.UnSnoc xs ~ '(,) ys y
+    , Superset "r-CHAR8" y
+    , encs ~ RemoveRs ys
+    , AllEncodeInto "r-CHAR8" encs
+    ) => Enc xs c String -> Enc xs c B8.ByteString
 pack = unsafeChangePayload B8.pack
 
 -- | @unpack@ on encoded strings.
@@ -56,8 +56,12 @@ pack = unsafeChangePayload B8.pack
 -- Future versions of /type-encoding/ are likely 
 -- to introduce constraints to guard this aspect of the type safety better. 
 --
--- @since 0.2.2.0
-unpack :: (Knds.LLast xs ~ t, IsSuperset "r-ASCII" t ~ 'True) => Enc xs c B8.ByteString -> Enc xs c String
+-- @since 0.4.0.0
+unpack :: (
+          Knds.UnSnoc xs ~ '(,) ys y
+         , Superset "r-CHAR8" y
+         , encs ~ RemoveRs ys
+         , AllEncodeInto "r-CHAR8" encs
+          ) => Enc xs c B8.ByteString -> Enc xs c String
 unpack = unsafeChangePayload B8.unpack      
 
--- TODO consider adding "r-CHAR8"

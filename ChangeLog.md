@@ -6,6 +6,31 @@
 - (post 0.3) "enc-B64" will be moved to a different package (more distant goal)
 - Improved constrains in `Data.TypedEncoding.Conv` modules
 
+##
+
+- Breaking 
+  - IsSupersetOpen type family type arguments have changed
+
+- Potentially Breaking  
+  (These changes should be backward compatible in almost all cases):
+  - Stronger (more precise) constraints on all functions `Data.TypedEncoding.Conv`
+  - Compilation errors emitted from `IsSuperset` are different
+  - "r-ban" now only allows ASCII chars in annotation name, errors-out otherwise
+   
+- New
+  - `"r-CHAR8"` phantom restriction and `Superset` modified for "r-CHAR8"
+  - `"r-UNICODE.D76"` /text/ character set restriction and `Superset` modifications
+  - `Superset` constraint added back (different than in 0.2)
+  - properties for `Superset` testing
+  - `"r-ByteRep"` annotation used as a marker of low level use of `Char` instead of `Word8` for `ByteString` work.
+
+- Improved:
+  - `Data.TypedEncoding.Conv` `Text`, `String` and `ByteString` conversions are now more type safe and less error prone.
+    Conversion functions are reversible, A to B to C diagrams commute.
+
+- Fixes:
+  - `Data.TypedEncoding.Instances.Restriction.BoundedAlphaNums` `"r-ban"` now verifies `Superset "r-ASCII"`
+  
 ## 0.3.0.2
 
 - Added documentation to `Data.TypedEncoding.Conv` outlining current limitations, challenges of conversions.
