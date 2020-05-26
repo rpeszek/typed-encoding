@@ -63,18 +63,18 @@ type family IsSuperset (y :: Symbol) (x :: Symbol) :: Bool where
     IsSuperset "r-UTF8"  "r-UTF8" = 'True
     IsSuperset "r-CHAR8" "r-ASCII" = 'True  -- "r-CHAR8" is phantom, no explicit instances so it does not need reflexive case
     IsSuperset "r-CHAR8" "r-ByteRep" = 'True
-    IsSuperset "r-CHAR8" x = Or (IsSuperset "r-ASCII" x) (IsSupersetOpen "r-CHAR8" (TakeUntil x ":") (ToList x))
+    IsSuperset "r-CHAR8" x = Or (IsSuperset "r-ASCII" x) (IsSupersetOpen "r-CHAR8" x (TakeUntil x ":") (ToList x))
     IsSuperset "r-UNICODE.D76" "r-UNICODE.D76" = 'True 
     IsSuperset "r-UNICODE.D76" "r-ASCII" = 'True 
-    IsSuperset "r-UNICODE.D76" x = Or (IsSuperset "r-CHAR8" x) (IsSupersetOpen "r-UNICODE.D76" (TakeUntil x ":") (ToList x))
-    IsSuperset y x = IsSupersetOpen y (TakeUntil x ":") (ToList x)
+    IsSuperset "r-UNICODE.D76" x = Or (IsSuperset "r-CHAR8" x) (IsSupersetOpen "r-UNICODE.D76" x (TakeUntil x ":") (ToList x))
+    IsSuperset y x = IsSupersetOpen y x (TakeUntil x ":") (ToList x)
 
 -- backward compatible r-CHAR8
 -- IsSuperset "r-CHAR8" x = Or (IsSuperset "r-ASCII" x) (IsSupersetOpen "r-CHAR8" (TakeUntil x ":") (ToList x))
 
 -- |
 -- @since 0.2.2.0
-type family IsSupersetOpen (y :: Symbol) (x :: Symbol) (xs :: [Symbol]) :: Bool
+type family IsSupersetOpen (big :: Symbol) (nm :: Symbol) (alg :: Symbol) (nmltrs :: [Symbol]) :: Bool
 
 type Superset big small = (IsSuperset big small ~ 'True)
 

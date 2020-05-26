@@ -52,7 +52,7 @@ type family IsBan (s :: Symbol) :: Bool where
 
 type Ban s = (KnownSymbol s, IsBan s ~ 'True)
 
-type instance IsSupersetOpen "r-ASCII" "r-ban" xs = 'True
+type instance IsSupersetOpen "r-ASCII" x "r-ban" xs = 'True
 
 
 instance (Ban s, Algorithm s "r-ban", IsStringR str) => Encode (Either EncodeEx) s "r-ban" c str where

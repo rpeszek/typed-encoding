@@ -8,10 +8,14 @@
 
 ##
 
-- Breaking (from a practical standpoint all changes should be backward compatible):
+- Breaking 
+  - IsSupersetOpen type family type arguments have changed
+
+- Potentially Breaking  
+  (These changes should be backward compatible in almost all cases):
   - Stronger (more precise) constraints on all functions `Data.TypedEncoding.Conv`
   - Compilation errors emitted from `IsSuperset` are different
-  - "r-ban" now only allows ASCII, errors-out otherwise
+  - "r-ban" now only allows ASCII chars in annotation name, errors-out otherwise
    
 - New
   - `"r-CHAR8"` phantom restriction and `Superset` modified for "r-CHAR8"
