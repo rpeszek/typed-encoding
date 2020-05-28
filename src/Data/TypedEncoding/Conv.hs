@@ -80,6 +80,9 @@
 -- @
 --
 -- @"r-UNICODE.D76"@ and @"r-UTF8"@ is considered redundant for @T.Text@ and can be added or dropped as needed.
+--
+-- (This library currently assumes that @"r-UTF8"@ includes the UNICODE.D76 restriction. This works well with
+-- assumptions made by 'T.Text').
 -- 
 -- Corresponding pairs reverse, this should be clear since the types are restricted to what @T.Text@ can store or to 
 -- how @B8.Char@ works.
@@ -99,15 +102,16 @@
 -- There are many character set encodings that utilize one byte (/CHAR8/) and /UTF8/ is different from all of them
 -- but it backward compatible only within the /ASCII/ range of chars @ < 127@.  So the intersection should be /ASCII/, let us check that:
 --
+--
 -- @
 -- ghci> :t ETE.encodeUtf8 . ET.pack @'["r-ASCII"]
 -- EncTe.encodeUtf8 . EncT.pack @'["r-ASCII"]
 --  :: Enc [Symbol] ((':) Symbol "r-ASCII" ('[] Symbol)) c String
---     -> Enc [Symbol] ((':) Symbol "r-ASCII" ('[] Symbol)) c B.ByteString
+--     -> Enc [Symbol] ((':) Symbol "r-ASCII" ('[] Symbol)) c B8.ByteString
 --
--- ghci> :t EncB8.pack @'["r-ASCII"]
+-- ghci> :t EB8.pack @'["r-ASCII"]
 --  :: Enc [Symbol] ((':) Symbol "r-ASCII" ('[] Symbol)) c String
---    -> Enc [Symbol] ((':) Symbol "r-ASCII" ('[] Symbol)) c B.ByteString
+--    -> Enc [Symbol] ((':) Symbol "r-ASCII" ('[] Symbol)) c B8.ByteString
 -- @  
 --
 -- They both accept that common denominator.  
