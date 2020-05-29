@@ -5,7 +5,7 @@
 {-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE FlexibleContexts #-}
---{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE PartialTypeSignatures #-}
 --{-# LANGUAGE TypeApplications #-}
@@ -30,6 +30,7 @@ import           Data.Bits
 import           Data.Word
 import           Data.Text.Internal.Encoding.Utf8
 import qualified Data.Text as T
+import qualified Data.Text.Lazy as TL
 
 import Numeric (showHex, showIntAtBase)
 
@@ -142,7 +143,7 @@ between x y z = x >= y && x <= z
 checkUtf8 :: B.ByteString -> UTF8Progress
 checkUtf8 = B.foldr (flip categorize) Check
 
-tstBs = B.replicate 10000000 120
+tstBs = B.replicate 5000000000 120 <> "\xc3\x28"
 
 try1 :: IO ()
 try1 = do
@@ -153,10 +154,21 @@ try1 = do
 try2 :: IO ()
 try2 = do
     let str = tstBs
-        res = TE.decodeUtf8' str
+        res = TEL.decodeUtf8' . BL.fromStrict $ str
     case res of 
         Left err -> putStrLn $ show err
-        Right x -> putStrLn (show $ T.head x)
+        Right x -> putStrLn "done"
+
+tstBLs = BL.replicate 5000000000 120 <> "\xc3\x28"
+
+try3 :: IO ()
+try3 = do
+    let str = tstBLs 
+        res = TEL.decodeUtf8' str
+    case res of 
+        Left err -> putStrLn $ show err
+        Right x -> putStrLn "done"
+
 
 -- putStrLn $ showHex 12 "" -- prints "c"
 -- putStrLn $ showIntAtBase 2 intToDigit 12 "" -- prints "1100"
@@ -186,3 +198,10 @@ try2 = do
 verEncoding :: B.ByteString -> Either err B.ByteString -> Bool
 verEncoding bs (Left _) = isLeft . TE.decodeUtf8' $ bs
 verEncoding bs (Right _) = isRight . TE.decodeUtf8' $ bs
+
+
+implVerifyR :: (a -> Either err b) -> a -> Either err a
+implVerifyR fn a = 
+     case fn a of 
+         Left err -> Left err
+         Right _ -> Right a
