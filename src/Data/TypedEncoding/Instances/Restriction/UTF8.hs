@@ -10,7 +10,10 @@
 {-# LANGUAGE PartialTypeSignatures #-}
 --{-# LANGUAGE TypeApplications #-}
 
--- | 'UTF-8' encoding
+-- | 'UTF-8' encoding with additional assumption of conforming to Unicode.D76.
+--
+-- @"r-UTF-8"@ basically defines restriction on @ByteString@ that is needed for
+-- conversion to @Text@ to work.
 --
 -- @since 0.1.0.0
 module Data.TypedEncoding.Instances.Restriction.UTF8 where
@@ -49,7 +52,6 @@ import           Data.Either
 
 prxyUtf8 = Proxy :: Proxy "r-UTF8"
 
--- TODO these may need rethinking (performance)
 
 -- | UTF8 encodings are defined for ByteString only as that would not make much sense for Text
 --
@@ -57,7 +59,7 @@ prxyUtf8 = Proxy :: Proxy "r-UTF8"
 -- Right (UnsafeMkEnc Proxy () "\195\177")
 --
 -- >>> encodeFAll . toEncoding () $ "\xc3\x28" :: Either EncodeEx (Enc '["r-UTF8"] () B.ByteString)
--- Left (EncodeEx "r-UTF8" (Cannot decode byte '\xc3': Data.Text.Internal.Encoding.decodeUtf8: Invalid UTF-8 stream))
+-- Left (EncodeEx "r-UTF8" (Cannot decode byte '\xc3': ...
 --
 -- Following test uses 'verEncoding' helper that checks that bytes are encoded as Right iff they are valid UTF8 bytes
 --
@@ -77,14 +79,15 @@ instance Encode (Either EncodeEx) "r-UTF8" "r-UTF8" c B.ByteString where
 instance Encode (Either EncodeEx) "r-UTF8" "r-UTF8" c BL.ByteString where
     encoding = encUTF8BL :: Encoding (Either EncodeEx) "r-UTF8" "r-UTF8" c BL.ByteString
 
+
+-- using lazy decoding to detect errors seems to be the fastest option that is not super hard to code
+
 encUTF8B :: Encoding (Either EncodeEx) "r-UTF8" "r-UTF8" c B.ByteString
-encUTF8B = _implEncodingEx (fmap TE.encodeUtf8 . TE.decodeUtf8')
-{-# WARNING encUTF8B "This method was not optimized for performance." #-}
+encUTF8B = _implEncodingEx (implVerifyR (TEL.decodeUtf8' . BL.fromStrict)) 
 
 
 encUTF8BL :: Encoding (Either EncodeEx) "r-UTF8" "r-UTF8" c BL.ByteString
-encUTF8BL = _implEncodingEx (fmap TEL.encodeUtf8 . TEL.decodeUtf8')
-{-# WARNING encUTF8BL "This method was not optimized for performance." #-}
+encUTF8BL = _implEncodingEx (implVerifyR TEL.decodeUtf8')
 
 -- * Decoding
 
@@ -106,3 +109,10 @@ instance (RecreateErr f, Applicative f) =>  Validate f "r-UTF8" "r-UTF8" c BL.By
 verEncoding :: B.ByteString -> Either err B.ByteString -> Bool
 verEncoding bs (Left _) = isLeft . TE.decodeUtf8' $ bs
 verEncoding bs (Right _) = isRight . TE.decodeUtf8' $ bs
+
+-- | private implementation helper
+implVerifyR :: (a -> Either err b) -> a -> Either err a
+implVerifyR fn a = 
+     case fn a of 
+         Left err -> Left err
+         Right _ -> Right a
