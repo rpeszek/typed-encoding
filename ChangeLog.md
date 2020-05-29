@@ -6,7 +6,12 @@
 - (post 0.3) "enc-B64" will be moved to a different package (more distant goal)
 - Improved constrains in `Data.TypedEncoding.Conv` modules
 
-##
+## unreleased
+
+- Backward compatible
+   - changed order in `IsSuperset` definition to speed up compilation of of more common cases (there is a small chance that it impacts GHC error messages)
+
+## 0.4
 
 - Breaking 
   - IsSupersetOpen type family type arguments have changed
