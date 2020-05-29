@@ -9,6 +9,7 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE PartialTypeSignatures #-}
 --{-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE BinaryLiterals #-}
 
 -- | 'UTF-8' encoding
 --
@@ -25,9 +26,17 @@ import qualified Data.Text.Encoding as TE
 import qualified Data.Text.Lazy.Encoding as TEL 
 import           Data.Either
 
+import           Data.Bits
+import           Data.Word
+import           Data.Text.Internal.Encoding.Utf8
+import qualified Data.Text as T
+
+import Numeric (showHex, showIntAtBase)
+
+import Data.Char (intToDigit)
 
 -- $setup
--- >>> :set -XScopedTypeVariables -XKindSignatures -XMultiParamTypeClasses -XDataKinds -XPolyKinds -XPartialTypeSignatures -XFlexibleInstances -XTypeApplications
+-- >>> :set -XBinaryLiterals -XOverloadedStrings -XScopedTypeVariables -XKindSignatures -XMultiParamTypeClasses -XDataKinds -XPolyKinds -XPartialTypeSignatures -XFlexibleInstances -XTypeApplications
 -- >>> import Test.QuickCheck
 -- >>> import Test.QuickCheck.Instances.Text()
 -- >>> import Test.QuickCheck.Instances.ByteString()
@@ -97,6 +106,77 @@ instance (RecreateErr f, Applicative f) =>  Validate f "r-UTF8" "r-UTF8" c B.Byt
 instance (RecreateErr f, Applicative f) =>  Validate f "r-UTF8" "r-UTF8" c BL.ByteString  where
     validation = validR encUTF8BL
 
+
+
+data UTF8Progress = Check | TwoB2 | ThreeB2 | ThreeB2R | ThreeB3 | FourB2 | FourB3 | FourB4 deriving Show
+
+progress :: UTF8Progress -> UTF8Progress
+progress ThreeB2 = ThreeB3
+progress ThreeB2R = ThreeB3
+progress FourB2 = FourB3
+progress FourB3 = FourB4
+progress _ = Check
+{-# INLINE progress #-}
+
+categorize :: UTF8Progress -> Word8 -> UTF8Progress
+categorize Check w 
+                | w <= 0x7F = Check
+                | w <= 0xDF = TwoB2
+                | w == 0xED = ThreeB2R
+                | w <= 0xEF = ThreeB2
+                | w <= 0xF7 = FourB2
+                | otherwise = error $ "Check " ++ showHex w ""             
+categorize ThreeB2R w 
+                | between w 0x80 0xA0 = ThreeB3
+                | otherwise = error $ "D76 " ++ showHex w ""   
+categorize r w 
+                | between w 0x80 0xbf = progress r
+                | otherwise = error $ show r ++ " " ++ showHex w ""   
+{-# INLINE categorize #-}
+
+
+between x y z = x >= y && x <= z
+{-# INLINE between #-}
+
+
+checkUtf8 :: B.ByteString -> UTF8Progress
+checkUtf8 = B.foldr (flip categorize) Check
+
+tstBs = B.replicate 10000000 120
+
+try1 :: IO ()
+try1 = do
+    let str = tstBs
+        res = checkUtf8 str
+    putStrLn $ show res  
+
+try2 :: IO ()
+try2 = do
+    let str = tstBs
+        res = TE.decodeUtf8' str
+    case res of 
+        Left err -> putStrLn $ show err
+        Right x -> putStrLn (show $ T.head x)
+
+-- putStrLn $ showHex 12 "" -- prints "c"
+-- putStrLn $ showIntAtBase 2 intToDigit 12 "" -- prints "1100"
+
+-- 0b01111111
+-- 0b11011111
+-- 0b11101111
+-- 0b11110000
+-- 0b11110111
+
+-- 0b11101101
+
+
+
+-- 0b10000000
+-- 0b10111111
+
+
+-- @"\xd800"@  (@11101101 10100000 10000000@ @ed a0 80@)
+-- "\xdfff"    (@11101101 10111111 10111111@ @ed bf bf@)
 
 --- Utilities ---
 
