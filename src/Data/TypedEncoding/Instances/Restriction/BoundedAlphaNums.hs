@@ -85,7 +85,7 @@ instance (KnownSymbol s, Restriction s, Algorithm s "r-ban", Applicative f) => D
 -- * Validation
 
 instance (KnownSymbol s , Ban s, Algorithm s "r-ban", IsStringR str, RecreateErr f, Applicative f) => Validate f s "r-ban" c str where
-    validation = validFromEnc' @"r-ban" encFBan
+    validation = validRFromEnc' @"r-ban" encFBan
 
 
 -- * Implementation

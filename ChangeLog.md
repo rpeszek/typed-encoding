@@ -8,8 +8,18 @@
 
 ## unreleased
 
-- Backward compatible
+- Code Changes. Backward compatible
    - changed order in `IsSuperset` definition to speed up compilation of of more common cases (there is a small chance that it impacts GHC error messages)
+   - Faster "r-UTF8", possible issue is changed error message in case ByteString is invalid.
+   - Deprecated 'validFromEnc' for its confusing name
+
+- Documentation / code comment fixes and improvements.
+
+- New functionality `validRFromEnc'` replacing 'validFromEnc' confusing name
+- `propCompEncoding` propery
+
+- Fixes
+  - corrected `propEncodesInto'` property test specification
 
 ## 0.4
 

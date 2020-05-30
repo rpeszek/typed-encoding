@@ -69,6 +69,8 @@ type family IsSuperset (y :: Symbol) (x :: Symbol) :: Bool where
     IsSuperset "r-CHAR8" x = Or (IsSuperset "r-ASCII" x) (IsSupersetOpen "r-CHAR8" x (TakeUntil x ":") (ToList x))
     IsSuperset y x = IsSupersetOpen y x (TakeUntil x ":") (ToList x)
 
+-- TODO introduce "r-NODEC" which is subset of everything
+
 -- backward compatible r-CHAR8
 -- IsSuperset "r-CHAR8" x = Or (IsSuperset "r-ASCII" x) (IsSupersetOpen "r-CHAR8" (TakeUntil x ":") (ToList x))
 
@@ -140,14 +142,12 @@ _encodesInto = injectInto . implEncInto
 -- Actual tests in the project /test/ suite.
 propEncodesInto' :: forall algb algr b r str . (EncodingSuperset b, r ~ EncSuperset b, Eq str) => Encoding (Either EncodeEx) b algb () str -> Encoding (Either EncodeEx) r algr () str -> str -> Bool
 propEncodesInto' encb encr str = 
-    case rb of
-        Left _ -> True
-        Right enc -> case runEncoding' @algr encr . toEncoding () $ getPayload enc of
-            Right _ -> True
-            Left _ -> False  
-    where
-        rb = runEncoding' @algb encb . toEncoding () $ str 
-
+   case runEncoding' @algb encb . toEncoding () $ str of
+            Right r -> case runEncoding' @algr encr . toEncoding () $ getPayload r of
+                Left _ -> False
+                Right _ -> True
+            Left _ -> True  
+ 
 propEncodesInto_ :: forall b r str algb algr. (
     EncodingSuperset b
     , r ~ EncSuperset b
@@ -159,6 +159,21 @@ propEncodesInto_ :: forall b r str algb algr. (
        -> str 
        -> Bool
 propEncodesInto_ = propEncodesInto' @algb @algr
+
+
+-- TODO add generic encodable prop which checks that b is less likely to exception than s
+
+-- | Checks if first encoding exceptions less often than second (has bigger domain).
+propCompEncoding :: forall algb algr b r str .  Encoding (Either EncodeEx) b algb () str -> Encoding (Either EncodeEx) r algr () str -> str -> Bool
+propCompEncoding encb encr str = 
+    case rr of
+        Left _ -> True
+        Right _ -> case runEncoding' @algb encb . toEncoding () $ str of
+            Right _ -> True
+            Left _ -> False  
+    where
+        rr = runEncoding' @algr encr . toEncoding () $ str 
+
 
 -- | 
 -- Aggregate version of 'EncodingSuperset' 
