@@ -54,13 +54,18 @@ mkValidation = UnsafeMkValidation Proxy
 runValidation :: forall alg nm f xs conf str . Validation f nm alg conf str -> Enc (nm ': xs) conf str -> f (Enc xs conf str)
 runValidation (UnsafeMkValidation _ fn) = fn
 
+{-# DEPRECATED runValidation "Use runValidation''" #-}
+
+runValidation' :: forall alg nm f xs conf str . Validation f nm alg conf str -> Enc (nm ': xs) conf str -> f (Enc xs conf str)
+runValidation' (UnsafeMkValidation _ fn) = fn
+
 -- | Same as 'runValidation" but compiler figures out algorithm name
 --
 -- Using it can slowdown compilation
 --
 -- @since 0.3.0.0
 _runValidation :: forall nm f xs conf str alg . (AlgNm nm ~ alg) => Validation f nm alg conf str -> Enc (nm ': xs) conf str -> f (Enc xs conf str)
-_runValidation = runValidation @(AlgNm nm)
+_runValidation = runValidation' @(AlgNm nm)
 
 -- |
 -- Wraps a list of @Validation@ elements.
@@ -82,7 +87,7 @@ data Validations f (nms :: [Symbol]) (algs :: [Symbol]) conf str where
 runValidationChecks :: forall algs nms f c str . (Monad f) => Validations f nms algs c str -> Enc nms c str -> f (Enc ('[]::[Symbol]) c str)
 runValidationChecks ZeroV enc0 = pure enc0
 runValidationChecks (ConsV fn xs) enc = 
-        let re :: f (Enc _ c str) = runValidation fn enc
+        let re :: f (Enc _ c str) = runValidation' fn enc
         in re >>= runValidationChecks xs
 
 

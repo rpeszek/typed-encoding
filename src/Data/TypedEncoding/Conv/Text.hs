@@ -16,7 +16,9 @@ import           Data.TypedEncoding.Instances.Support
 -- >>> :set -XDataKinds -XTypeFamilies -XTypeApplications
 
 
--- | This assumes that each of the encodings in @xs@ work work equivalently in @String@ and @Text@. 
+-- | This assumes that each of the encodings in @xs@ work work equivalently in @String@ and @Text@.
+-- See discussion in "Examples.TypedEncoding.Conversions" and 
+-- "Data.TypedEncoding.Conv.ByteString.Char8.pack"
 pack :: (
           Knds.UnSnoc xs ~ '(,) ys y
          , Superset "r-UNICODE.D76" y 
@@ -25,7 +27,8 @@ pack :: (
           ) => Enc xs c String -> Enc xs c T.Text
 pack = unsafeChangePayload T.pack
 
--- | This assumes that each of the encodings in @xs@ work work equivalently in @String@ and @Text@. 
+-- | This assumes that each of the encodings in @xs@ work work equivalently in @String@ and @Text@.
+-- This is similar to the assumptions made in 'pack'. 
 unpack :: (
           Knds.UnSnoc xs ~ '(,) ys y
          , Superset "r-UNICODE.D76" y 

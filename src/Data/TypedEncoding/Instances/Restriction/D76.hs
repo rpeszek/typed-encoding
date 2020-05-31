@@ -12,7 +12,7 @@
 -- U+D800 to U+DFFF inclusive)
 --
 -- Note, no IsSuperset "r-UNICODE.D76" "r-CHAR8" mapping even though the numeric range of D76 includes all CHAR8 bytes.
--- This is more 'nominal' decision that prevents certain unwanted conversions from being possible.
+-- This is more /nominal/ decision that prevents certain unwanted conversions from being possible.
 --
 -- Similarly no IsSuperset "r-UNICODE.D76" "r-ByteRep", this annotation acts as a guard to what can go into @Text@.
 -- 

@@ -32,6 +32,14 @@ import qualified Data.ByteString.Base64.Lazy as BL64
 -- >>> import Test.QuickCheck
 -- >>> import Test.QuickCheck.Instances.Text()
 -- >>> import Test.QuickCheck.Instances.ByteString()
+-- >>> :{  
+-- instance Arbitrary (UncheckedEnc () B.ByteString) where 
+--      arbitrary = do
+--          payload <- frequency [ (5, fmap (getPayload . encodeAll @'["enc-B64"] @(). toEncoding ()) $ arbitrary) 
+--                             , (1, arbitrary)]
+--          pure $ toUncheckedEnc ["enc-B64"] () payload
+-- :}
+
 
 -----------------
 -- * Conversions
@@ -92,6 +100,7 @@ instance Applicative f => Encode f "enc-B64" "enc-B64" c B.ByteString where
     encoding = encB64B
 
 -- |
+--
 -- @since 0.3.0.0 
 encB64B :: Applicative f => Encoding f "enc-B64" "enc-B64" c B.ByteString
 encB64B = _implEncodingP B64.encode
@@ -130,6 +139,10 @@ instance (UnexpectedDecodeErr f, Applicative f) => Decode f "enc-B64" "enc-B64" 
 -- making undetectable changes, but error handling at this stage
 -- could verify that email was corrupted.
 --
+-- prop> _propSafeDecoding @"enc-B64" @() @B.ByteString encB64B decB64B ()
+-- 
+-- prop> _propSafeValidatedDecoding @"enc-B64" @() @B.ByteString validation decB64B () . getUncheckedPayload @() @B.ByteString
+--
 -- @since 0.3.0.0
 decB64B :: (UnexpectedDecodeErr f, Applicative f) => Decoding f "enc-B64" "enc-B64" c B.ByteString
 decB64B = _implDecodingF (asUnexpected @"enc-B64" . B64.decode)
@@ -140,6 +153,8 @@ instance (UnexpectedDecodeErr f, Applicative f) => Decode f "enc-B64" "enc-B64" 
     decoding = decB64BL
 
 -- |
+-- prop> _propSafeDecoding @"enc-B64" @() @BL.ByteString encB64BL decB64BL
+--
 -- @since 0.3.0.0 
 decB64BL :: (UnexpectedDecodeErr f, Applicative f) => Decoding f "enc-B64" "enc-B64" c BL.ByteString
 decB64BL = _implDecodingF (asUnexpected @"enc-B64" . BL64.decode)

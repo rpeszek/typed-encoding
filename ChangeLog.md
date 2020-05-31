@@ -6,22 +6,30 @@
 - (post 0.3) "enc-B64" will be moved to a different package (more distant goal)
 - Improved constrains in `Data.TypedEncoding.Conv` modules
 
-## unreleased
+## 0.4.1
 
 - Code Changes. Backward compatible
    - changed order in `IsSuperset` definition to speed up compilation of of more common cases (there is a small chance that it impacts GHC error messages)
    - Faster "r-UTF8", possible issue is changed error message in case ByteString is invalid.
    - Deprecated 'validFromEnc' for its confusing name
+   - Deprecated `runDecodings` in favor of consistently named `runDecodings'`
+   - Deprecated `runDecoding` in favor of consistently named `runDecoding'`
+   - Deprecated `runValidation` in favor of consistently named `runValidation'`
 
 - Documentation / code comment fixes and improvements.
 
 - New functionality `validRFromEnc'` replacing 'validFromEnc' confusing name
   - `propCompEncoding` property
+  - `propSupersetCheck` property
+  - `propSafeDecoding'` properties
+  - `propSafeValidatedDecoding` properties
   - `IsEnc` type family and `Encoding` constraint
-
+  - `getUncheckedPayload` function
+  - `pack` and `unpack` overloads in `Data.TypedEncoding.Conv.ByteString.Char8`
 
 - Fixes
   - corrected `propEncodesInto'` property test specification
+
 
 ## 0.4
 

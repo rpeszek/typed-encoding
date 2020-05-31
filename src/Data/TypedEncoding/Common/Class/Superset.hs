@@ -54,7 +54,7 @@ import           Data.Either (isLeft)
 -- @IsSuperset bigger smaller@ reads as @bigger@ is a superset of @smaller@
 --
 -- Note, no IsSuperset "r-UNICODE.D76" "r-CHAR8" even though the numeric range of D76 includes all CHAR8 bytes.
--- This is more 'nominal' decision that prevents certain unwanted conversions from being possible.
+-- This is more /nominal/ decision that prevents certain unwanted conversions from being possible.
 --
 -- @since 0.2.2.0
 type family IsSuperset (y :: Symbol) (x :: Symbol) :: Bool where
@@ -101,7 +101,18 @@ propSuperset' :: forall algb algs b s str . (Superset b s, Eq str)
                  -> Encoding (Either EncodeEx) s algs () str 
                  -> str 
                  -> Bool
-propSuperset' encb encs str = 
+propSuperset' = propSupersetCheck @algb @algs
+        
+propSuperset_ :: forall b s str algb algs. (Superset b s, Eq str, AlgNm b ~ algb, AlgNm s ~ algs) => Encoding (Either EncodeEx) b algb () str -> Encoding (Either EncodeEx) s algs () str -> str -> Bool
+propSuperset_ = propSupersetCheck @algb @algs
+
+propSupersetCheck :: forall algb algs b s str . (Eq str) 
+                 => 
+                 Encoding (Either EncodeEx) b algb () str 
+                 -> Encoding (Either EncodeEx) s algs () str 
+                 -> str 
+                 -> Bool
+propSupersetCheck encb encs str = 
     case (isLeft rb, isLeft rs) of 
         (True, False) -> False
         (False, False) -> pb == ps
@@ -112,9 +123,6 @@ propSuperset' encb encs str =
         rs = runEncoding' @algs encs . toEncoding () $ str 
         pb = either (const str) id $ getPayload <$> rb
         ps = either (const str) id $ getPayload <$> rs
-        
-propSuperset_ :: forall b s str algb algs. (Superset b s, Eq str, AlgNm b ~ algb, AlgNm s ~ algs) => Encoding (Either EncodeEx) b algb () str -> Encoding (Either EncodeEx) s algs () str -> str -> Bool
-propSuperset_ = propSuperset' @algb @algs
 
 -- |
 -- IsSuperset is not intended for @"enc-"@ encodings. This class is.
