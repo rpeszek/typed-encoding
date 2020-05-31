@@ -47,6 +47,17 @@ pack :: (
     ) => Enc xs c String -> Enc xs c B8.ByteString
 pack = unsafeChangePayload B8.pack
 
+-- |
+-- Version of pack that works without first "r-" encoding
+--  @since 0.4.1.0
+pack'' :: (
+    Knds.UnSnoc xs ~ '(,) ys y
+    , EncodingAnn y
+    , encs ~ RemoveRs ys
+    , AllEncodeInto "r-CHAR8" encs
+    ) => Enc xs c String -> Enc xs c B8.ByteString
+pack'' = unsafeChangePayload B8.pack
+
 -- | @unpack@ on encoded strings.
 --
 -- See 'pack'
@@ -65,3 +76,14 @@ unpack :: (
           ) => Enc xs c B8.ByteString -> Enc xs c String
 unpack = unsafeChangePayload B8.unpack      
 
+
+-- |
+-- Version of pack that works without first "r-" encoding
+--  @since 0.4.1.0
+unpack'' :: (
+          Knds.UnSnoc xs ~ '(,) ys y
+         , EncodingAnn y
+         , encs ~ RemoveRs ys
+         , AllEncodeInto "r-CHAR8" encs
+          ) => Enc xs c B8.ByteString -> Enc xs c String
+unpack'' = unsafeChangePayload B8.unpack     

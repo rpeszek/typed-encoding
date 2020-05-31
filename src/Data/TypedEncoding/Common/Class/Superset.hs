@@ -69,10 +69,8 @@ type family IsSuperset (y :: Symbol) (x :: Symbol) :: Bool where
     IsSuperset "r-CHAR8" x = Or (IsSuperset "r-ASCII" x) (IsSupersetOpen "r-CHAR8" x (TakeUntil x ":") (ToList x))
     IsSuperset y x = IsSupersetOpen y x (TakeUntil x ":") (ToList x)
 
--- TODO introduce "r-NODEC" which is subset of everything
+-- TODO introduce "r-NODEC" which does not decode
 
--- backward compatible r-CHAR8
--- IsSuperset "r-CHAR8" x = Or (IsSuperset "r-ASCII" x) (IsSupersetOpen "r-CHAR8" (TakeUntil x ":") (ToList x))
 
 -- |
 -- @since 0.2.2.0
@@ -160,8 +158,6 @@ propEncodesInto_ :: forall b r str algb algr. (
        -> Bool
 propEncodesInto_ = propEncodesInto' @algb @algr
 
-
--- TODO add generic encodable prop which checks that b is less likely to exception than s
 
 -- | Checks if first encoding exceptions less often than second (has bigger domain).
 propCompEncoding :: forall algb algr b r str .  Encoding (Either EncodeEx) b algb () str -> Encoding (Either EncodeEx) r algr () str -> str -> Bool

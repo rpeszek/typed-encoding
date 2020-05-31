@@ -81,6 +81,7 @@ instance Encode (Either EncodeEx) "r-UTF8" "r-UTF8" c BL.ByteString where
 
 
 -- using lazy decoding to detect errors seems to be the fastest option that is not super hard to code
+-- TODO v0.4.1 test performance
 
 encUTF8B :: Encoding (Either EncodeEx) "r-UTF8" "r-UTF8" c B.ByteString
 encUTF8B = _implEncodingEx (implVerifyR (TEL.decodeUtf8' . BL.fromStrict)) 

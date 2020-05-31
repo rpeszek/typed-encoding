@@ -16,7 +16,9 @@
 - Documentation / code comment fixes and improvements.
 
 - New functionality `validRFromEnc'` replacing 'validFromEnc' confusing name
-- `propCompEncoding` propery
+  - `propCompEncoding` property
+  - `IsEnc` type family and `Encoding` constraint
+
 
 - Fixes
   - corrected `propEncodesInto'` property test specification
