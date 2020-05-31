@@ -26,13 +26,21 @@ import           GHC.TypeLits
 type EncAnn = String    
 
 -- | 
--- Contraint for "r-" annotations.
+-- Constraint for "r-" annotations.
 --
 -- @since 0.3.0.0
 type Restriction s = (KnownSymbol s, IsR s ~ 'True)
 
+
 -- | 
--- Contraint for algorithm name.
+-- Constraint for "r-" annotations.
+--
+-- @since 0.4.1.0
+type EncodingAnn s = (KnownSymbol s, IsEnc s ~ 'True)
+
+
+-- | 
+-- Constraint for algorithm name.
 --
 -- @since 0.3.0.0
 type Algorithm nm alg = AlgNm nm ~ alg
@@ -87,3 +95,13 @@ type family IsROrEmpty (s :: Symbol) :: Bool where
 type family RemoveRs (s :: [Symbol]) :: [Symbol] where
     RemoveRs '[] = '[]
     RemoveRs (x ': xs) = If (OrdBool (CmpSymbol "r-" (Take 2 x))) (RemoveRs xs) (x ': RemoveRs xs) 
+
+
+-- | 
+-- >>> :kind! IsEnc "enc-boo"
+-- ...
+-- = 'True
+--
+-- @since 0.4.1.0 
+type family IsEnc (s :: Symbol) :: Bool where
+    IsEnc s = AcceptEq ('Text "Not enc- encoding " ':<>: ShowType s ) (CmpSymbol "enc-" (Take 4 s))

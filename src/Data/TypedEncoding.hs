@@ -1,4 +1,8 @@
 
+{-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE DataKinds #-}
 -- |
 -- = Overview
 --
@@ -149,7 +153,14 @@ module Data.TypedEncoding (
 
     -- * @UncheckedEnc@ is an /untyped/ version of Enc that represents not validated encoding      
     , module Data.TypedEncoding.Common.Types.UncheckedEnc
- 
+
+    -- * Laws / properties
+
+    , propSafeDecoding' 
+    , _propSafeDecoding
+    , propSafeValidatedDecoding'
+    , _propSafeValidatedDecoding
+
     -- * Classes
     , module Data.TypedEncoding.Common.Class
   
@@ -187,3 +198,64 @@ import           Data.TypedEncoding.Combinators.Validate
 import           Data.TypedEncoding.Combinators.Unsafe
 import           Data.TypedEncoding.Combinators.ToEncStr
 import           Data.TypedEncoding.Combinators.Promotion
+
+
+-- | 
+-- Main property that encodings are expected to enforce.
+--
+-- Decoding is safe and can use @Identity@ instance of 'UnexpectedDecodeErr'.
+--
+-- Errors are handled during the encoding phase.
+propSafeDecoding' :: forall alg nm c str. (Eq c, Eq str) =>
+                     Encoding (Either EncodeEx) nm alg c str 
+                     -> Decoding (Either UnexpectedDecodeEx) nm alg c str 
+                     -> c 
+                     -> str 
+                     -> Bool
+propSafeDecoding' encf decf c str = Right enc0 == edec
+   where 
+       enc0 = toEncoding c str
+       eenc = runEncoding' @alg encf enc0
+       edec = case eenc of 
+           Right enc -> either (Left . show) Right $ runDecoding' @alg decf enc
+           Left enc -> Right enc0 -- quick and dirty, magically decode all encoded failures  
+
+
+_propSafeDecoding :: forall nm c str alg . (Algorithm nm alg, Eq c, Eq str) => 
+                     Encoding (Either EncodeEx) nm alg c str 
+                     -> Decoding (Either UnexpectedDecodeEx) nm alg c str 
+                     -> c 
+                     -> str 
+                     -> Bool
+_propSafeDecoding = propSafeDecoding' @(AlgNm nm)
+
+-- |
+-- Similar to 'propSafeDecoding'' but 'Validation' based.
+-- 'Validation' acts as 'Decoding' recovering original payload value.
+-- Recovering with validation keeps the encoded value and that value
+-- is supposed to decode without error. 
+--
+-- Expects input of encoded values
+propSafeValidatedDecoding' :: forall alg nm c str. (Eq c, Eq str) =>
+                     Validation (Either RecreateEx) nm alg c str 
+                     -> Decoding (Either UnexpectedDecodeEx) nm alg c str 
+                     -> c 
+                     -> str 
+                     -> Bool
+propSafeValidatedDecoding' validf decf c str = edec == echeck
+   where 
+       enc0 = toEncoding c str
+       valfs = validf `ConsV` ZeroV
+       eenc = recreateWithValidations @'[alg] @'[nm] valfs enc0 
+       (edec :: Either String str, echeck :: Either String str) = case eenc of 
+           Right enc -> (either (Left . show) (Right . getPayload) $ runDecoding' @alg decf enc
+                         , either (Left . show) (Right . getPayload) $ runValidation' @alg validf enc)
+           Left _ -> (Left "not-recovered", Left "not-recovered")  
+
+_propSafeValidatedDecoding :: forall nm c str alg. (Algorithm nm alg, Eq c, Eq str) =>
+                     Validation (Either RecreateEx) nm alg c str 
+                     -> Decoding (Either UnexpectedDecodeEx) nm alg c str 
+                     -> c 
+                     -> str 
+                     -> Bool
+_propSafeValidatedDecoding = propSafeValidatedDecoding' @(AlgNm nm)

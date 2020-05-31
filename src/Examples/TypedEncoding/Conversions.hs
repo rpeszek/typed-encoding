@@ -30,7 +30,7 @@
 --
 -- Conversions aim at providing type safety when moving between encoded string-like types.
 --
--- __The assumption__ made by `typed-encoding` is that encodings work in equivalent way independently of the payload type.
+-- __The assumption__ made by `typed-encoding` is that @"enc-"@ encodings work in an equivalent way independently of the payload type.
 -- For example, if the following instances exist:
 --
 -- @
@@ -51,8 +51,14 @@
 --
 -- (@unpack@ and $decode$ are expected to satisfy similar diagrams, not shown)
 --
--- Basically, it should not matter which type we run the encoding on (other than performance cost).
+-- Basically, it should not matter which type we run the encoding (or decoding) on (other than performance cost).
 --
+-- Note that, as a consequence, multi-byte encodings (such as @enc-UTF8@ - available in /typed-encoding-encoding/ package) 
+-- that encode a Unicode characters into several bytes cannot be decoded
+-- in @ByteString@ as this would violate @EncB8.pack@ and @EncB8.unpack@ consistency.
+--
+-- Also note that this requirement is concerned about @"enc-"@ encodings, @"r-"@ encodings are much simpler to reason about 
+-- in conversions.
 --
 -- This module also discusses concepts of __Superset__ (for @"r-"@ encodings), __leniency__, and __flattening__. 
 module Examples.TypedEncoding.Conversions where

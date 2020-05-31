@@ -14,14 +14,16 @@ import           Data.TypedEncoding.Instances.Support
 
 -- $setup
 -- >>> :set -XDataKinds -XTypeApplications -XOverloadedStrings
+-- >>> import Data.TypedEncoding.Instances.Enc.Base64 ()
 
 -- | 
 -- Type safer version of 'Data.ByteString.Char8.pack'.
 -- 
 -- This assumes that each of the encodings in @xs@ work equivalently in @String@ and @ByteString@.
+-- See "Examples.TypedEncoding.Conversions".
 --
 -- This function also (currently) does not insist that @xs@ is a valid encoding stack for @ByteString@. 
--- This will be reexamined in the future, possibly offering alternatives with different safety levels.
+-- This will be reexamined in the future, possibly offering stricter overloads of @pack@.
 --
 -- Expected encoding stack @xs@ needs to have @"r-" as last element and it needs to be more restrictive 
 -- than "r-CHAR8" (String cannot have chars @> 255@).  Otherwise any encodings other than "r-" need to 
@@ -47,6 +49,21 @@ pack :: (
     ) => Enc xs c String -> Enc xs c B8.ByteString
 pack = unsafeChangePayload B8.pack
 
+-- |
+-- Version of pack that works without first "r-" encoding.
+--
+-- >>> displ $ pack'' (unsafeSetPayload () "SGVsbG8gV29ybGQ=" :: Enc '["enc-B64"] () String)
+-- "Enc '[enc-B64] () (ByteString SGVsbG8gV29ybGQ=)"
+--
+--  @since 0.4.1.0
+pack'' :: (
+    Knds.UnSnoc xs ~ '(,) ys y
+    , EncodingAnn y
+    , encs ~ RemoveRs ys
+    , AllEncodeInto "r-CHAR8" encs
+    ) => Enc xs c String -> Enc xs c B8.ByteString
+pack'' = unsafeChangePayload B8.pack
+
 -- | @unpack@ on encoded strings.
 --
 -- See 'pack'
@@ -65,3 +82,18 @@ unpack :: (
           ) => Enc xs c B8.ByteString -> Enc xs c String
 unpack = unsafeChangePayload B8.unpack      
 
+
+-- |
+-- Version of pack that works without first "r-" encoding
+--
+-- >>> displ $ unpack'' (unsafeSetPayload () "SGVsbG8gV29ybGQ=" :: Enc '["enc-B64"] () B8.ByteString)
+-- "Enc '[enc-B64] () (String SGVsbG8gV29ybGQ=)"
+--
+--  @since 0.4.1.0
+unpack'' :: (
+          Knds.UnSnoc xs ~ '(,) ys y
+         , EncodingAnn y
+         , encs ~ RemoveRs ys
+         , AllEncodeInto "r-CHAR8" encs
+          ) => Enc xs c B8.ByteString -> Enc xs c String
+unpack'' = unsafeChangePayload B8.unpack     

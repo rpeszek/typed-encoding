@@ -53,6 +53,16 @@ import           Data.TypedEncoding.Unsafe (withUnsafe)
 -- |
 -- With given constraints 'decodeUtf8' and 'encodeUtf8' can be used on subsets of @"r-UTF8"@
 --
+-- Note: For example, the @ByteString@ encoding of @"\xd800"@  (@11101101 10100000 10000000@ @ed a0 80@) is considered invalid /UTF8/ by the 'T.Text' library
+-- To be consistent we make the same assumption of also restricting representable Unicode chars as in /Unicode.D76/.
+--
+-- >>> TE.decodeUtf8 "\237\160\128"
+-- "*** Exception: Cannot decode byte '\xed': Data.Text.Internal.Encoding.decodeUtf8: Invalid UTF-8 stream
+-- 
+-- The "\xdfff" case (@11101101 10111111 10111111@ @ed bf bf@):
+-- >>> TE.decodeUtf8 "\237\191\191"
+-- "*** Exception: Cannot decode byte '\xed': Data.Text.Internal.Encoding.decodeUtf8: Invalid UTF-8 stream
+--
 -- >>> displ . decodeUtf8 $ (unsafeSetPayload () "Hello" :: Enc '["r-ASCII"] () B.ByteString)
 -- "Enc '[r-ASCII] () (Text Hello)"
 --

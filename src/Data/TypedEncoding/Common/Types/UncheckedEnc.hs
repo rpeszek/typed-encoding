@@ -44,6 +44,10 @@ toUncheckedEnc = MkUncheckedEnc
 getUncheckedEncAnn :: UncheckedEnc c str -> [EncAnn]
 getUncheckedEncAnn (MkUncheckedEnc ann _ _) = ann
 
+
+getUncheckedPayload :: forall c str . UncheckedEnc c str -> str
+getUncheckedPayload (MkUncheckedEnc _ _ str) = str
+
 -- |
 -- @since 0.2.0.0 
 verifyAnn :: forall xs c str . SymbolList xs => UncheckedEnc c str -> Either String (UncheckedEnc c str)

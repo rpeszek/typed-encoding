@@ -52,6 +52,13 @@ mkDecoding = UnsafeMkDecoding Proxy
 runDecoding :: forall alg nm f xs conf str . Decoding f nm alg conf str -> Enc (nm ': xs) conf str -> f (Enc xs conf str)
 runDecoding (UnsafeMkDecoding _ fn) = fn
 
+{-# DEPRECATED runDecoding "Use runDecoding'" #-}
+
+-- |
+-- @since 0.3.0.0
+runDecoding' :: forall alg nm f xs conf str . Decoding f nm alg conf str -> Enc (nm ': xs) conf str -> f (Enc xs conf str)
+runDecoding' (UnsafeMkDecoding _ fn) = fn
+
 -- | Same as 'runDecoding" but compiler figures out algorithm name
 --
 -- Using it can slowdown compilation
@@ -76,11 +83,16 @@ data Decodings f (nms :: [Symbol]) (algs :: [Symbol]) conf str where
 -- |
 -- @since 0.3.0.0
 runDecodings :: forall algs nms f c str . (Monad f) => Decodings f nms algs c str -> Enc nms c str -> f (Enc ('[]::[Symbol]) c str)
-runDecodings ZeroD enc0 = pure enc0
-runDecodings (ConsD fn xs) enc = 
+runDecodings = runDecodings' @algs @nms
+
+{-# DEPRECATED runDecodings "Use runDecodings'" #-}
+
+
+runDecodings' :: forall algs nms f c str . (Monad f) => Decodings f nms algs c str -> Enc nms c str -> f (Enc ('[]::[Symbol]) c str)
+runDecodings' ZeroD enc0 = pure enc0
+runDecodings' (ConsD fn xs) enc = 
         let re :: f (Enc _ c str) = runDecoding fn enc
         in re >>= runDecodings xs
-
 
 -- | At possibly big compilation cost, have compiler figure out algorithm names.
 --

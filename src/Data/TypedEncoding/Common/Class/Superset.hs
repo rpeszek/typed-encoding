@@ -54,7 +54,7 @@ import           Data.Either (isLeft)
 -- @IsSuperset bigger smaller@ reads as @bigger@ is a superset of @smaller@
 --
 -- Note, no IsSuperset "r-UNICODE.D76" "r-CHAR8" even though the numeric range of D76 includes all CHAR8 bytes.
--- This is more 'nominal' decision that prevents certain unwanted conversions from being possible.
+-- This is more /nominal/ decision that prevents certain unwanted conversions from being possible.
 --
 -- @since 0.2.2.0
 type family IsSuperset (y :: Symbol) (x :: Symbol) :: Bool where
@@ -63,14 +63,14 @@ type family IsSuperset (y :: Symbol) (x :: Symbol) :: Bool where
     IsSuperset "r-UTF8"  "r-UTF8" = 'True
     IsSuperset "r-CHAR8" "r-ASCII" = 'True  -- "r-CHAR8" is phantom, no explicit instances so it does not need reflexive case
     IsSuperset "r-CHAR8" "r-ByteRep" = 'True
-    IsSuperset "r-CHAR8" x = Or (IsSuperset "r-ASCII" x) (IsSupersetOpen "r-CHAR8" x (TakeUntil x ":") (ToList x))
     IsSuperset "r-UNICODE.D76" "r-UNICODE.D76" = 'True 
     IsSuperset "r-UNICODE.D76" "r-ASCII" = 'True 
     IsSuperset "r-UNICODE.D76" x = Or (IsSuperset "r-CHAR8" x) (IsSupersetOpen "r-UNICODE.D76" x (TakeUntil x ":") (ToList x))
+    IsSuperset "r-CHAR8" x = Or (IsSuperset "r-ASCII" x) (IsSupersetOpen "r-CHAR8" x (TakeUntil x ":") (ToList x))
     IsSuperset y x = IsSupersetOpen y x (TakeUntil x ":") (ToList x)
 
--- backward compatible r-CHAR8
--- IsSuperset "r-CHAR8" x = Or (IsSuperset "r-ASCII" x) (IsSupersetOpen "r-CHAR8" (TakeUntil x ":") (ToList x))
+-- TODO introduce "r-NODEC" which does not decode
+
 
 -- |
 -- @since 0.2.2.0
@@ -101,7 +101,18 @@ propSuperset' :: forall algb algs b s str . (Superset b s, Eq str)
                  -> Encoding (Either EncodeEx) s algs () str 
                  -> str 
                  -> Bool
-propSuperset' encb encs str = 
+propSuperset' = propSupersetCheck @algb @algs
+        
+propSuperset_ :: forall b s str algb algs. (Superset b s, Eq str, AlgNm b ~ algb, AlgNm s ~ algs) => Encoding (Either EncodeEx) b algb () str -> Encoding (Either EncodeEx) s algs () str -> str -> Bool
+propSuperset_ = propSupersetCheck @algb @algs
+
+propSupersetCheck :: forall algb algs b s str . (Eq str) 
+                 => 
+                 Encoding (Either EncodeEx) b algb () str 
+                 -> Encoding (Either EncodeEx) s algs () str 
+                 -> str 
+                 -> Bool
+propSupersetCheck encb encs str = 
     case (isLeft rb, isLeft rs) of 
         (True, False) -> False
         (False, False) -> pb == ps
@@ -112,9 +123,6 @@ propSuperset' encb encs str =
         rs = runEncoding' @algs encs . toEncoding () $ str 
         pb = either (const str) id $ getPayload <$> rb
         ps = either (const str) id $ getPayload <$> rs
-        
-propSuperset_ :: forall b s str algb algs. (Superset b s, Eq str, AlgNm b ~ algb, AlgNm s ~ algs) => Encoding (Either EncodeEx) b algb () str -> Encoding (Either EncodeEx) s algs () str -> str -> Bool
-propSuperset_ = propSuperset' @algb @algs
 
 -- |
 -- IsSuperset is not intended for @"enc-"@ encodings. This class is.
@@ -140,14 +148,12 @@ _encodesInto = injectInto . implEncInto
 -- Actual tests in the project /test/ suite.
 propEncodesInto' :: forall algb algr b r str . (EncodingSuperset b, r ~ EncSuperset b, Eq str) => Encoding (Either EncodeEx) b algb () str -> Encoding (Either EncodeEx) r algr () str -> str -> Bool
 propEncodesInto' encb encr str = 
-    case rb of
-        Left _ -> True
-        Right enc -> case runEncoding' @algr encr . toEncoding () $ getPayload enc of
-            Right _ -> True
-            Left _ -> False  
-    where
-        rb = runEncoding' @algb encb . toEncoding () $ str 
-
+   case runEncoding' @algb encb . toEncoding () $ str of
+            Right r -> case runEncoding' @algr encr . toEncoding () $ getPayload r of
+                Left _ -> False
+                Right _ -> True
+            Left _ -> True  
+ 
 propEncodesInto_ :: forall b r str algb algr. (
     EncodingSuperset b
     , r ~ EncSuperset b
@@ -159,6 +165,19 @@ propEncodesInto_ :: forall b r str algb algr. (
        -> str 
        -> Bool
 propEncodesInto_ = propEncodesInto' @algb @algr
+
+
+-- | Checks if first encoding exceptions less often than second (has bigger domain).
+propCompEncoding :: forall algb algr b r str .  Encoding (Either EncodeEx) b algb () str -> Encoding (Either EncodeEx) r algr () str -> str -> Bool
+propCompEncoding encb encr str = 
+    case rr of
+        Left _ -> True
+        Right _ -> case runEncoding' @algb encb . toEncoding () $ str of
+            Right _ -> True
+            Left _ -> False  
+    where
+        rr = runEncoding' @algr encr . toEncoding () $ str 
+
 
 -- | 
 -- Aggregate version of 'EncodingSuperset' 

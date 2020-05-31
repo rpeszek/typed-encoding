@@ -42,15 +42,22 @@ validFromDec' (UnsafeMkDecoding p fn) = UnsafeMkValidation p (decAsRecreateErr .
 -- |
 -- @since 0.3.0.0
 validR :: forall nm f c str . (Restriction nm, KnownSymbol nm, RecreateErr f, Applicative f) => Encoding (Either EncodeEx) nm nm c str -> Validation f nm nm c str  
-validR = validFromEnc' @nm @nm 
+validR = validRFromEnc' @nm @nm 
+
+
+-- TODO rename for consistency to _
 
 -- | Can cause slow compilation if used
 -- 
 -- @since 0.3.0.0
 validR' :: forall nm f c str alg . (Restriction nm, Algorithm nm alg, KnownSymbol nm, RecreateErr f, Applicative f) =>  Encoding (Either EncodeEx) nm alg c str -> Validation f nm alg c str  
-validR' = validFromEnc' @alg @nm 
+validR' = validRFromEnc' @alg @nm 
+
+
 
 -- |
+-- This should be used with "r-" validations only
+--
 -- @since 0.3.0.0
 validFromEnc' :: forall alg nm f c str . (KnownSymbol nm, RecreateErr f, Applicative f) => Encoding (Either EncodeEx) nm alg c str -> Validation f nm alg c str  
 validFromEnc' (UnsafeMkEncoding p fn) = UnsafeMkValidation p (encAsRecreateErr . rfn) 
@@ -64,5 +71,17 @@ validFromEnc' (UnsafeMkEncoding p fn) = UnsafeMkValidation p (encAsRecreateErr .
             in  UnsafeMkEnc Proxy conf . getPayload <$> re 
 
 
+{-# DEPRECATED validFromEnc' "Use validR' instead (valid for r- encodings only)" #-}
 
+
+validRFromEnc' :: forall alg nm f c str . (KnownSymbol nm, RecreateErr f, Applicative f) => Encoding (Either EncodeEx) nm alg c str -> Validation f nm alg c str  
+validRFromEnc' (UnsafeMkEncoding p fn) = UnsafeMkValidation p (encAsRecreateErr . rfn) 
+   where
+        encAsRecreateErr :: Either EncodeEx a -> f a
+        encAsRecreateErr (Left (EncodeEx p err)) = recoveryErr $ RecreateEx p err
+        encAsRecreateErr (Right r) = pure r 
+        rfn :: forall (xs :: [Symbol]) . Enc (nm ': xs) c str -> Either EncodeEx (Enc xs c str)
+        rfn (UnsafeMkEnc _ conf str)  =    
+            let re = fn $ UnsafeMkEnc Proxy conf str
+            in  UnsafeMkEnc Proxy conf . getPayload <$> re 
 

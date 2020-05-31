@@ -52,12 +52,12 @@ decodePart = decodePart' @xs @xs
 -- * Convenience combinators which mimic v0.2 type signatures. These do not try to figure out @algs@ or assume much about them
 
 decodeF' :: forall alg nm xs f c str . (Decode f nm alg c str) => Enc (nm ': xs) c str -> f (Enc xs c str)
-decodeF' = runDecoding (decoding @f @nm @alg)
+decodeF' = runDecoding' (decoding @f @nm @alg)
 
 decodeFAll' :: forall algs nms f c str . (Monad f,  DecodeAll f nms algs c str) => 
                Enc nms c str
                -> f (Enc ('[]::[Symbol]) c str)  
-decodeFAll' = runDecodings @algs @nms @f decodings 
+decodeFAll' = runDecodings' @algs @nms @f decodings 
 
 -- | 
 -- 
