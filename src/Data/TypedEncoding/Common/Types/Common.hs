@@ -104,4 +104,4 @@ type family RemoveRs (s :: [Symbol]) :: [Symbol] where
 --
 -- @since 0.4.1.0 
 type family IsEnc (s :: Symbol) :: Bool where
-    IsR s = AcceptEq ('Text "Not enc- encoding " ':<>: ShowType s ) (CmpSymbol "enc-" (Take 4 s))
+    IsEnc s = AcceptEq ('Text "Not enc- encoding " ':<>: ShowType s ) (CmpSymbol "enc-" (Take 4 s))
