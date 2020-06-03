@@ -20,7 +20,8 @@ import           Data.TypedEncoding.Common.Types
 import           GHC.TypeLits
 
 
--- * Compiler figure out algorithm, these appear fast enough 
+-- * Compiler figures out algorithm, these appear fast enough 
+
 
 _implEncodingP :: forall nm f c str . Applicative f => (str -> str) -> Encoding f nm (AlgNm nm)  c str
 _implEncodingP f = _mkEncoding $ implTranF (pure . f)

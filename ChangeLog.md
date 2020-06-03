@@ -6,6 +6,10 @@
 - (post 0.3) "enc-B64" will be moved to a different package (more distant goal)
 - Improved constrains in `Data.TypedEncoding.Conv` modules
 
+## Unreleased (0.4.2)
+
+- `Data.TypedEncoding.Instances.Support.Bool` combinators ("r-bool" remains experimental)
+
 ## 0.4.1
 
 - Code Changes. Backward compatible
