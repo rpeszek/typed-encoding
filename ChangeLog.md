@@ -9,6 +9,7 @@
 ## Unreleased (0.4.2)
 
 - `Data.TypedEncoding.Instances.Support.Bool` combinators ("r-bool" remains experimental)
+- Correction in `r-ban` error message typo ("'G' not bounded by 'F'")
 
 ## 0.4.1
 
