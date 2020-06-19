@@ -3,7 +3,7 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ScopedTypeVariables #-}
--- {-# LANGUAGE AllowAmbiguousTypes #-}
+{-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE AllowAmbiguousTypes #-}
 {-# LANGUAGE FlexibleContexts #-}
@@ -14,14 +14,34 @@
 module Data.TypedEncoding.Instances.Support.Encode where
 
 import           Data.TypedEncoding.Instances.Support.Unsafe
+import           Data.TypedEncoding.Combinators.Unsafe
 import           Data.TypedEncoding.Common.Types.Enc
 import           Data.Proxy
 import           Data.TypedEncoding.Common.Types
 import           GHC.TypeLits
 
+-- | 
+-- Create @"r-"@ - like encoding based on 'Data.TypedEncoding.Common.Class.fromEncF' like function. 
+-- 
+-- Useful for small not performance critical encoding since it executed provided @fromEnc@ function
+-- to verify the encoding
+--
+-- this method does not restrict @nm@ to follow "r-" naming convention but is expected to be used to define @"r-"@ encoding. 
+_implEncFromString :: forall nm err a c str . 
+                       (KnownSymbol nm
+                       , Show err) 
+                       => 
+                       (Enc '[nm] () str -> Either err a) 
+                       -> Encoding (Either EncodeEx) nm (AlgNm nm) c str
+_implEncFromString fn = UnsafeMkEncoding Proxy f
+   where 
+       f :: forall xs . Enc xs c str -> Either EncodeEx (Enc (nm ': xs) c str)
+       f enc = 
+           case fn (unsafeSetPayload () $ getPayload enc) of
+               Right _ -> Right $ withUnsafeCoerce id enc
+               Left err ->  Left $ EncodeEx (Proxy :: Proxy nm) err
 
 -- * Compiler figures out algorithm, these appear fast enough 
-
 
 _implEncodingP :: forall nm f c str . Applicative f => (str -> str) -> Encoding f nm (AlgNm nm)  c str
 _implEncodingP f = _mkEncoding $ implTranF (pure . f)

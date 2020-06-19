@@ -2,14 +2,19 @@
 
 ## Anticipated future breaking changes
 
-- `Data.TypedEncoding.Internal.Class.IsStringR` expected to be be changed / replaced
-- (post 0.3) "enc-B64" will be moved to a different package (more distant goal)
-- Improved constrains in `Data.TypedEncoding.Conv` modules
+- `Data.TypedEncoding.Instances.Do.Sample` will be moved to `Examples`
+- `HasA` Typeclass will be moved to `Examples`
+- `Data.TypedEncoding.Common.Class.IsStringR` expected to be be changed / replaced
+- More module renaming to separate internal implementation code and code targeting examples
+- (post 0.5) "enc-B64" will be moved to a different package (more distant goal)
 
-## Unreleased (0.4.2)
+
+## 0.4.2
 
 - `Data.TypedEncoding.Instances.Support.Bool` combinators ("r-bool" remains experimental)
 - Correction in `r-ban` error message typo ("'G' not bounded by 'F'")
+- `_implEncFromString` creates "r-" encoding from `FromEncString` definition
+- property changes: `propEncodesIntoCheck` added; `propSuperset'`,  `propEncodesInto'` deprecated
 
 ## 0.4.1
 

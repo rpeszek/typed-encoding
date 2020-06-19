@@ -103,7 +103,7 @@
 -- * "Data.TypedEncoding.Instances.Restriction.UTF8" 
 -- * "Data.TypedEncoding.Instances.Restriction.Bool" (experimental / early alpha version, moved from @Combinators@ to @Instances@ in v0.3)
 -- * "Data.TypedEncoding.Instances.Restriction.BoundedAlphaNums" (moved from @Combinators@ to @Instances@ in v0.3)
--- * "Data.TypedEncoding.Instances.Do.Sample" 
+-- * "Data.TypedEncoding.Instances.Do.Sample" - This module is intended as example code and will be moved under 'Examples.TypedEncoding' in the future
 -- 
 -- ... and needed conversions. 
 --
