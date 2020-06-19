@@ -94,7 +94,7 @@ instance (KnownSymbol s , Ban s, Algorithm s "r-ban", IsStringR str, RecreateErr
 -- >>> verifyBoundedAlphaNum (Proxy :: Proxy "r-ban:FF-FF") (T.pack "12-3E")
 -- Right "12-3E"
 -- >>> verifyBoundedAlphaNum (Proxy :: Proxy "r-ban:FF-FF") (T.pack "1G-3E")
--- Left "'G' not boulded by 'F'"
+-- Left "'G' not bounded by 'F'"
 -- >>> verifyBoundedAlphaNum (Proxy :: Proxy "r-ban:FF-FF") (T.pack "13G3E")
 -- Left "'G' not matching '-'"
 -- >>> verifyBoundedAlphaNum (Proxy :: Proxy "r-ban:FFяFF") (T.pack "13я234")
@@ -119,5 +119,5 @@ verifyBoundedAlphaNum p str =
         fn ci cp = case (isAlphaNum ci, isAlphaNum cp, ci <= cp, ci == cp) of
             (True, True, True, _) -> Right ()
             (_, _, _, True) -> Right ()
-            (_, True, _, False) -> Left $ show ci ++ " not boulded by " ++ show cp
+            (_, True, _, False) -> Left $ show ci ++ " not bounded by " ++ show cp
             (_, False, _, False) -> Left $ show ci ++ " not matching " ++ show cp

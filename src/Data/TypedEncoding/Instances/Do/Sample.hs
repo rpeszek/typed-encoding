@@ -11,6 +11,8 @@
 
 -- | This module defines some sample "do-" encodings
 -- currently for example use only.
+--
+-- WARNING this Module will be moved to Examples in future versions
 module Data.TypedEncoding.Instances.Do.Sample where
 
 import qualified Data.Text as T

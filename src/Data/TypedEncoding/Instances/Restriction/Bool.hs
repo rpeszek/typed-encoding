@@ -15,7 +15,11 @@
 --
 -- @since 0.2.1.0
 -- 
--- /(Experimental, early alpha development stage)/ This module was not converted to v0.3 style yet.
+-- /(Experimental, early alpha development stage)/ 
+--
+-- Use 'Data.TypedEncoding.Instances.Support.Bool' instead.
+-- 
+-- This module was not converted to v0.3 style yet.
 --
 -- == Grammar
 -- 

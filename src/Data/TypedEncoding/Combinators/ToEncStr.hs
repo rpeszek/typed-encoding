@@ -23,6 +23,8 @@ import           Data.TypedEncoding.Common.Types (Enc(..) )
 
 import           Data.Functor.Identity
 
+-- * backward compatible v0.2 like combinators
+
 toEncStringF :: forall nm f a str  . (ToEncString f nm nm a str) => a -> f (Enc '[nm] () str)
 toEncStringF = toEncStringF' @nm @nm
 
@@ -37,7 +39,6 @@ toEncString' = runIdentity . toEncF @Identity @nm @alg
 
 
 
--- backward compatible v0.2 like combinators
 fromEncStringF :: forall nm f a str  . (FromEncString f nm nm a str) => Enc '[nm] () str -> f a
 fromEncStringF = fromEncStringF' @nm @nm
 

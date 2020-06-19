@@ -91,10 +91,6 @@ injectInto = withUnsafeCoerce id
 -- _injectInto ::forall y x xs c str . (IsSuperset y x ~ 'True) =>  Enc (x ': xs) c str ->  Enc (Replace x y xs) c str
 
 
--- |
--- Test for Supersets defined in this module
---
--- Actual tests in the project /test/ suite.
 propSuperset' :: forall algb algs b s str . (Superset b s, Eq str) 
                  => 
                  Encoding (Either EncodeEx) b algb () str 
@@ -102,10 +98,15 @@ propSuperset' :: forall algb algs b s str . (Superset b s, Eq str)
                  -> str 
                  -> Bool
 propSuperset' = propSupersetCheck @algb @algs
+{-# DEPRECATED propSuperset' "Use propSupersetCheck or propSuperset_" #-}
         
 propSuperset_ :: forall b s str algb algs. (Superset b s, Eq str, AlgNm b ~ algb, AlgNm s ~ algs) => Encoding (Either EncodeEx) b algb () str -> Encoding (Either EncodeEx) s algs () str -> str -> Bool
 propSuperset_ = propSupersetCheck @algb @algs
 
+-- |
+-- Test for Supersets defined in this module
+--
+-- Actual tests in the project /test/ suite.
 propSupersetCheck :: forall algb algs b s str . (Eq str) 
                  => 
                  Encoding (Either EncodeEx) b algb () str 
@@ -147,13 +148,9 @@ _encodesInto = injectInto . implEncInto
 -- 
 -- Actual tests in the project /test/ suite.
 propEncodesInto' :: forall algb algr b r str . (EncodingSuperset b, r ~ EncSuperset b, Eq str) => Encoding (Either EncodeEx) b algb () str -> Encoding (Either EncodeEx) r algr () str -> str -> Bool
-propEncodesInto' encb encr str = 
-   case runEncoding' @algb encb . toEncoding () $ str of
-            Right r -> case runEncoding' @algr encr . toEncoding () $ getPayload r of
-                Left _ -> False
-                Right _ -> True
-            Left _ -> True  
- 
+propEncodesInto' = propEncodesIntoCheck
+{-# DEPRECATED propEncodesInto' "Use propEncodesIntoCheck or propEncodesInto_" #-}
+
 propEncodesInto_ :: forall b r str algb algr. (
     EncodingSuperset b
     , r ~ EncSuperset b
@@ -164,8 +161,19 @@ propEncodesInto_ :: forall b r str algb algr. (
        -> Encoding (Either EncodeEx) r algr () str 
        -> str 
        -> Bool
-propEncodesInto_ = propEncodesInto' @algb @algr
+propEncodesInto_ = propEncodesIntoCheck @algb @algr
 
+-- |
+-- validates superset restriction
+-- 
+-- Actual tests in the project /test/ suite.
+propEncodesIntoCheck :: forall algb algr b r str . (Eq str) => Encoding (Either EncodeEx) b algb () str -> Encoding (Either EncodeEx) r algr () str -> str -> Bool
+propEncodesIntoCheck encb encr str = 
+   case runEncoding' @algb encb . toEncoding () $ str of
+            Right r -> case runEncoding' @algr encr . toEncoding () $ getPayload r of
+                Left _ -> False
+                Right _ -> True
+            Left _ -> True  
 
 -- | Checks if first encoding exceptions less often than second (has bigger domain).
 propCompEncoding :: forall algb algr b r str .  Encoding (Either EncodeEx) b algb () str -> Encoding (Either EncodeEx) r algr () str -> str -> Bool
