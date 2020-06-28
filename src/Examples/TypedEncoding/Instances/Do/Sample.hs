@@ -12,6 +12,10 @@
 -- | This module defines some example "do-" encodings
 -- 
 -- See "Examples.TypedEncoding.Overview" for usage examples.
+-- 
+-- (moved from @Data.TypedEncoding.Instances.Do.Sample@)
+--
+-- @since 0.5.0.0
 module Examples.TypedEncoding.Instances.Do.Sample where
 
 import qualified Data.Text as T
