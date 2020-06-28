@@ -62,7 +62,7 @@
 --
 -- Examples: @"r-UTF8"@, @"r-ASCII"@, upper alpha-numeric bound /r-ban/ restrictions like @"r-ban:999-999-9999"@
 --
--- == "do-" transformations
+-- == "do-" transformations (not provided in this library other than as /Examples/ "Examples.TypedEncoding.Instances.Do.Sample")
 --
 -- * /encoding/ applies transformation to the string (could be partial)
 -- * /decoding/ - typically none
@@ -103,7 +103,6 @@
 -- * "Data.TypedEncoding.Instances.Restriction.UTF8" 
 -- * "Data.TypedEncoding.Instances.Restriction.Bool" (experimental / early alpha version, moved from @Combinators@ to @Instances@ in v0.3)
 -- * "Data.TypedEncoding.Instances.Restriction.BoundedAlphaNums" (moved from @Combinators@ to @Instances@ in v0.3)
--- * "Data.TypedEncoding.Instances.Do.Sample" - This module is intended as example code and will be moved under 'Examples.TypedEncoding' in the future
 -- 
 -- ... and needed conversions. 
 --
@@ -124,6 +123,7 @@
 -- Examples of how to use this library are included in
 --
 -- * "Examples.TypedEncoding"    
+
 module Data.TypedEncoding (
   
     -- * @Enc@ and basic combinators

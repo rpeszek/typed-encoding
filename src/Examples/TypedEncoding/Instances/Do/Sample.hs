@@ -9,11 +9,10 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeApplications #-}
 
--- | This module defines some sample "do-" encodings
--- currently for example use only.
---
--- WARNING this Module will be moved to Examples in future versions
-module Data.TypedEncoding.Instances.Do.Sample where
+-- | This module defines some example "do-" encodings
+-- 
+-- See "Examples.TypedEncoding.Overview" for usage examples.
+module Examples.TypedEncoding.Instances.Do.Sample where
 
 import qualified Data.Text as T
 import qualified Data.Text.Lazy as TL

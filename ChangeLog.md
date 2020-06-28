@@ -8,6 +8,11 @@
 - More module renaming to separate internal implementation code and code targeting examples
 - (post 0.5) "enc-B64" will be moved to a different package (more distant goal)
 
+## 0.5.0
+
+- Data.TypedEncoding.Instances.Do.Sample moved to Examples
+- Examples.TypedEncoding folder re-org
+
 
 ## 0.4.2
 
