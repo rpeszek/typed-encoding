@@ -49,7 +49,7 @@ type Algorithm nm alg = AlgNm nm ~ alg
 -- |
 -- Converts encoding name to algorithm name, this assumes the ":" delimiter expected by this library. 
 --
--- This allows working with open encoding definitions such as "r-ban" or "r-bool"
+-- This allows working with open encoding definitions such as "r-ban" 
 -- 
 -- >>> :kind! AlgNm "enc-B64"
 -- ...

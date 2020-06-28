@@ -14,7 +14,8 @@
 - Examples.TypedEncoding folder re-org
 - `Data.TypedEncoding.Instances.Support.Helpers` removed `foldEncStr`, `foldCheckedEncStr` 
    renamed  `splitSomePayload` to `splitCheckedPayload`
-
+- removed experimental `Data.TypedEncoding.Instances.Restriction.Bool` in favor of combinator helpers
+  `Data.TypedEncoding.Instances.Support.Bool`
 
 ## 0.4.2
 

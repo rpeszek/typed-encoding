@@ -33,12 +33,13 @@
 -- date = toEncString ...
 -- @
 --
--- Primary focus of type-encodings is to provide type safe
+-- Primary focus of /type-encodings/ is to provide type safe
 --
 -- * /encoding/
 -- * /decoding/
 -- * /validation (recreation)/ (verification of existing payload)
 -- * type conversions between encoded types
+-- * combinators for creating new encodings from existing encodings (e.g. by applying Boolean rules)
 --
 -- of string-like data (@ByteString@, @Text@) that is subject of some
 -- encoding or formatting restrictions.
@@ -78,18 +79,6 @@
 --
 -- Examples: @"enc-B64"@
 -- 
--- == "bool[Op]:" encodings
---
--- Encodings that are defined in terms of other encodings using boolean algebra.
---
--- (early, beta version)
---
--- Examples: 
---
--- @"boolOr:(r-ban:999-999-9999)(r-ban:(999) 999-9999)"@ 
---
--- "@boolNot:(r-ASCII)"
---
 --
 -- = Call Site Usage
 --
@@ -101,7 +90,6 @@
 -- * "Data.TypedEncoding.Instances.Restriction.Misc" (replaces @Common@ from v0.2)
 -- * "Data.TypedEncoding.Instances.Restriction.ASCII" 
 -- * "Data.TypedEncoding.Instances.Restriction.UTF8" 
--- * "Data.TypedEncoding.Instances.Restriction.Bool" (experimental / early alpha version, moved from @Combinators@ to @Instances@ in v0.3)
 -- * "Data.TypedEncoding.Instances.Restriction.BoundedAlphaNums" (moved from @Combinators@ to @Instances@ in v0.3)
 -- 
 -- ... and needed conversions. 
