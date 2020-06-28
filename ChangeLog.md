@@ -12,11 +12,12 @@
 
 - Data.TypedEncoding.Instances.Do.Sample moved to Examples
 - Examples.TypedEncoding folder re-org
-- `Data.TypedEncoding.Instances.Support.Helpers` removed `foldEncStr`, `foldCheckedEncStr` 
+- `Data.TypedEncoding.Instances.Support.Helpers` removed `foldEncStr`, `foldCheckedEncStr`
    renamed  `splitSomePayload` to `splitCheckedPayload`
 - removed experimental `Data.TypedEncoding.Instances.Restriction.Bool` in favor of combinator helpers
   `Data.TypedEncoding.Instances.Support.Bool`
 - `Data.TypedEncoding.Common.Types.SomeEnc` moved to Examples  
+- camel-case of some property names
 
 ## 0.4.2
 

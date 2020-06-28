@@ -85,19 +85,19 @@ fromCheckedEnc (UnsafeMkCheckedEnc xs c s) =
 
 -- |
 -- >>> let encsometest = UnsafeMkCheckedEnc ["TEST"] () $ T.pack "hello"
--- >>> proc_toCheckedEncFromCheckedEnc @'["TEST"] encsometest
+-- >>> procToCheckedEncFromCheckedEnc @'["TEST"] encsometest
 -- True
--- >>> proc_toCheckedEncFromCheckedEnc @'["TEST1"] encsometest
+-- >>> procToCheckedEncFromCheckedEnc @'["TEST1"] encsometest
 -- False
-proc_toCheckedEncFromCheckedEnc :: forall xs c str . (SymbolList xs, Eq c, Eq str) => CheckedEnc c str -> Bool
-proc_toCheckedEncFromCheckedEnc x = (== Just x) . fmap (toCheckedEnc @ xs) . fromCheckedEnc $ x
+procToCheckedEncFromCheckedEnc :: forall xs c str . (SymbolList xs, Eq c, Eq str) => CheckedEnc c str -> Bool
+procToCheckedEncFromCheckedEnc x = (== Just x) . fmap (toCheckedEnc @ xs) . fromCheckedEnc $ x
 
 -- |
 -- >>> let enctest = unsafeSetPayload () "hello" :: Enc '["TEST"] () T.Text
--- >>> proc_fromCheckedEncToCheckedEnc enctest
+-- >>> procFromCheckedEncToCheckedEnc enctest
 -- True
-proc_fromCheckedEncToCheckedEnc :: forall xs c str . (SymbolList xs, Eq c, Eq str) => Enc xs c str -> Bool
-proc_fromCheckedEncToCheckedEnc x = (== Just x) . fromCheckedEnc . toCheckedEnc $ x
+procFromCheckedEncToCheckedEnc :: forall xs c str . (SymbolList xs, Eq c, Eq str) => Enc xs c str -> Bool
+procFromCheckedEncToCheckedEnc x = (== Just x) . fromCheckedEnc . toCheckedEnc $ x
 
 -- |
 -- >>> displ $ unsafeCheckedEnc ["TEST"] () ("hello" :: T.Text)
