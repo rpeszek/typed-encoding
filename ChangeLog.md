@@ -16,6 +16,7 @@
    renamed  `splitSomePayload` to `splitCheckedPayload`
 - removed experimental `Data.TypedEncoding.Instances.Restriction.Bool` in favor of combinator helpers
   `Data.TypedEncoding.Instances.Support.Bool`
+- `Data.TypedEncoding.Common.Types.SomeEnc` moved to Examples  
 
 ## 0.4.2
 

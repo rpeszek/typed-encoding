@@ -10,7 +10,16 @@
 {-# LANGUAGE RankNTypes #-}
 
 -- |
--- Module defines 'CheckedEnc' - untyped ADT version of 'Enc' 
+-- Module defines 'CheckedEnc' - untyped ADT version of 'Enc'
+--
+-- A more dependently typed approach would be to define SomeEnc GADT
+-- that accepts some @Enc '[..]@ in its constructor.  The approach here
+-- turns out to be isomorphic to @SomeEnc@ approach.  Both, however, yield
+-- somewhat different programming.  
+--
+-- Post v0.4 /typed-encoding/ decided to not support @SomeEnc@, it remains only as /Example/.
+-- 
+-- See "Examples.TypedEncoding.SomeEnc".
 
 module Data.TypedEncoding.Common.Types.CheckedEnc where
 

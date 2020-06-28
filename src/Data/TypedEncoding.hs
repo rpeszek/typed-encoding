@@ -120,8 +120,7 @@ module Data.TypedEncoding (
     , fromEncoding
     , getPayload
 
-    -- * Existentially quantified and untyped versions of @Enc@
-    , module Data.TypedEncoding.Common.Types.SomeEnc
+    -- * Untyped versions of @Enc@
     , module  Data.TypedEncoding.Common.Types.CheckedEnc
 
     -- * @Encoding@ and basic combinators
@@ -175,7 +174,6 @@ import           Data.TypedEncoding.Common.Types.Validation
 
 import           Data.TypedEncoding.Common.Types.Common
 import           Data.TypedEncoding.Common.Types.CheckedEnc
-import           Data.TypedEncoding.Common.Types.SomeEnc
 import           Data.TypedEncoding.Common.Types.UncheckedEnc
 import           Data.TypedEncoding.Common.Types.Exceptions
 import           Data.TypedEncoding.Common.Class
