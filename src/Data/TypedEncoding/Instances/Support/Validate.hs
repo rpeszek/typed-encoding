@@ -8,10 +8,8 @@
 {-# LANGUAGE UndecidableInstances #-}
 {-# LANGUAGE TypeApplications #-}
 
--- | Exports for instance creation.
--- 
--- Contains typical things needed when implementing
--- encoding, decoding, recreate, or type to string conversions.
+-- | 
+-- Convenience validation utilities.
 module Data.TypedEncoding.Instances.Support.Validate where
 import           Data.TypedEncoding.Common.Types
 import           Data.TypedEncoding.Common.Class 

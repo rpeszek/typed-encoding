@@ -8,7 +8,8 @@
 {-# LANGUAGE AllowAmbiguousTypes #-}
 {-# LANGUAGE FlexibleContexts #-}
 
--- | Support for mostly creating instances ToEncString and FromEncString conversions
+-- | Various helper functions.
+-- There are mostly for for creating @ToEncString@ and @FromEncString@ instances
 
 module Data.TypedEncoding.Instances.Support.Helpers where
 
@@ -97,14 +98,14 @@ verifyWithRead msg x =
 
 
 -- | Convenience function for checking if @str@ decodes without error
--- using @enc@ encoding markers and decoders that can pick decoder based
+-- using @dec@ encoding markers and decoders that can pick decoder based
 -- on that marker
 --
 -- @since 0.3.0.0
-verifyDynEnc :: forall s str err1 err2 enc a. (KnownSymbol s, Show err1, Show err2) => 
+verifyDynEnc :: forall s str err1 err2 dec a. (KnownSymbol s, Show err1, Show err2) => 
                   Proxy s   -- ^ proxy defining encoding annotation
-                  -> (Proxy s -> Either err1 enc)  -- ^ finds encoding marker @enc@ for given annotation or fails
-                  -> (enc -> str -> Either err2 a)  -- ^ decoder based on @enc@ marker
+                  -> (Proxy s -> Either err1 dec)  -- ^ finds encoding marker @dec@ for given annotation or fails
+                  -> (dec -> str -> Either err2 a)  -- ^ decoder based on @dec@ marker
                   -> str                            -- ^ input
                   -> Either EncodeEx str
 verifyDynEnc p findenc decoder str = 
