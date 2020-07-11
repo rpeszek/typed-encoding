@@ -17,10 +17,7 @@ import           Data.TypedEncoding.Instances.Support.Unsafe
 
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Lazy as BL
-import qualified Data.Text as T
-import qualified Data.Text.Lazy as TL
-import qualified Data.Text.Encoding as TE 
-import qualified Data.Text.Lazy.Encoding as TEL 
+
 
 import qualified Data.ByteString.Base64 as B64
 import qualified Data.ByteString.Base64.Lazy as BL64
@@ -30,7 +27,6 @@ import qualified Data.ByteString.Base64.Lazy as BL64
 -- $setup
 -- >>> :set -XOverloadedStrings -XScopedTypeVariables -XKindSignatures -XMultiParamTypeClasses -XDataKinds -XPolyKinds -XPartialTypeSignatures -XFlexibleInstances -XTypeApplications
 -- >>> import Test.QuickCheck
--- >>> import Test.QuickCheck.Instances.Text()
 -- >>> import Test.QuickCheck.Instances.ByteString()
 -- >>> :{  
 -- instance Arbitrary (UncheckedEnc () B.ByteString) where 
@@ -116,15 +112,6 @@ encB64BL :: Applicative f => Encoding f "enc-B64" "enc-B64" c BL.ByteString
 encB64BL = _implEncodingP BL64.encode
 
 
--- | This instance will likely be removed in future versions (performance concerns)
---
--- @since 0.3.0.0
-instance Applicative f => Encode f "enc-B64" "enc-B64" c T.Text where
-    encoding = endB64T
-
--- | This function will likely be removed in future versions (performance concerns)
-endB64T :: Applicative f => Encoding f "enc-B64" "enc-B64" c T.Text
-endB64T = _implEncodingP (TE.decodeUtf8 . B64.encode . TE.encodeUtf8)  
 
 -- * Decoders
 
@@ -160,33 +147,6 @@ decB64BL :: (UnexpectedDecodeErr f, Applicative f) => Decoding f "enc-B64" "enc-
 decB64BL = _implDecodingF (asUnexpected @"enc-B64" . BL64.decode)
 
 
--- Kept for now but performance issues
-
--- | WARNING (performance)
---
--- @since 0.3.0.0
-instance (UnexpectedDecodeErr f, Applicative f) => Decode f "enc-B64" "enc-B64" c T.Text where
-    decoding = decB64T
-
--- |
--- @since 0.3.0.0 
-decB64T :: (UnexpectedDecodeErr f, Applicative f) => Decoding f "enc-B64" "enc-B64" c T.Text
-decB64T = _implDecodingF (asUnexpected @"enc-B64"  . fmap TE.decodeUtf8 . B64.decode . TE.encodeUtf8) 
-{-# WARNING decB64T "This method was not optimized for performance." #-}
-
--- | WARNING (performance)
---
--- @since 0.3.0.0 
-instance (UnexpectedDecodeErr f, Applicative f) => Decode f "enc-B64" "enc-B64" c TL.Text where
-    decoding = decB64TL
-
--- |
--- @since 0.3.0.0 
-decB64TL :: (UnexpectedDecodeErr f, Applicative f) => Decoding f "enc-B64" "enc-B64" c TL.Text
-decB64TL = _implDecodingF (asUnexpected @"enc-B64"  . fmap TEL.decodeUtf8 . BL64.decode . TEL.encodeUtf8) 
-{-# WARNING decB64TL "This method was not optimized for performance." #-}
-
-
 -- * Validation
 
 -- |
@@ -199,15 +159,6 @@ instance (RecreateErr f, Applicative f) => Validate f "enc-B64" "enc-B64" c B.By
 instance (RecreateErr f, Applicative f) => Validate f "enc-B64" "enc-B64" c BL.ByteString where
     validation = validFromDec decB64BL
 
--- |
--- @since 0.3.0.0 
-instance (RecreateErr f, Applicative f) => Validate f "enc-B64" "enc-B64" c T.Text where
-    validation = validFromDec decB64T
-
--- |
--- @since 0.3.0.0 
-instance (RecreateErr f, Applicative f) => Validate f "enc-B64" "enc-B64" c TL.Text where
-    validation = validFromDec decB64TL
 
 -- | Lenient decoding does not fail
 -- 

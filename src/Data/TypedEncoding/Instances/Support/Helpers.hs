@@ -12,7 +12,7 @@
 
 module Data.TypedEncoding.Instances.Support.Helpers where
 
-import           Data.String
+-- import           Data.String
 import           Data.Proxy
 import           Text.Read
 import           Data.TypedEncoding.Common.Types

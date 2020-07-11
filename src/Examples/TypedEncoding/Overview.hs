@@ -3,8 +3,7 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE TypeApplications #-}
 
--- {-# LANGUAGE PartialTypeSignatures #-}
--- {-# OPTIONS_GHC -Wno-partial-type-signatures #-}
+{-# OPTIONS_GHC -Wno-deprecations #-}
 
 -- | type-encoding overview examples. 
 --
@@ -23,6 +22,7 @@ module Examples.TypedEncoding.Overview where
 
 import           Data.TypedEncoding
 import           Data.TypedEncoding.Instances.Enc.Base64 ()
+import           Data.TypedEncoding.Instances.Enc.Warn.Base64 ()
 import           Data.TypedEncoding.Instances.Restriction.ASCII ()
 import           Examples.TypedEncoding.Instances.Do.Sample
  
