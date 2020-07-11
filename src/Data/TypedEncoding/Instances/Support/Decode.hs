@@ -3,12 +3,12 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ScopedTypeVariables #-}
--- {-# LANGUAGE AllowAmbiguousTypes #-}
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE AllowAmbiguousTypes #-}
 {-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE TypeFamilies #-}
 
--- | v0.2 style decoding combinators
+-- | Common decoding combinators
 -- 
 -- @since 0.3.0.0
 module Data.TypedEncoding.Instances.Support.Decode where
@@ -18,7 +18,26 @@ import           Data.TypedEncoding.Common.Types.Decoding
 import           Data.Proxy
 import           Data.TypedEncoding.Common.Types
 
+-- * Universal decoding for all "r-" types
 
+-- | 
+--
+-- @since 0.3.0.0
+decAnyR :: forall r f c str . (Restriction r, Applicative f) => Decoding f r r c str
+decAnyR = decAnyR' @r @r
+
+-- |
+-- @since 0.3.0.0
+decAnyR' :: forall alg r f c str . (Restriction r, Applicative f) => Decoding f r alg c str
+decAnyR' = UnsafeMkDecoding Proxy (implTranP id) 
+
+-- |
+-- @since 0.3.0.0
+decAnyR_ :: forall r f c str alg . (Restriction r, Algorithm r alg, Applicative f) => Decoding f r alg c str
+decAnyR_ = mkDecoding $ implTranP id
+
+
+-- * v0.2 style decoding combinators
 
 -- * Compiler figure out algorithm, these appear fast enough 
 
