@@ -18,6 +18,10 @@
   `Data.TypedEncoding.Instances.Support.Bool`
 - `Data.TypedEncoding.Common.Types.SomeEnc` moved to Examples  
 - camel-case of some property names
+- Text instances for "Base64" moved to `Data.TypedEncoding.Instances.Enc.Warn.Base64`
+- Removed instanced for `"r-()"` encoding
+
+- More general instances for some encodings in `Data.TypedEncoding.Instances.Restriction.Misc`
 
 ## 0.4.2
 

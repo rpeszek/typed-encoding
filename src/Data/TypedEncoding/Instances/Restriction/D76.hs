@@ -8,13 +8,16 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 
 -- | 
--- Checks that satisfy D76 Unicode standard (/text/ replaces chars that are in range
--- U+D800 to U+DFFF inclusive)
+-- "r-UNICODE.D76" restricts Unicode characters by excluding the range U+D800 to U+DFFF.
 --
--- Note, no IsSuperset "r-UNICODE.D76" "r-CHAR8" mapping even though the numeric range of D76 includes all CHAR8 bytes.
+-- This is important because the commonly used @Text@ type from /text/ package replaces chars that are in range
+-- U+D800 to U+DFFF (inclusive).
+--
+-- Note, there is no @IsSuperset "r-UNICODE.D76" "r-CHAR8"@ mapping even though the numeric range of D76 includes all CHAR8 bytes.
 -- This is more /nominal/ decision that prevents certain unwanted conversions from being possible.
 --
--- Similarly no IsSuperset "r-UNICODE.D76" "r-ByteRep", this annotation acts as a guard to what can go into @Text@.
+-- Similarly no IsSuperset "r-UNICODE.D76" "r-ByteRep", "r-UNICODE.D76" acts as a guard to what can go into @Text@
+-- and this prevents some unwanted conversions.
 -- 
 -- @since 0.4.0.0
 module Data.TypedEncoding.Instances.Restriction.D76 where

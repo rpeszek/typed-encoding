@@ -9,11 +9,11 @@
 
 -- | 
 --
--- Should not be used directly, only as superset
+-- "r-CHAR8" should not be used directly, only as superset.
 --
--- Checks if all chars are @< \'\256\'@
+-- This module includes tests that verify that all chars are @< \'\256\'@
 --
--- Encoding functions are here for test support only, no instances
+-- Encoding functions are here for test support only, no instances.
 --
 -- @since 0.3.1.0
 module Data.TypedEncoding.Instances.Restriction.CHAR8 where
