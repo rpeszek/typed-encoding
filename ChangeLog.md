@@ -50,6 +50,7 @@
 - More general instances for some encodings in `Data.TypedEncoding.Instances.Restriction.Misc`
 - `mkDecoding` deprecated in favor of `_mkDecoding` to follow the naming convention
 - `mkValidation` deprecated in favor of `_mkValidation` to follow the naming convention
+- `validR'` function renamed to `_validR`
 
 ## 0.4.2
 
