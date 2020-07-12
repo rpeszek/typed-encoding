@@ -22,6 +22,8 @@
 --
 -- Use of 'Data.TypedEncoding.Combinators.Unsafe.unsafeSetPayload' currently recommended
 -- for recovering 'Enc' from trusted input sources (if avoiding cost of Validation is important).
+--
+-- This module is re-exported in "Data.TypedEncoding" and it is best not to import it directly.
 
 module Data.TypedEncoding.Common.Types.Validation where
 
@@ -50,11 +52,20 @@ data Validation f (nm :: Symbol) (alg :: Symbol) conf str where
 -- @since 0.3.0.0
 mkValidation :: forall f (nm :: Symbol) conf str . (forall (xs :: [Symbol]) . Enc (nm ': xs) conf str -> f (Enc xs conf str)) -> Validation f nm (AlgNm nm) conf str
 mkValidation = UnsafeMkValidation Proxy
+{-# DEPRECATED mkValidation "Use _mkValidation" #-}
 
-runValidation :: forall alg nm f xs conf str . Validation f nm alg conf str -> Enc (nm ': xs) conf str -> f (Enc xs conf str)
+-- | Type safe smart constructor
+-- adding the type family @(AlgNm nm)@ restriction to UnsafeMkValidation slows down compilation, especially in tests.      
+--
+-- This function follows the naming convention of using "_" when the typechecker figures out @alg@
+--
+-- @since 0.5.0.0
+_mkValidation :: forall f (nm :: Symbol) conf str . (forall (xs :: [Symbol]) . Enc (nm ': xs) conf str -> f (Enc xs conf str)) -> Validation f nm (AlgNm nm) conf str
+_mkValidation = UnsafeMkValidation Proxy
+
+
+runValidation :: forall nm f xs conf str . Validation f nm nm conf str -> Enc (nm ': xs) conf str -> f (Enc xs conf str)
 runValidation (UnsafeMkValidation _ fn) = fn
-
-{-# DEPRECATED runValidation "Use runValidation''" #-}
 
 runValidation' :: forall alg nm f xs conf str . Validation f nm alg conf str -> Enc (nm ': xs) conf str -> f (Enc xs conf str)
 runValidation' (UnsafeMkValidation _ fn) = fn
@@ -80,15 +91,19 @@ data Validations f (nms :: [Symbol]) (algs :: [Symbol]) conf str where
     ZeroV :: Validations f '[] '[] conf str
     ConsV ::  Validation f nm alg conf str -> Validations f nms algs conf str -> Validations f (nm ': nms) (alg ': algs) conf str
 
+
+
 -- | This basically puts payload in decoded state.
 -- More useful combinators are in "Data.TypedEncoding.Combinators.Validate"
 --
--- @since 0.3.0.0
-runValidationChecks :: forall algs nms f c str . (Monad f) => Validations f nms algs c str -> Enc nms c str -> f (Enc ('[]::[Symbol]) c str)
-runValidationChecks ZeroV enc0 = pure enc0
-runValidationChecks (ConsV fn xs) enc = 
+-- (@runValidationChecks@ before v0.5)
+--
+-- @since 0.5.0.0
+runValidationChecks' :: forall algs nms f c str . (Monad f) => Validations f nms algs c str -> Enc nms c str -> f (Enc ('[]::[Symbol]) c str)
+runValidationChecks' ZeroV enc0 = pure enc0
+runValidationChecks' (ConsV fn xs) enc = 
         let re :: f (Enc _ c str) = runValidation' fn enc
-        in re >>= runValidationChecks xs
+        in re >>= runValidationChecks' xs
 
 
 -- -- | At possibly big compilation cost, have compiler figure out algorithm names.

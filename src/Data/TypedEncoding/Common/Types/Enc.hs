@@ -11,7 +11,11 @@
 {-# LANGUAGE PartialTypeSignatures #-}
 {-# OPTIONS_GHC -Wno-partial-type-signatures #-}
 -- |
--- Internal definition of types
+-- Contains main @Enc@ type that carries encoded payload as well as
+-- @Encoding@ and @Encodings@ types contains encoding functions.
+-- This module also contains basic combinators for these types.
+--
+-- This module is re-exported in "Data.TypedEncoding" and it is best not to import it directly.
 
 module Data.TypedEncoding.Common.Types.Enc where
 

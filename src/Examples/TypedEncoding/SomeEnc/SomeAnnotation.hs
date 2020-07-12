@@ -6,8 +6,11 @@
 {-# LANGUAGE AllowAmbiguousTypes #-}
 {-# LANGUAGE RankNTypes #-}
 
--- | internally used existential type for taking track of annotations
-module Data.TypedEncoding.Common.Types.SomeAnnotation where
+-- | Internally used existential type for tracking of annotations
+--
+-- This module is re-exported in "Data.TypedEncoding" and it is best not to import it directly.
+
+module Examples.TypedEncoding.SomeEnc.SomeAnnotation where
 
 import           Data.TypedEncoding.Common.Types.Common
 import           Data.TypedEncoding.Common.Class.Util

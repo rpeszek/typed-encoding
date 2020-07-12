@@ -33,7 +33,7 @@ instance Applicative f => Encode f "do-UPPER" "do-UPPER" c T.Text where
     encoding = _implEncodingP T.toUpper
 
 instance (RecreateErr f, Applicative f) => Validate f "do-UPPER" "do-UPPER" c T.Text where
-    validation = mkValidation $
+    validation = _mkValidation $
                           implTranF (asRecreateErr @"do-UPPER" . (\t -> 
                                  let (g,b) = T.partition isUpper t
                                  in if T.null b

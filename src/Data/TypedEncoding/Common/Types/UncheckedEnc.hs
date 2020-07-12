@@ -9,7 +9,9 @@
 {-# LANGUAGE AllowAmbiguousTypes #-}
 
 -- |
--- Internal definition of types
+-- Defines @UncheckedEnc@ representing not verified encoding and basic combinators for using it. 
+--
+-- This module is re-exported in "Data.TypedEncoding" and it is best not to import it directly.
 
 module Data.TypedEncoding.Common.Types.UncheckedEnc where
 
@@ -25,6 +27,8 @@ import           Data.TypedEncoding.Common.Types.Common
 -- * UncheckedEnc for validation, similar to CheckedEnc but not verified
 
 -- | Represents some encoded string where encoding was not validated.
+--
+-- Encoding is not tracked at the type level.
 --
 -- Similar to 'Data.TypedEncoding.Common.Types.CheckedEnc' but unlike
 -- @CheckedEnc@ it can contain payloads that have invalid encoding.

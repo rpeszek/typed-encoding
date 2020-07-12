@@ -17,11 +17,20 @@
 - removed experimental `Data.TypedEncoding.Instances.Restriction.Bool` in favor of combinator helpers
   `Data.TypedEncoding.Instances.Support.Bool`
 - `Data.TypedEncoding.Common.Types.SomeEnc` moved to Examples  
+- `Data.TypedEncoding.Common.Types.SomeAnnotation` moved to Examples
 - camel-case of some property names
 - Text instances for "Base64" moved to `Data.TypedEncoding.Instances.Enc.Warn.Base64`
 - Removed instanced for `"r-()"` encoding
-- Fuctions from `Data.TypedEncoding.Instances.Support.Common` moved to `Data.TypedEncoding.Instances.Support.Decode`
+- Functions from `Data.TypedEncoding.Instances.Support.Common` moved to `Data.TypedEncoding.Instances.Support.Decode`
+- Signature changed in previously deprecated function `runDecoding` to match `mn ~ alg` convention and deprecation removed
+- Signature changed in previously deprecated function `runDecodings` to match `mns ~ algs` convention and deprecation removed
+-  Signature changed in previously deprecated function `runValidation` to match `mns ~ algs` convention and deprecation removed
+- `runValidationChecks` renamed to `runValidationChecks'` to match /typed-encoding/ naming conventions. 
+
+
 - More general instances for some encodings in `Data.TypedEncoding.Instances.Restriction.Misc`
+- `mkDecoding` deprecated in favor of `_mkDecoding` to follow the naming convention
+- `mkValidation` deprecated in favor of `_mkValidation` to follow the naming convention
 
 ## 0.4.2
 

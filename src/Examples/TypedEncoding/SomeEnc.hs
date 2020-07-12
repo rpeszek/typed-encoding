@@ -21,8 +21,8 @@ module Examples.TypedEncoding.SomeEnc where
 
 import           Data.TypedEncoding.Common.Types.Enc
 import           Data.TypedEncoding.Common.Class.Util
-import           Data.TypedEncoding.Common.Types.SomeAnnotation
 import           Data.TypedEncoding.Common.Types.CheckedEnc
+import           Examples.TypedEncoding.SomeEnc.SomeAnnotation
 
 -- $setup
 -- >>> :set -XOverloadedStrings -XMultiParamTypeClasses -XDataKinds -XAllowAmbiguousTypes

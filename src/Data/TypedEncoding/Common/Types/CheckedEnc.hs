@@ -1,10 +1,6 @@
 {-# LANGUAGE GADTs #-}
 {-# LANGUAGE ScopedTypeVariables #-}
--- {-# LANGUAGE PolyKinds #-}
--- {-# LANGUAGE DataKinds #-}
--- {-# LANGUAGE TypeOperators #-}
--- {-# LANGUAGE FlexibleInstances #-}
-{-# LANGUAGE StandaloneDeriving #-}
+-- {-# LANGUAGE StandaloneDeriving #-}
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE AllowAmbiguousTypes #-}
 {-# LANGUAGE RankNTypes #-}
@@ -17,9 +13,12 @@
 -- turns out to be isomorphic to @SomeEnc@ approach.  Both, however, yield
 -- somewhat different programming.  
 --
--- Post v0.4 /typed-encoding/ decided to not support @SomeEnc@, it remains only as /Example/.
+-- Post v0.4 /typed-encoding/ does not support @SomeEnc@ and it remains only as an /Example/.
 -- 
 -- See "Examples.TypedEncoding.SomeEnc".
+--
+-- This module is re-exported in "Data.TypedEncoding" and it is best not to import it directly.
+
 
 module Data.TypedEncoding.Common.Types.CheckedEnc where
 
@@ -36,8 +35,6 @@ import           Data.Proxy
 
 -- * Untyped Enc
 
--- constructor is to be treated as Unsafe to Encode and Decode instance implementations
--- particular encoding instances may expose smart constructors for limited data types
 
 -- | Represents some validated encoded string. 
 --
@@ -48,7 +45,8 @@ import           Data.Proxy
 -- @since 0.2.0.0 
 data CheckedEnc conf str = UnsafeMkCheckedEnc [EncAnn] conf str -- ^ @since 0.3.0.0
                                                                 -- Constructor renamed from previous versions
-
+                                                                -- This constructor is considered unsafe as pattern matching on it and
+                                                                -- using it allows access to the encoded payload.
      deriving (Show, Eq) 
 
 -- |

@@ -183,7 +183,7 @@ exampleConf = Config (SizeLimit 8)
 instance HasA SizeLimit Config where
    has = sizeLimit  
 
--- | `helloTitle' is needed in following examples
+-- | @helloTitle'@ is needed in following examples
 --
 helloTitle :: Enc '["do-Title"] Config T.Text
 helloTitle = encodeAll . toEncoding exampleConf $ "hello wOrld"

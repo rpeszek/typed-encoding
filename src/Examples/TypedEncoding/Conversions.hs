@@ -30,7 +30,7 @@
 --
 -- Conversions aim at providing type safety when moving between encoded string-like types.
 --
--- __The assumption__ made by `typed-encoding` is that @"enc-"@ encodings work in an equivalent way independently of the payload type.
+-- __The assumption__ made by /typed-encoding/ is that @"enc-"@ encodings work in an equivalent way independently of the payload type.
 -- For example, if the following instances exist:
 --
 -- @

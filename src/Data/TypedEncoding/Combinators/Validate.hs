@@ -7,9 +7,10 @@
 {-# LANGUAGE AllowAmbiguousTypes #-}
 {-# LANGUAGE TypeApplications #-}
 
--- | Combinators re-exported in Data.TypedEncoding.
+-- |
 -- 
--- Decoding combinators that are backward compatible to v0.2 versions.
+-- Validation combinators that are backward compatible to v0.2 versions.
+-- This module is re-exported in Data.TypedEncoding.
 --
 -- @since 0.3.0.0
 module Data.TypedEncoding.Combinators.Validate where
@@ -53,7 +54,7 @@ check' = checkWithValidations @algs @nms @f validations
 recreateWithValidations :: forall algs nms f c str . (Monad f) => Validations f nms algs c str -> Enc ('[]::[Symbol]) c str -> f (Enc nms c str)
 recreateWithValidations vers str@(UnsafeMkEnc _ _ pay) = 
         let str0 :: Enc nms c str = withUnsafeCoerce id str
-        in withUnsafeCoerce (const pay) <$> runValidationChecks vers str0    
+        in withUnsafeCoerce (const pay) <$> runValidationChecks' vers str0    
 
 -- * v0.2 style recreate functions
 

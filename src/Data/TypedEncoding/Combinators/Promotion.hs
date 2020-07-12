@@ -12,7 +12,9 @@
 {-# LANGUAGE GADTs #-}
 {-# LANGUAGE AllowAmbiguousTypes #-}
 
--- | Promote and demote combinators.
+-- | 
+-- Combinators allowing to add or remove redundant annotations.
+-- Such operations are referred to in this package as promoting or demoting.
 module Data.TypedEncoding.Combinators.Promotion where
 
 import           Data.TypedEncoding.Common.Class

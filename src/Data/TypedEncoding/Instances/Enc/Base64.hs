@@ -164,13 +164,13 @@ instance (RecreateErr f, Applicative f) => Validate f "enc-B64" "enc-B64" c BL.B
 -- 
 -- @since 0.3.0.0 
 instance Applicative f => Validate f "enc-B64-len" "enc-B64-len" c B.ByteString where
-    validation = mkValidation $ implTranP id
+    validation = _mkValidation $ implTranP id
 
 -- | Lenient decoding does not fail
 -- 
 -- @since 0.3.0.0 
 instance Applicative f => Validate f "enc-B64-len" "enc-B64-len" c BL.ByteString where
-    validation = mkValidation $ implTranP id
+    validation = _mkValidation $ implTranP id
 
 
 

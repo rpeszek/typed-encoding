@@ -7,7 +7,8 @@
 {-# LANGUAGE AllowAmbiguousTypes #-}
 {-# LANGUAGE FlexibleContexts #-}
 
--- | Combinators reexported in Data.TypedEncoding
+-- | Common encoding combinators.
+-- This module is re-exported in Data.TypedEncoding
 module Data.TypedEncoding.Combinators.Common where
 
 import           Data.TypedEncoding.Common.Types

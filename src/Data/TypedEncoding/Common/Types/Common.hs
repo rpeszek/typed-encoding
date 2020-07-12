@@ -2,15 +2,14 @@
 {-# LANGUAGE PolyKinds #-}
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE TypeOperators #-}
--- {-# LANGUAGE FlexibleInstances #-}
--- {-# LANGUAGE FlexibleContexts #-}
--- {-# LANGUAGE UndecidableInstances #-}
--- {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE KindSignatures  #-}
 {-# LANGUAGE UndecidableInstances #-}
 {-# LANGUAGE ConstraintKinds #-}
 
+-- | Common types and some type families used in /typed-encoding/ definitions.
+-- 
+-- This module is re-exported in "Data.TypedEncoding" and it is best not to import it directly.
 module Data.TypedEncoding.Common.Types.Common where
 
 import           Data.TypedEncoding.Common.Util.TypeLits

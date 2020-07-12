@@ -34,7 +34,7 @@ decAnyR' = UnsafeMkDecoding Proxy (implTranP id)
 -- |
 -- @since 0.3.0.0
 decAnyR_ :: forall r f c str alg . (Restriction r, Algorithm r alg, Applicative f) => Decoding f r alg c str
-decAnyR_ = mkDecoding $ implTranP id
+decAnyR_ = _mkDecoding $ implTranP id
 
 
 -- * v0.2 style decoding combinators
@@ -42,10 +42,10 @@ decAnyR_ = mkDecoding $ implTranP id
 -- * Compiler figure out algorithm, these appear fast enough 
 
 _implDecodingF :: forall nm f c str . Functor f => (str -> f str) -> Decoding f nm (AlgNm nm) c str
-_implDecodingF f = mkDecoding $ implTranF f
+_implDecodingF f = _mkDecoding $ implTranF f
 
 _implDecodingConfF :: forall nm f c str . Functor f => (c -> str -> f str) -> Decoding f nm (AlgNm nm) c str
-_implDecodingConfF f = mkDecoding $ implTranF' f
+_implDecodingConfF f = _mkDecoding $ implTranF' f
 
 
 -- * Assume @alg ~ nm@ or explicit @alg@ 

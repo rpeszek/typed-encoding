@@ -19,10 +19,9 @@
 --
 -- Uses @symbols@ library for its ToList type family.
 --
--- Currently this is spread out in different modules
+-- Currently this is spread out to different modules including
 --
 -- * "Data.TypedEncoding.Common.Class.Util"
--- * "Data.TypedEncoding.Common.Types.SomeAnnotation"
 --
 -- (TODO) these will need to get consolidated.
 module  Data.TypedEncoding.Common.Util.TypeLits where
