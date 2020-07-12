@@ -24,7 +24,7 @@ module Data.TypedEncoding.Common.Types.CheckedEnc where
 
 import           Data.TypedEncoding.Common.Types.Enc
 import           Data.TypedEncoding.Common.Types.Common
-import           Data.TypedEncoding.Common.Class.Util
+import           Data.TypedEncoding.Common.Class.Common
 import           Data.Proxy
 
 -- $setup

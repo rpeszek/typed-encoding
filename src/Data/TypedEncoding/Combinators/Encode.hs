@@ -17,7 +17,7 @@
 module Data.TypedEncoding.Combinators.Encode where
 
 import           Data.TypedEncoding.Common.Types.Enc
-import           Data.TypedEncoding.Common.Class.Util -- Append
+import           Data.TypedEncoding.Common.Util.TypeLits -- Append
 import           Data.TypedEncoding.Combinators.Common
 import           Data.TypedEncoding.Common.Class.Encode
 import           GHC.TypeLits

@@ -13,7 +13,7 @@ module Data.TypedEncoding.Combinators.Common where
 
 import           Data.TypedEncoding.Common.Types
 import           Data.TypedEncoding.Combinators.Unsafe
-import           Data.TypedEncoding.Common.Class.Util (Append)
+import           Data.TypedEncoding.Common.Util.TypeLits (Append)
 import           GHC.TypeLits
 import           Data.Proxy
 

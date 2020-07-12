@@ -13,6 +13,9 @@
 {-# LANGUAGE AllowAmbiguousTypes #-}
 {-# LANGUAGE ConstraintKinds #-}
 
+-- |
+-- This module contains typeclasses and type families that are used by /typed-encoding/ to 
+-- define subset / superset relationships between different encodings. 
 module Data.TypedEncoding.Common.Class.Superset where
 
 import           Data.TypedEncoding.Common.Util.TypeLits
@@ -143,13 +146,6 @@ class EncodingSuperset (enc :: Symbol) where
 _encodesInto :: forall y enc xs c str r . (IsSuperset y r ~ 'True, EncodingSuperset enc, r ~ EncSuperset enc) => Enc (enc ': xs) c str -> Enc (y ': enc ': xs) c str
 _encodesInto = injectInto . implEncInto
 
--- |
--- validates superset restriction
--- 
--- Actual tests in the project /test/ suite.
-propEncodesInto' :: forall algb algr b r str . (EncodingSuperset b, r ~ EncSuperset b, Eq str) => Encoding (Either EncodeEx) b algb () str -> Encoding (Either EncodeEx) r algr () str -> str -> Bool
-propEncodesInto' = propEncodesIntoCheck
-{-# DEPRECATED propEncodesInto' "Use propEncodesIntoCheck or propEncodesInto_" #-}
 
 propEncodesInto_ :: forall b r str algb algr. (
     EncodingSuperset b
@@ -166,7 +162,7 @@ propEncodesInto_ = propEncodesIntoCheck @algb @algr
 -- |
 -- validates superset restriction
 -- 
--- Actual tests in the project /test/ suite.
+-- Actual tests are in the project /test/ suite.
 propEncodesIntoCheck :: forall algb algr b r str . (Eq str) => Encoding (Either EncodeEx) b algb () str -> Encoding (Either EncodeEx) r algr () str -> str -> Bool
 propEncodesIntoCheck encb encr str = 
    case runEncoding' @algb encb . toEncoding () $ str of
@@ -190,9 +186,12 @@ propCompEncoding encb encr str =
 -- | 
 -- Aggregate version of 'EncodingSuperset' 
 --
--- This is not ideal but easy to implement.
--- The issue is that this assumes restricted co-domain which is what often happens
--- but often does not,  e.g. it will not work well with id transformation.
+-- It is used to assure type safety of conversion functions in "Data.TypedEncoding.Conv".
+-- This approach is not ideal since
+-- it produces an overly conservative restriction on encoding stack. 
+--
+-- The issue is that this enforces restriction on the co-domain or each encoding and it does not take 
+-- into account the fact that the domain is already restricted, e.g. it will prevent adding id transformation to the stack.
 --
 -- @since 0.4.0.0
 class AllEncodeInto (superset :: Symbol) (encnms :: [Symbol]) where

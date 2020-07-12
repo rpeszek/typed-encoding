@@ -19,7 +19,8 @@ import           Data.TypedEncoding.Combinators.Common
 import           Data.TypedEncoding.Combinators.Unsafe
 import           Data.TypedEncoding.Common.Types
 import           Data.TypedEncoding.Common.Class.Validate
-import           Data.TypedEncoding.Common.Class.Util (SymbolList, Append)
+import           Data.TypedEncoding.Common.Class.Common (SymbolList)
+import           Data.TypedEncoding.Common.Util.TypeLits (Append)
 import           GHC.TypeLits
 import           Data.Functor.Identity
 

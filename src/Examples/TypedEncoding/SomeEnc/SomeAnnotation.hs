@@ -13,7 +13,7 @@
 module Examples.TypedEncoding.SomeEnc.SomeAnnotation where
 
 import           Data.TypedEncoding.Common.Types.Common
-import           Data.TypedEncoding.Common.Class.Util
+import           Data.TypedEncoding.Common.Class.Common
 import           Data.TypedEncoding.Internal.Util
 import           Data.Proxy
 import           GHC.TypeLits

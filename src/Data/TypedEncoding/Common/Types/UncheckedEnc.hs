@@ -16,7 +16,7 @@
 module Data.TypedEncoding.Common.Types.UncheckedEnc where
 
 import           Data.Proxy
-import           Data.TypedEncoding.Common.Class.Util
+import           Data.TypedEncoding.Common.Class.Common
 import           Data.TypedEncoding.Common.Types.Common
 
 -- $setup

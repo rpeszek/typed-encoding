@@ -8,6 +8,14 @@
 {-# LANGUAGE AllowAmbiguousTypes #-}
 {-# LANGUAGE TypeApplications #-}
 
+-- | Type classes accompanying decoding types defined in "Data.TypedEncoding.Common.Types.Enc"
+--
+-- "Examples.TypedEncoding.Instances.DiySignEncoding" contains an implementation example.
+--
+-- "Examples.TypedEncoding.Overview" shows decoding usage examples.
+-- 
+-- This module is re-exported in "Data.TypedEncoding" and it is best not to import it directly.
+
 module Data.TypedEncoding.Common.Class.Encode where
 
 import           Data.TypedEncoding.Common.Types.Enc

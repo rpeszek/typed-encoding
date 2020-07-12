@@ -18,7 +18,7 @@ import           Data.TypedEncoding.Common.Types.Enc
 import           Data.TypedEncoding.Common.Types.Decoding
 import           Data.TypedEncoding.Combinators.Common
 
-import           Data.TypedEncoding.Common.Class.Util
+import           Data.TypedEncoding.Common.Util.TypeLits
 import           Data.TypedEncoding.Common.Class.Decode
 import           Data.Functor.Identity
 import           GHC.TypeLits

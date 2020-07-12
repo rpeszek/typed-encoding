@@ -26,7 +26,8 @@
 - Signature changed in previously deprecated function `runDecodings` to match `mns ~ algs` convention and deprecation removed
 -  Signature changed in previously deprecated function `runValidation` to match `mns ~ algs` convention and deprecation removed
 - `runValidationChecks` renamed to `runValidationChecks'` to match /typed-encoding/ naming conventions. 
-
+- removed deprecated `propEncodesInto'`
+- `HasA` typeclass moved to Examples
 
 - More general instances for some encodings in `Data.TypedEncoding.Instances.Restriction.Misc`
 - `mkDecoding` deprecated in favor of `_mkDecoding` to follow the naming convention

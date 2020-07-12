@@ -25,6 +25,7 @@ import           Data.TypedEncoding.Instances.Enc.Base64 ()
 import           Data.TypedEncoding.Instances.Enc.Warn.Base64 ()
 import           Data.TypedEncoding.Instances.Restriction.ASCII ()
 import           Examples.TypedEncoding.Instances.Do.Sample
+import           Examples.TypedEncoding.Util (HasA (..))
  
 import qualified Data.ByteString as B
 import qualified Data.Text as T

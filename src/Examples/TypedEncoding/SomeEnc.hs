@@ -4,7 +4,7 @@
 {-# LANGUAGE RankNTypes #-}
 
 -- |
--- Module defines 'SomeEnc' - existentially quantified version of @Enc@
+-- This module defines 'SomeEnc' - existentially quantified version of @Enc@
 -- and basic combinators.
 --
 -- This construction is common to more dependently typed Haskell but is 
@@ -20,7 +20,7 @@
 module Examples.TypedEncoding.SomeEnc where
 
 import           Data.TypedEncoding.Common.Types.Enc
-import           Data.TypedEncoding.Common.Class.Util
+import           Data.TypedEncoding.Common.Class.Common
 import           Data.TypedEncoding.Common.Types.CheckedEnc
 import           Examples.TypedEncoding.SomeEnc.SomeAnnotation
 

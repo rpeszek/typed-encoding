@@ -21,7 +21,7 @@
 --
 -- Currently this is spread out to different modules including
 --
--- * "Data.TypedEncoding.Common.Class.Util"
+-- * "Data.TypedEncoding.Common.Class.Common"
 --
 -- (TODO) these will need to get consolidated.
 module  Data.TypedEncoding.Common.Util.TypeLits where
@@ -33,44 +33,56 @@ import           Data.Symbol.Ascii
 -- $setup
 -- >>> :set -XScopedTypeVariables -XTypeFamilies -XKindSignatures -XDataKinds
 
--- !
+
+-- |
+-- Type level list append
+--
+-- (moved from @Data.TypedEncoding.Common.Class.Common@)
+--
+-- @since 0.1.0.0
+type family Append (xs :: [k]) (ys :: [k]) :: [k] where
+    Append '[] xs = xs
+    Append (y ': ys) xs = y ': Append ys xs
+
+
+-- |
 -- @since 0.2.1.0
 type family AcceptEq (msg :: ErrorMessage) (c :: Ordering) :: Bool where
     AcceptEq _  EQ = True
     AcceptEq msg _ =  TypeError msg
 
--- !
+-- |
 -- @since 0.4.0.0
 type family OrdBool (c :: Ordering) :: Bool where
     OrdBool EQ = 'True
     OrdBool _  =  'False
 
 
--- !
+-- |
 -- @since 0.2.1.0
 type family And (b1 :: Bool) (b2 :: Bool) :: Bool where
     And 'True 'True = 'True
     And _ _ = 'False
 
--- !
+-- |
 -- @since 0.2.1.0
 type family Or (b1 :: Bool) (b2 :: Bool) :: Bool where
     Or 'False 'False = 'False
     Or _ _ = 'True
 
--- !
+-- |
 -- @since 0.2.1.0
 type family If (b1 :: Bool) (a :: k) (b :: k) :: k where
     If 'True a _ = a
     If 'False _ b = b
 
--- !
+-- |
 -- @since 0.2.1.0
 type family Repeat (n :: Nat) (s :: Symbol) :: Symbol where
     Repeat 0 s = ""
     Repeat n s = AppendSymbol s (Repeat (n - 1) s)
 
--- !
+-- |
 -- @since 0.2.1.0
 type family Fst (s :: (k,h)) :: k where
    Fst ('(,) a _) = a

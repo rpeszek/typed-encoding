@@ -26,7 +26,7 @@ import           Data.TypedEncoding.Combinators.Unsafe (withUnsafeCoerce)
 
 -- $setup
 -- >>> :set -XOverloadedStrings -XMultiParamTypeClasses -XDataKinds -XTypeApplications
--- >>> import           Data.TypedEncoding.Common.Class.Util (displ)
+-- >>> import           Data.TypedEncoding.Common.Class.Common (displ)
 -- >>> import           Data.TypedEncoding.Combinators.Unsafe (unsafeSetPayload)
 -- >>> import           Data.TypedEncoding.Instances.Restriction.UTF8 ()
 -- >>> import           Data.TypedEncoding.Instances.Restriction.ASCII ()

@@ -22,7 +22,7 @@ module Data.TypedEncoding.Common.Types.Enc where
 import           Data.Proxy
 import           GHC.TypeLits
 
-import           Data.TypedEncoding.Common.Class.Util
+import           Data.TypedEncoding.Common.Class.Common
 import           Data.TypedEncoding.Common.Types.Common
 
 -- $setup

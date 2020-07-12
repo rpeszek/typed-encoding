@@ -26,7 +26,7 @@ import           Data.Char
 
 import           Data.TypedEncoding.Instances.Support
 import           Data.TypedEncoding.Instances.Support.Unsafe
-
+import           Examples.TypedEncoding.Util (HasA (..))
 -- |
 -- @since 0.3.0.0 
 instance Applicative f => Encode f "do-UPPER" "do-UPPER" c T.Text where
