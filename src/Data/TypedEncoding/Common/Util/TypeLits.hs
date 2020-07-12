@@ -11,6 +11,8 @@
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE KindSignatures  #-}
 {-# LANGUAGE AllowAmbiguousTypes #-}
+{-# LANGUAGE RankNTypes #-}
+-- {-# LANGUAGE GADTs #-}
 
 
 -- | TypeLits related utilities.
@@ -23,11 +25,28 @@ module  Data.TypedEncoding.Common.Util.TypeLits where
 
 import           GHC.TypeLits
 import           Data.Symbol.Ascii
+import           Data.Proxy
 
 
 -- $setup
 -- >>> :set -XScopedTypeVariables -XTypeFamilies -XKindSignatures -XDataKinds
 
+-- |
+-- Convenience combinator missing in TypeLits, See "Examples.TypedEncoding.SomeEnc.SomeAnnotation"
+-- "Examples.TypedEncoding.SomeEnc.someAnnValue"
+--
+-- @since 0.2.0.0
+withSomeSymbol :: SomeSymbol -> (forall x. KnownSymbol x => Proxy x -> r) -> r
+withSomeSymbol s fn = case s of 
+    SomeSymbol p -> fn p
+
+
+-- |
+-- (Moved from previously defined module @Data.TypedEncoding.Common.Types.SomeAnnotation@)
+-- 
+-- @since 0.2.0.0
+proxyCons :: forall (x :: Symbol) (xs :: [Symbol]) . Proxy x -> Proxy xs -> Proxy (x ': xs)
+proxyCons _ _ = Proxy
 
 -- |
 -- Type level list append

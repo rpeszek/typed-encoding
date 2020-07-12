@@ -10,10 +10,24 @@
 
 ## Unreleased 0.5.0
 
+### Changes on a high level
+
+- Most of the changes should not create a big impact on upgrading.  Many definitions were moved to a different module but these modules are re-exported by either `Data.TypedEncoding` or
+`Data.TypedEncoding.Instances.Support`
+- Some functionality has been moved to Examples or removed, notably:
+  - "do-" encodings
+  - `SomeEnc`, `SomeAnnotation`
+  - `HasA` typeclass
+- Some functions have been renamed or type signatures adjusted to follow consistent naming conventions.  In most cases the changes have been made on previously deprecated definitions.
+
+
+###  Details 
+
 - Data.TypedEncoding.Instances.Do.Sample moved to Examples
 - Examples.TypedEncoding folder re-org
 - `Data.TypedEncoding.Instances.Support.Helpers` removed `foldEncStr`, `foldCheckedEncStr`
    renamed  `splitSomePayload` to `splitCheckedPayload`
+- `HasA` typeclass moved to Examples
 - removed experimental `Data.TypedEncoding.Instances.Restriction.Bool` in favor of combinator helpers
   `Data.TypedEncoding.Instances.Support.Bool`
 - `Data.TypedEncoding.Common.Types.SomeEnc` moved to Examples  
@@ -27,9 +41,11 @@
 -  Signature changed in previously deprecated function `runValidation` to match `mns ~ algs` convention and deprecation removed
 - `runValidationChecks` renamed to `runValidationChecks'` to match /typed-encoding/ naming conventions. 
 - removed deprecated `propEncodesInto'`
-- `HasA` typeclass moved to Examples
 - moved `Append` type family from from `Data.TypedEncoding.Common.Class.Util` to `Data.TypedEncoding.Common.Util.TypeLits`
 - `Data.TypedEncoding.Common.Class.Util` renamed to `Data.TypedEncoding.Common.Class.Common`
+- function `extractEither` removed from `Data.TypedEncoding.Internal.Util`
+- function `withSomeSymbol` moved to `Data.TypedEncoding.Common.Util.TypeLits`
+- function `proxyCons` moved to `Data.TypedEncoding.Common.Util.TypeLits`
 
 - More general instances for some encodings in `Data.TypedEncoding.Instances.Restriction.Misc`
 - `mkDecoding` deprecated in favor of `_mkDecoding` to follow the naming convention

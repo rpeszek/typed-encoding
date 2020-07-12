@@ -35,7 +35,6 @@ import           Data.Either
 -- >>> import Test.QuickCheck.Instances.Text()
 -- >>> import Test.QuickCheck.Instances.ByteString()
 -- >>> import Data.TypedEncoding
--- >>> import Data.TypedEncoding.Internal.Util (proxiedId)
 -- >>> let emptyUTF8B = unsafeSetPayload () "" ::  Enc '["r-UTF8"] () B.ByteString 
 -- >>> :{  
 -- instance Arbitrary (Enc '["r-UTF8"] () B.ByteString) where 
