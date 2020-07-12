@@ -7,6 +7,9 @@
 
 -- | This Module will be removed in the future in favor of classes defined in
 -- "Data.TypedEncoding.Common.Class.Util.StringConstraints"
+--
+-- This module is re-exported in "Data.TypedEncoding" and it is best not to import it directly.
+
 module Data.TypedEncoding.Common.Class.IsStringR where
 
 import           Data.Proxy

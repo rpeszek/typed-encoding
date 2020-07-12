@@ -9,11 +9,14 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeApplications #-}
 
--- | This module defines some sample "do-" encodings
--- currently for example use only.
+-- | This module defines some example "do-" encodings
+-- 
+-- See "Examples.TypedEncoding.Overview" for usage examples.
+-- 
+-- (moved from @Data.TypedEncoding.Instances.Do.Sample@)
 --
--- WARNING this Module will be moved to Examples in future versions
-module Data.TypedEncoding.Instances.Do.Sample where
+-- @since 0.5.0.0
+module Examples.TypedEncoding.Instances.Do.Sample where
 
 import qualified Data.Text as T
 import qualified Data.Text.Lazy as TL
@@ -23,14 +26,14 @@ import           Data.Char
 
 import           Data.TypedEncoding.Instances.Support
 import           Data.TypedEncoding.Instances.Support.Unsafe
-
+import           Examples.TypedEncoding.Util (HasA (..))
 -- |
 -- @since 0.3.0.0 
 instance Applicative f => Encode f "do-UPPER" "do-UPPER" c T.Text where
     encoding = _implEncodingP T.toUpper
 
 instance (RecreateErr f, Applicative f) => Validate f "do-UPPER" "do-UPPER" c T.Text where
-    validation = mkValidation $
+    validation = _mkValidation $
                           implTranF (asRecreateErr @"do-UPPER" . (\t -> 
                                  let (g,b) = T.partition isUpper t
                                  in if T.null b

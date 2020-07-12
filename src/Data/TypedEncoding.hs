@@ -33,12 +33,13 @@
 -- date = toEncString ...
 -- @
 --
--- Primary focus of type-encodings is to provide type safe
+-- Primary focus of /type-encodings/ is to provide type safe
 --
 -- * /encoding/
 -- * /decoding/
 -- * /validation (recreation)/ (verification of existing payload)
 -- * type conversions between encoded types
+-- * combinators for creating new encodings from existing encodings (e.g. by applying Boolean rules)
 --
 -- of string-like data (@ByteString@, @Text@) that is subject of some
 -- encoding or formatting restrictions.
@@ -62,7 +63,7 @@
 --
 -- Examples: @"r-UTF8"@, @"r-ASCII"@, upper alpha-numeric bound /r-ban/ restrictions like @"r-ban:999-999-9999"@
 --
--- == "do-" transformations
+-- == "do-" transformations (not provided in this library other than as /Examples/ "Examples.TypedEncoding.Instances.Do.Sample")
 --
 -- * /encoding/ applies transformation to the string (could be partial)
 -- * /decoding/ - typically none
@@ -78,18 +79,6 @@
 --
 -- Examples: @"enc-B64"@
 -- 
--- == "bool[Op]:" encodings
---
--- Encodings that are defined in terms of other encodings using boolean algebra.
---
--- (early, beta version)
---
--- Examples: 
---
--- @"boolOr:(r-ban:999-999-9999)(r-ban:(999) 999-9999)"@ 
---
--- "@boolNot:(r-ASCII)"
---
 --
 -- = Call Site Usage
 --
@@ -101,9 +90,7 @@
 -- * "Data.TypedEncoding.Instances.Restriction.Misc" (replaces @Common@ from v0.2)
 -- * "Data.TypedEncoding.Instances.Restriction.ASCII" 
 -- * "Data.TypedEncoding.Instances.Restriction.UTF8" 
--- * "Data.TypedEncoding.Instances.Restriction.Bool" (experimental / early alpha version, moved from @Combinators@ to @Instances@ in v0.3)
 -- * "Data.TypedEncoding.Instances.Restriction.BoundedAlphaNums" (moved from @Combinators@ to @Instances@ in v0.3)
--- * "Data.TypedEncoding.Instances.Do.Sample" - This module is intended as example code and will be moved under 'Examples.TypedEncoding' in the future
 -- 
 -- ... and needed conversions. 
 --
@@ -124,6 +111,7 @@
 -- Examples of how to use this library are included in
 --
 -- * "Examples.TypedEncoding"    
+
 module Data.TypedEncoding (
   
     -- * @Enc@ and basic combinators
@@ -132,8 +120,7 @@ module Data.TypedEncoding (
     , fromEncoding
     , getPayload
 
-    -- * Existentially quantified and untyped versions of @Enc@
-    , module Data.TypedEncoding.Common.Types.SomeEnc
+    -- * Untyped versions of @Enc@
     , module  Data.TypedEncoding.Common.Types.CheckedEnc
 
     -- * @Encoding@ and basic combinators
@@ -187,7 +174,6 @@ import           Data.TypedEncoding.Common.Types.Validation
 
 import           Data.TypedEncoding.Common.Types.Common
 import           Data.TypedEncoding.Common.Types.CheckedEnc
-import           Data.TypedEncoding.Common.Types.SomeEnc
 import           Data.TypedEncoding.Common.Types.UncheckedEnc
 import           Data.TypedEncoding.Common.Types.Exceptions
 import           Data.TypedEncoding.Common.Class

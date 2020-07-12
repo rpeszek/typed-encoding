@@ -1,22 +1,30 @@
 {-# LANGUAGE GADTs #-}
 {-# LANGUAGE ScopedTypeVariables #-}
--- {-# LANGUAGE PolyKinds #-}
--- {-# LANGUAGE DataKinds #-}
--- {-# LANGUAGE TypeOperators #-}
--- {-# LANGUAGE FlexibleInstances #-}
-{-# LANGUAGE StandaloneDeriving #-}
+-- {-# LANGUAGE StandaloneDeriving #-}
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE AllowAmbiguousTypes #-}
 {-# LANGUAGE RankNTypes #-}
 
 -- |
--- Module defines 'CheckedEnc' - untyped ADT version of 'Enc' 
+-- Module defines 'CheckedEnc' - untyped ADT version of 'Enc'
+--
+-- A more dependently typed approach would be to define SomeEnc GADT
+-- that accepts some @Enc '[..]@ in its constructor.  The approach here
+-- turns out to be isomorphic to @SomeEnc@ approach.  Both, however, yield
+-- somewhat different programming.  
+--
+-- Post v0.4 /typed-encoding/ does not support @SomeEnc@ and it remains only as an /Example/.
+-- 
+-- See "Examples.TypedEncoding.SomeEnc".
+--
+-- This module is re-exported in "Data.TypedEncoding" and it is best not to import it directly.
+
 
 module Data.TypedEncoding.Common.Types.CheckedEnc where
 
 import           Data.TypedEncoding.Common.Types.Enc
 import           Data.TypedEncoding.Common.Types.Common
-import           Data.TypedEncoding.Common.Class.Util
+import           Data.TypedEncoding.Common.Class.Common
 import           Data.Proxy
 
 -- $setup
@@ -27,8 +35,6 @@ import           Data.Proxy
 
 -- * Untyped Enc
 
--- constructor is to be treated as Unsafe to Encode and Decode instance implementations
--- particular encoding instances may expose smart constructors for limited data types
 
 -- | Represents some validated encoded string. 
 --
@@ -39,7 +45,8 @@ import           Data.Proxy
 -- @since 0.2.0.0 
 data CheckedEnc conf str = UnsafeMkCheckedEnc [EncAnn] conf str -- ^ @since 0.3.0.0
                                                                 -- Constructor renamed from previous versions
-
+                                                                -- This constructor is considered unsafe as pattern matching on it and
+                                                                -- using it allows access to the encoded payload.
      deriving (Show, Eq) 
 
 -- |
@@ -76,19 +83,19 @@ fromCheckedEnc (UnsafeMkCheckedEnc xs c s) =
 
 -- |
 -- >>> let encsometest = UnsafeMkCheckedEnc ["TEST"] () $ T.pack "hello"
--- >>> proc_toCheckedEncFromCheckedEnc @'["TEST"] encsometest
+-- >>> procToCheckedEncFromCheckedEnc @'["TEST"] encsometest
 -- True
--- >>> proc_toCheckedEncFromCheckedEnc @'["TEST1"] encsometest
+-- >>> procToCheckedEncFromCheckedEnc @'["TEST1"] encsometest
 -- False
-proc_toCheckedEncFromCheckedEnc :: forall xs c str . (SymbolList xs, Eq c, Eq str) => CheckedEnc c str -> Bool
-proc_toCheckedEncFromCheckedEnc x = (== Just x) . fmap (toCheckedEnc @ xs) . fromCheckedEnc $ x
+procToCheckedEncFromCheckedEnc :: forall xs c str . (SymbolList xs, Eq c, Eq str) => CheckedEnc c str -> Bool
+procToCheckedEncFromCheckedEnc x = (== Just x) . fmap (toCheckedEnc @ xs) . fromCheckedEnc $ x
 
 -- |
 -- >>> let enctest = unsafeSetPayload () "hello" :: Enc '["TEST"] () T.Text
--- >>> proc_fromCheckedEncToCheckedEnc enctest
+-- >>> procFromCheckedEncToCheckedEnc enctest
 -- True
-proc_fromCheckedEncToCheckedEnc :: forall xs c str . (SymbolList xs, Eq c, Eq str) => Enc xs c str -> Bool
-proc_fromCheckedEncToCheckedEnc x = (== Just x) . fromCheckedEnc . toCheckedEnc $ x
+procFromCheckedEncToCheckedEnc :: forall xs c str . (SymbolList xs, Eq c, Eq str) => Enc xs c str -> Bool
+procFromCheckedEncToCheckedEnc x = (== Just x) . fromCheckedEnc . toCheckedEnc $ x
 
 -- |
 -- >>> displ $ unsafeCheckedEnc ["TEST"] () ("hello" :: T.Text)

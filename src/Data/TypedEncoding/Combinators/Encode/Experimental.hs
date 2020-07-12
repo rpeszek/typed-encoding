@@ -16,7 +16,7 @@ module Data.TypedEncoding.Combinators.Encode.Experimental where
 import           Data.TypedEncoding.Combinators.Encode
 import           Data.TypedEncoding.Common.Types.Enc
 import           Data.TypedEncoding.Common.Types.Common
-import           Data.TypedEncoding.Common.Class.Util -- Append
+import           Data.TypedEncoding.Common.Util.TypeLits -- Append
 import           Data.TypedEncoding.Common.Class.Encode    
 import           Data.Functor.Identity
 import           GHC.TypeLits

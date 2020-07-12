@@ -3,8 +3,7 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE TypeApplications #-}
 
--- {-# LANGUAGE PartialTypeSignatures #-}
--- {-# OPTIONS_GHC -Wno-partial-type-signatures #-}
+{-# OPTIONS_GHC -Wno-deprecations #-}
 
 -- | type-encoding overview examples. 
 --
@@ -16,15 +15,17 @@
 --
 -- * "Data.TypedEncoding.Instances.Enc.Base64"
 -- * "Data.TypedEncoding.Instances.Restriction.ASCII"
--- * "Data.TypedEncoding.Instances.Do.Sample"
+-- * "Examples.TypedEncoding.Instances.Do.Sample"
 --
 
 module Examples.TypedEncoding.Overview where
 
 import           Data.TypedEncoding
 import           Data.TypedEncoding.Instances.Enc.Base64 ()
+import           Data.TypedEncoding.Instances.Enc.Warn.Base64 ()
 import           Data.TypedEncoding.Instances.Restriction.ASCII ()
-import           Data.TypedEncoding.Instances.Do.Sample
+import           Examples.TypedEncoding.Instances.Do.Sample
+import           Examples.TypedEncoding.Util (HasA (..))
  
 import qualified Data.ByteString as B
 import qualified Data.Text as T
@@ -151,7 +152,7 @@ helloB64B64RecoveredErr = recreateFAll . toEncoding () $ "SGVsbG8gV29ybGQ="
 -- * "do-" Encodings
 
 -- |
--- "do-UPPER" (from 'Data.TypedEncoding.Instances.Do.Sample' module) encoding applied to "Hello World"
+-- "do-UPPER" (from 'Examples.TypedEncoding.Instances.Do.Sample' module) encoding applied to "Hello World"
 --
 -- Notice a namespace thing going on, "enc-" is encoding, "do-" is some transformation. 
 -- These are typically not reversible, some could be recoverable.
@@ -183,7 +184,7 @@ exampleConf = Config (SizeLimit 8)
 instance HasA SizeLimit Config where
    has = sizeLimit  
 
--- | `helloTitle' is needed in following examples
+-- | @helloTitle'@ is needed in following examples
 --
 helloTitle :: Enc '["do-Title"] Config T.Text
 helloTitle = encodeAll . toEncoding exampleConf $ "hello wOrld"

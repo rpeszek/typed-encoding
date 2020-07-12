@@ -4,15 +4,25 @@
 {-# LANGUAGE RankNTypes #-}
 
 -- |
--- Module defines 'SomeEnc' - existentially quantified version of @Enc@
--- and basic combinators
+-- This module defines 'SomeEnc' - existentially quantified version of @Enc@
+-- and basic combinators.
+--
+-- This construction is common to more dependently typed Haskell but is 
+-- isomorphic to 'Data.TypedEncoding.Common.Types.CheckedEnc.CheckedEnc'.  
+--
+-- Post v0.4 /typed-encoding/ supports @CheckedEnc@ while @SomeEnc@ remains as
+-- as example.
+--
+-- (Moved from @Data.TypedEncoding.Common.Types.SomeEnc@ in previous versions)
+--
+-- @since 0.5.0.0
 
-module Data.TypedEncoding.Common.Types.SomeEnc where
+module Examples.TypedEncoding.SomeEnc where
 
 import           Data.TypedEncoding.Common.Types.Enc
-import           Data.TypedEncoding.Common.Class.Util
-import           Data.TypedEncoding.Common.Types.SomeAnnotation
+import           Data.TypedEncoding.Common.Class.Common
 import           Data.TypedEncoding.Common.Types.CheckedEnc
+import           Examples.TypedEncoding.SomeEnc.SomeAnnotation
 
 -- $setup
 -- >>> :set -XOverloadedStrings -XMultiParamTypeClasses -XDataKinds -XAllowAmbiguousTypes

@@ -10,6 +10,7 @@
 
 -- | Direct use of these methods is discouraged.
 -- Use "Data.TypedEncoding.Instances.Support.Encode" or "Data.TypedEncoding.Instances.Support.Decode" 
+-- instead.
 module Data.TypedEncoding.Instances.Support.Unsafe where
 
 import           Data.Proxy

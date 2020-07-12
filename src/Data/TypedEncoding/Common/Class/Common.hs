@@ -11,11 +11,14 @@
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE AllowAmbiguousTypes #-}
 
--- | This module should be merged with 
--- "Data.TypedEncoding.Common.Util.TypeLits"
+-- | 
+-- This module defines @SymbolList@ and @Displ@ type classes
+-- using by /typed-encoding/ used for display / testing as well as 
+-- for construction of untyped versions of @Enc@ (@CheckedEnc@ and @UncheckedEnc@)
 --
--- Since both provide type level helpers
-module Data.TypedEncoding.Common.Class.Util where
+-- This module is re-exported in "Data.TypedEncoding" and it is best not to import it directly.
+
+module Data.TypedEncoding.Common.Class.Common where
 
 import           Data.TypedEncoding.Common.Types.Common
 
@@ -82,27 +85,4 @@ instance (SymbolList xs) => Displ (Proxy xs) where
         -- "[" ++ (L.intercalate "," $ map displ $ symbolVals @ xs) ++ "]"
 
 
--- * Other
 
--- TODO should this be imported from somewhere?
-
--- |
--- Type level list append
--- 
--- @since 0.1.0.0
-type family Append (xs :: [k]) (ys :: [k]) :: [k] where
-    Append '[] xs = xs
-    Append (y ': ys) xs = y ': Append ys xs
-
--- | Polymorphic data payloads used to encode/decode
---
--- This class is intended for example use only and will be moved to Example modules.
--- 
--- Use your favorite polymorphic records / ad-hock product polymorphism library.
---
--- @since 0.1.0.0
-class HasA a c where
-    has :: c -> a
-
-instance HasA () c where
-    has = const ()

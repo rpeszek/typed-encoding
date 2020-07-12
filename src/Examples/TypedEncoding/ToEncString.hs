@@ -86,10 +86,10 @@ tstIp = IpV4F 128 1 1 10
 -- UnsafeMkEnc Proxy () "128.1.1.10"
 --
 -- Implementation is a classic map reduce where reduce is done with help of
--- 'EnT.foldEncStr'
+-- 'EnT.foldEnc'
 --
 -- >>> let fn a b = if b == "" then a else a <> "." <> b
--- >>> let reduce = EnT.foldEncStr @'["r-IPv4"] @'["r-Word8-decimal"] () fn
+-- >>> let reduce = EnT.foldEnc @'["r-IPv4"] @'["r-Word8-decimal"] () fn ""
 -- >>>  displ . reduce . fmap toEncString $ tstIp
 -- "Enc '[r-IPv4] () (String 128.1.1.10)"
 --
@@ -112,7 +112,7 @@ instance ToEncString Identity "r-IPv4" "r-IPv4" IpV4 T.Text where
             map = fmap toEncString
 
             reduce :: IpV4F (Enc '["r-Word8-decimal"] () T.Text) -> Enc '["r-IPv4"] () T.Text 
-            reduce = EnT.foldEncStr () (\a b-> if b == "" then a else a <> "." <> b) 
+            reduce = EnT.foldEnc () (\a b-> if b == "" then a else a <> "." <> b) ""
 
 -- |
 --

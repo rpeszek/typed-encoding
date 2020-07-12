@@ -6,12 +6,15 @@
 {-# LANGUAGE AllowAmbiguousTypes #-}
 {-# LANGUAGE RankNTypes #-}
 
--- | internally used existential type for taking track of annotations
-module Data.TypedEncoding.Common.Types.SomeAnnotation where
+-- | Internally used existential type for tracking of annotations
+--
+-- This module is re-exported in "Data.TypedEncoding" and it is best not to import it directly.
+
+module Examples.TypedEncoding.SomeEnc.SomeAnnotation where
 
 import           Data.TypedEncoding.Common.Types.Common
-import           Data.TypedEncoding.Common.Class.Util
-import           Data.TypedEncoding.Internal.Util
+import           Data.TypedEncoding.Common.Class.Common
+import           Data.TypedEncoding.Common.Util.TypeLits (withSomeSymbol, proxyCons)
 import           Data.Proxy
 import           GHC.TypeLits
 
@@ -26,7 +29,7 @@ withSomeAnnotation :: SomeAnnotation -> (forall xs . SymbolList xs => Proxy xs -
 withSomeAnnotation (MkSomeAnnotation p) fn = fn p
 
 
--- | folds over SomeSymbol list using withSomeSymbol and proxyCons
+-- | folds over SomeSymbol list 
 -- @since 0.2.0.0
 someAnnValue :: [EncAnn] -> SomeAnnotation
 someAnnValue xs = 
@@ -35,7 +38,4 @@ someAnnValue xs =
          somesymbs = map someSymbolVal xs
          fn ss (MkSomeAnnotation pxs) = withSomeSymbol ss (\px -> MkSomeAnnotation  (px `proxyCons` pxs)) 
 
--- |
--- @since 0.2.0.0
-proxyCons :: forall (x :: Symbol) (xs :: [Symbol]) . Proxy x -> Proxy xs -> Proxy (x ': xs)
-proxyCons _ _ = Proxy
+

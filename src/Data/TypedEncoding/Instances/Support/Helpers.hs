@@ -8,11 +8,12 @@
 {-# LANGUAGE AllowAmbiguousTypes #-}
 {-# LANGUAGE FlexibleContexts #-}
 
--- | Support for mostly creating instances ToEncString and FromEncString conversions
+-- | Various helper functions.
+-- There are mostly for for creating @ToEncString@ and @FromEncString@ instances
 
 module Data.TypedEncoding.Instances.Support.Helpers where
 
-import           Data.String
+-- import           Data.String
 import           Data.Proxy
 import           Text.Read
 import           Data.TypedEncoding.Common.Types
@@ -39,13 +40,6 @@ foldEnc :: forall (xs2 :: [Symbol]) (xs1 :: [Symbol]) f c s1 s2
            => c -> (s1 -> s2 -> s2) -> s2 -> f (Enc xs1 c s1) -> Enc xs2 c s2
 foldEnc c f sinit = unsafeSetPayload c . foldr f sinit . fmap getPayload 
 
--- | Similar to 'foldEnc', assumes that destination payload has @IsString@ instance and uses @""@ as base case. 
---
--- @since 0.2.0.0
-foldEncStr :: forall (xs2 :: [Symbol]) (xs1 :: [Symbol]) f c s1 s2 
-             . (Foldable f, Functor f, IsString s2) 
-             => c -> (s1 -> s2 -> s2) -> f (Enc xs1 c s1) -> Enc xs2 c s2
-foldEncStr c f = foldEnc c f ""
 
 -- | Similar to 'foldEnc', works with untyped 'CheckedEnc'
 --
@@ -55,16 +49,11 @@ foldCheckedEnc :: forall (xs2 :: [Symbol]) f c s1 s2
              => c -> ([EncAnn] -> s1 -> s2 -> s2) -> s2 -> f (CheckedEnc c s1) -> Enc xs2 c s2
 foldCheckedEnc c f sinit = unsafeSetPayload c . foldr (uncurry f) sinit . fmap getCheckedEncPayload
 
--- | Similar to 'foldEncStr', works with untyped 'CheckedEnc'
---
--- @since 0.2.0.0
-foldCheckedEncStr :: forall (xs2 :: [Symbol]) f c s1 s2 . (Foldable f, Functor f, IsString s2) => c -> ([EncAnn] -> s1 -> s2 -> s2) -> f (CheckedEnc c s1) -> Enc xs2 c s2
-foldCheckedEncStr c f  = foldCheckedEnc c f ""
 
 
 -- * Composite encoding: Recreate and Encode helpers
 
--- | Splits composite payload into homogenious chunks
+-- | Splits composite payload into homogeneous chunks
 --
 -- @since 0.2.0.0
 splitPayload :: forall (xs2 :: [Symbol]) (xs1 :: [Symbol]) c s1 s2 . 
@@ -75,12 +64,13 @@ splitPayload f (UnsafeMkEnc _ c s1) = map (UnsafeMkEnc Proxy c) (f s1)
    
 -- | Untyped version of 'splitPayload'
 --
--- @since 0.2.0.0
-splitSomePayload :: forall c s1 s2 . 
+-- (renamed from @splitCheckedPayload@ in previous versions)
+-- @since 0.5.0.0
+splitCheckedPayload :: forall c s1 s2 . 
              ([EncAnn] -> s1 -> [([EncAnn], s2)]) 
              -> CheckedEnc c s1 
              -> [CheckedEnc c s2]
-splitSomePayload f (UnsafeMkCheckedEnc ann1 c s1) = map (\(ann2, s2) -> UnsafeMkCheckedEnc ann2 c s2) (f ann1 s1)
+splitCheckedPayload f (UnsafeMkCheckedEnc ann1 c s1) = map (\(ann2, s2) -> UnsafeMkCheckedEnc ann2 c s2) (f ann1 s1)
 
 
 -- * Utility combinators 
@@ -108,14 +98,14 @@ verifyWithRead msg x =
 
 
 -- | Convenience function for checking if @str@ decodes without error
--- using @enc@ encoding markers and decoders that can pick decoder based
+-- using @dec@ encoding markers and decoders that can pick decoder based
 -- on that marker
 --
 -- @since 0.3.0.0
-verifyDynEnc :: forall s str err1 err2 enc a. (KnownSymbol s, Show err1, Show err2) => 
+verifyDynEnc :: forall s str err1 err2 dec a. (KnownSymbol s, Show err1, Show err2) => 
                   Proxy s   -- ^ proxy defining encoding annotation
-                  -> (Proxy s -> Either err1 enc)  -- ^ finds encoding marker @enc@ for given annotation or fails
-                  -> (enc -> str -> Either err2 a)  -- ^ decoder based on @enc@ marker
+                  -> (Proxy s -> Either err1 dec)  -- ^ finds encoding marker @dec@ for given annotation or fails
+                  -> (dec -> str -> Either err2 a)  -- ^ decoder based on @dec@ marker
                   -> str                            -- ^ input
                   -> Either EncodeEx str
 verifyDynEnc p findenc decoder str = 

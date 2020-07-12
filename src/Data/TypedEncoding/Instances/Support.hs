@@ -10,7 +10,6 @@ module Data.TypedEncoding.Instances.Support (
     -- * Classes
     , module Data.TypedEncoding.Common.Class
     -- * Combinators
-    , module Data.TypedEncoding.Instances.Support.Common
     , module Data.TypedEncoding.Instances.Support.Helpers
     , module Data.TypedEncoding.Instances.Support.Encode
     , module Data.TypedEncoding.Instances.Support.Decode
@@ -20,7 +19,6 @@ module Data.TypedEncoding.Instances.Support (
     , module Data.TypedEncoding.Common.Util.TypeLits
    ) where
 
-import           Data.TypedEncoding.Instances.Support.Common 
 import           Data.TypedEncoding.Instances.Support.Helpers 
 import           Data.TypedEncoding.Instances.Support.Encode 
 import           Data.TypedEncoding.Instances.Support.Decode 

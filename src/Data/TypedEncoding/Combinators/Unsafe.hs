@@ -10,7 +10,7 @@ import           Data.Proxy
 
 -- |
 -- Currently this is the recommended way of recreating encoding from trusted input,
--- if avoiding cost of "Data.TypedEncoding.Common.Types.Validation" is important.
+-- if avoiding cost of "Data.TypedEncoding.Common.Types.Validation" is needed.
 --    
 -- @since 0.1.0.0 
 unsafeSetPayload :: conf -> str -> Enc enc conf str 
