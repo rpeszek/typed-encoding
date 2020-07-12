@@ -19,11 +19,6 @@
 --
 -- Uses @symbols@ library for its ToList type family.
 --
--- Currently this is spread out to different modules including
---
--- * "Data.TypedEncoding.Common.Class.Common"
---
--- (TODO) these will need to get consolidated.
 module  Data.TypedEncoding.Common.Util.TypeLits where
 
 import           GHC.TypeLits

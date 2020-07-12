@@ -11,6 +11,10 @@
 -- {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE AllowAmbiguousTypes #-}
 
+-- |
+-- Type classes accompanying decoding types defined in "Data.TypedEncoding.Common.Types.Validation"
+--
+-- This module is re-exported in "Data.TypedEncoding" and it is best not to import it directly.
 module Data.TypedEncoding.Common.Class.Validate where
 
 import           Data.TypedEncoding.Common.Types (RecreateEx(..))

@@ -16,6 +16,9 @@
 -- |
 -- This module contains typeclasses and type families that are used by /typed-encoding/ to 
 -- define subset / superset relationships between different encodings. 
+--
+-- This module is re-exported in "Data.TypedEncoding" and it is best not to import it directly.
+
 module Data.TypedEncoding.Common.Class.Superset where
 
 import           Data.TypedEncoding.Common.Util.TypeLits

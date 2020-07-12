@@ -15,6 +15,9 @@
 -- This module defines @SymbolList@ and @Displ@ type classes
 -- using by /typed-encoding/ used for display / testing as well as 
 -- for construction of untyped versions of @Enc@ (@CheckedEnc@ and @UncheckedEnc@)
+--
+-- This module is re-exported in "Data.TypedEncoding" and it is best not to import it directly.
+
 module Data.TypedEncoding.Common.Class.Common where
 
 import           Data.TypedEncoding.Common.Types.Common

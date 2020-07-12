@@ -28,6 +28,8 @@
 - `runValidationChecks` renamed to `runValidationChecks'` to match /typed-encoding/ naming conventions. 
 - removed deprecated `propEncodesInto'`
 - `HasA` typeclass moved to Examples
+- moved `Append` type family from from `Data.TypedEncoding.Common.Class.Util` to `Data.TypedEncoding.Common.Util.TypeLits`
+- `Data.TypedEncoding.Common.Class.Util` renamed to `Data.TypedEncoding.Common.Class.Common`
 
 - More general instances for some encodings in `Data.TypedEncoding.Instances.Restriction.Misc`
 - `mkDecoding` deprecated in favor of `_mkDecoding` to follow the naming convention
