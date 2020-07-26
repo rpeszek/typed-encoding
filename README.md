@@ -9,16 +9,16 @@ This library allows to specify and work with types like
 
 ```Haskell
 -- some data encoded in base 64
-mydata :: Enc '["enc-B64"] ByteString
+mydata :: Enc '["enc-B64"] c ByteString
 
 -- some text (utf8) data encoded in base 64 
-myData :: Enc '["enc-B64", "r-UTF8"] ByteString
+myData :: Enc '["enc-B64", "r-UTF8"] c ByteString
 ```
 
 It allows to define precise string content annotations like:
 
 ```Haskell
-ipaddr :: Enc '["r-IpV4"] Text
+ipaddr :: Enc '["r-IpV4"] c Text
 ```
 
 and provides ways for 
@@ -82,7 +82,6 @@ Here are some code examples:
 ## Hackage
 
 https://hackage.haskell.org/package/typed-encoding
-
 
 ## Other encoding packages
 
