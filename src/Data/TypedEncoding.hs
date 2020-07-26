@@ -10,26 +10,26 @@
 --
 -- @
 -- -- Base 64 encoded bytes (could represent binary files)
--- Enc '["enc-B64"] ByteString
+-- Enc '["enc-B64"] () ByteString
 --
 -- -- Base 64 encoded UTF8 bytes
--- Enc '["enc-B64", "r-UTF8"] ByteString
+-- Enc '["enc-B64", "r-UTF8"] () ByteString
 --
 -- -- Text that contains only ASCII characters
--- Enc '["r-ASCII"] Text
+-- Enc '["r-ASCII"] () Text
 -- @
 --
 -- or to do transformations to strings like
 --
 -- @
--- upper :: Text -> Enc '["do-UPPER"] Text
+-- upper :: Text -> Enc '["do-UPPER"] c Text
 -- upper = ...
 -- @
 --
 -- or to define precise types to use with 'toEncString' and 'fromEncString'
 -- 
 -- @
--- date :: Enc '["r-date-%d/%b/%Y:%X %Z"] Text
+-- date :: Enc '["r-date-%d/%b/%Y:%X %Z"] () Text
 -- date = toEncString ...
 -- @
 --
