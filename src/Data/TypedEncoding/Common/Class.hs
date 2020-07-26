@@ -13,14 +13,14 @@
 
 module Data.TypedEncoding.Common.Class (
     module Data.TypedEncoding.Common.Class
-    , module Data.TypedEncoding.Common.Class.Util
+    , module Data.TypedEncoding.Common.Class.Common
     , module Data.TypedEncoding.Common.Class.Encode
     , module Data.TypedEncoding.Common.Class.Decode
     , module Data.TypedEncoding.Common.Class.Validate 
     , module Data.TypedEncoding.Common.Class.Superset 
   ) where
 
-import           Data.TypedEncoding.Common.Class.Util
+import           Data.TypedEncoding.Common.Class.Common
 import           Data.TypedEncoding.Common.Class.Encode
 import           Data.TypedEncoding.Common.Class.Decode
 import           Data.TypedEncoding.Common.Class.Validate

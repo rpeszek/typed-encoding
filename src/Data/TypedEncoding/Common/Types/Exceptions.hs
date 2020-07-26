@@ -9,7 +9,9 @@
 -- {-# LANGUAGE RankNTypes #-}
 
 -- |
--- Internal definition of types
+-- Exception types used in /typed-encoding/
+--
+-- This module is re-exported in "Data.TypedEncoding" and it is best not to import it directly.
 
 module Data.TypedEncoding.Common.Types.Exceptions where
 

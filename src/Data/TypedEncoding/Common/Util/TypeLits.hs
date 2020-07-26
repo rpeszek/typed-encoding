@@ -11,6 +11,8 @@
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE KindSignatures  #-}
 {-# LANGUAGE AllowAmbiguousTypes #-}
+{-# LANGUAGE RankNTypes #-}
+-- {-# LANGUAGE GADTs #-}
 
 
 -- | TypeLits related utilities.
@@ -19,59 +21,82 @@
 --
 -- Uses @symbols@ library for its ToList type family.
 --
--- Currently this is spread out in different modules
---
--- * "Data.TypedEncoding.Common.Class.Util"
--- * "Data.TypedEncoding.Common.Types.SomeAnnotation"
---
--- (TODO) these will need to get consolidated.
 module  Data.TypedEncoding.Common.Util.TypeLits where
 
 import           GHC.TypeLits
 import           Data.Symbol.Ascii
+import           Data.Proxy
 
 
 -- $setup
 -- >>> :set -XScopedTypeVariables -XTypeFamilies -XKindSignatures -XDataKinds
 
--- !
+-- |
+-- Convenience combinator missing in TypeLits, See "Examples.TypedEncoding.SomeEnc.SomeAnnotation"
+-- "Examples.TypedEncoding.SomeEnc.someAnnValue"
+--
+-- @since 0.2.0.0
+withSomeSymbol :: SomeSymbol -> (forall x. KnownSymbol x => Proxy x -> r) -> r
+withSomeSymbol s fn = case s of 
+    SomeSymbol p -> fn p
+
+
+-- |
+-- (Moved from previously defined module @Data.TypedEncoding.Common.Types.SomeAnnotation@)
+-- 
+-- @since 0.2.0.0
+proxyCons :: forall (x :: Symbol) (xs :: [Symbol]) . Proxy x -> Proxy xs -> Proxy (x ': xs)
+proxyCons _ _ = Proxy
+
+-- |
+-- Type level list append
+--
+-- (moved from @Data.TypedEncoding.Common.Class.Common@)
+--
+-- @since 0.1.0.0
+type family Append (xs :: [k]) (ys :: [k]) :: [k] where
+    Append '[] xs = xs
+    Append (y ': ys) xs = y ': Append ys xs
+
+
+-- |
 -- @since 0.2.1.0
 type family AcceptEq (msg :: ErrorMessage) (c :: Ordering) :: Bool where
     AcceptEq _  EQ = True
     AcceptEq msg _ =  TypeError msg
 
--- !
+-- |
 -- @since 0.4.0.0
 type family OrdBool (c :: Ordering) :: Bool where
     OrdBool EQ = 'True
     OrdBool _  =  'False
 
 
--- !
+-- |
 -- @since 0.2.1.0
 type family And (b1 :: Bool) (b2 :: Bool) :: Bool where
     And 'True 'True = 'True
     And _ _ = 'False
 
--- !
+-- |
 -- @since 0.2.1.0
 type family Or (b1 :: Bool) (b2 :: Bool) :: Bool where
     Or 'False 'False = 'False
     Or _ _ = 'True
 
--- !
+-- |
 -- @since 0.2.1.0
 type family If (b1 :: Bool) (a :: k) (b :: k) :: k where
     If 'True a _ = a
     If 'False _ b = b
 
--- !
+-- |
 -- @since 0.2.1.0
 type family Repeat (n :: Nat) (s :: Symbol) :: Symbol where
     Repeat 0 s = ""
     Repeat n s = AppendSymbol s (Repeat (n - 1) s)
 
--- !
+-- |
 -- @since 0.2.1.0
 type family Fst (s :: (k,h)) :: k where
    Fst ('(,) a _) = a

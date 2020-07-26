@@ -8,10 +8,8 @@
 {-# LANGUAGE UndecidableInstances #-}
 {-# LANGUAGE TypeApplications #-}
 
--- | Exports for instance creation.
--- 
--- Contains typical things needed when implementing
--- encoding, decoding, recreate, or type to string conversions.
+-- | 
+-- Convenience validation utilities.
 module Data.TypedEncoding.Instances.Support.Validate where
 import           Data.TypedEncoding.Common.Types
 import           Data.TypedEncoding.Common.Class 
@@ -45,14 +43,13 @@ validR :: forall nm f c str . (Restriction nm, KnownSymbol nm, RecreateErr f, Ap
 validR = validRFromEnc' @nm @nm 
 
 
--- TODO rename for consistency to _
-
 -- | Can cause slow compilation if used
--- 
--- @since 0.3.0.0
-validR' :: forall nm f c str alg . (Restriction nm, Algorithm nm alg, KnownSymbol nm, RecreateErr f, Applicative f) =>  Encoding (Either EncodeEx) nm alg c str -> Validation f nm alg c str  
-validR' = validRFromEnc' @alg @nm 
-
+--
+-- (renamed from validR defined in pre 0.5 versions)
+--
+-- @since 0.5.0.0
+_validR :: forall nm f c str alg . (Restriction nm, Algorithm nm alg, KnownSymbol nm, RecreateErr f, Applicative f) =>  Encoding (Either EncodeEx) nm alg c str -> Validation f nm alg c str  
+_validR = validRFromEnc' @alg @nm 
 
 
 -- |
@@ -60,18 +57,10 @@ validR' = validRFromEnc' @alg @nm
 --
 -- @since 0.3.0.0
 validFromEnc' :: forall alg nm f c str . (KnownSymbol nm, RecreateErr f, Applicative f) => Encoding (Either EncodeEx) nm alg c str -> Validation f nm alg c str  
-validFromEnc' (UnsafeMkEncoding p fn) = UnsafeMkValidation p (encAsRecreateErr . rfn) 
-   where
-        encAsRecreateErr :: Either EncodeEx a -> f a
-        encAsRecreateErr (Left (EncodeEx p err)) = recoveryErr $ RecreateEx p err
-        encAsRecreateErr (Right r) = pure r 
-        rfn :: forall (xs :: [Symbol]) . Enc (nm ': xs) c str -> Either EncodeEx (Enc xs c str)
-        rfn (UnsafeMkEnc _ conf str)  =    
-            let re = fn $ UnsafeMkEnc Proxy conf str
-            in  UnsafeMkEnc Proxy conf . getPayload <$> re 
+validFromEnc' = validRFromEnc'
+ 
 
-
-{-# DEPRECATED validFromEnc' "Use validR' instead (valid for r- encodings only)" #-}
+{-# DEPRECATED validFromEnc' "Use _validR instead (valid for r- encodings only)" #-}
 
 
 validRFromEnc' :: forall alg nm f c str . (KnownSymbol nm, RecreateErr f, Applicative f) => Encoding (Either EncodeEx) nm alg c str -> Validation f nm alg c str  

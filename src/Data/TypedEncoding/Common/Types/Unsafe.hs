@@ -12,8 +12,10 @@ import           Data.Proxy
 import           Data.TypedEncoding.Common.Types
 
  
--- | Allows to operate within Enc. These are considered unsafe.
--- keeping the same list of encodings 
+-- | Allows to operate within @Enc@
+-- keeping the same list of encodings.
+--
+-- These are considered unsafe. 
 --
 -- @since 0.1.0.0 
 newtype Unsafe enc conf str = Unsafe {runUnsafe :: Enc enc conf str} deriving (Show)

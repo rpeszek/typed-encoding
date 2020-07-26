@@ -24,7 +24,7 @@
 -- This still is user decision, the errors during decoding process are considered unexpected 'UnexpectedDecodeErr'.
 -- In particular user can decide to use unsafe operations with the encoded type. See 'Examples.TypedEncoding.Unsafe'.
 
-module Examples.TypedEncoding.DiySignEncoding where
+module Examples.TypedEncoding.Instances.DiySignEncoding where
 
 import           Data.TypedEncoding
 import qualified Data.TypedEncoding.Instances.Support as EnT

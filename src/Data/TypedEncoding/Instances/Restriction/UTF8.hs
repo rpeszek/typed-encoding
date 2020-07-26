@@ -35,7 +35,6 @@ import           Data.Either
 -- >>> import Test.QuickCheck.Instances.Text()
 -- >>> import Test.QuickCheck.Instances.ByteString()
 -- >>> import Data.TypedEncoding
--- >>> import Data.TypedEncoding.Internal.Util (proxiedId)
 -- >>> let emptyUTF8B = unsafeSetPayload () "" ::  Enc '["r-UTF8"] () B.ByteString 
 -- >>> :{  
 -- instance Arbitrary (Enc '["r-UTF8"] () B.ByteString) where 
@@ -81,7 +80,6 @@ instance Encode (Either EncodeEx) "r-UTF8" "r-UTF8" c BL.ByteString where
 
 
 -- using lazy decoding to detect errors seems to be the fastest option that is not super hard to code
--- TODO v0.4.1 test performance
 
 encUTF8B :: Encoding (Either EncodeEx) "r-UTF8" "r-UTF8" c B.ByteString
 encUTF8B = _implEncodingEx (implVerifyR (TEL.decodeUtf8' . BL.fromStrict)) 
