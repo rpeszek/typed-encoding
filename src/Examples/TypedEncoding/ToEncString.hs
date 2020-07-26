@@ -30,7 +30,7 @@
 -- Current version of typed-encoding does not have dependencies on such types. 
 --
 -- These examples use 'CheckedEnc' when untyped version of 'Enc' is needed.
--- Alternatively, an existentially quantified 'SomeEnc' type could have been used.
+-- Alternatively, an existentially quantified 'Examples.TypedEncoding.SomeEnc' type could have been used.
 -- Both are isomorphic.  
 module Examples.TypedEncoding.ToEncString where
 
