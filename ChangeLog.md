@@ -8,11 +8,11 @@
 - More module renaming to separate internal implementation code and code targeting examples
 - (post 0.5) "enc-B64" will be moved to a different package (more distant goal)
 
-## Unreleased 0.5.0
+## 0.5.0
 
 ### Changes on a high level
 
-- Most of the changes should not create a big impact on upgrading.  Many definitions were moved to a different module but these modules are re-exported by either `Data.TypedEncoding` or
+- Most of the changes should not create a big impact on upgrading.  Many definitions were moved to a different module but these modules are and had been re-exported by either `Data.TypedEncoding` or
 `Data.TypedEncoding.Instances.Support`
 - Some functionality has been moved to Examples or removed, notably:
   - "do-" encodings
