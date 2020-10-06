@@ -23,7 +23,6 @@ module Data.TypedEncoding.Instances.Restriction.Base64 where
 
 import           Data.TypedEncoding.Instances.Support
 
-import           Data.Proxy
 
 import qualified Data.Text as T
 import qualified Data.Text.Lazy as TL
@@ -31,19 +30,13 @@ import qualified Data.ByteString as B
 import qualified Data.ByteString.Lazy as BL
 import qualified Data.Text.Encoding as TE 
 import qualified Data.Text.Lazy.Encoding as TEL 
-import           Data.Either
 import qualified Data.ByteString.Base64 as B64
 import qualified Data.ByteString.Base64.Lazy as BL64
 import qualified Data.ByteString.Char8 as B8
-import qualified Data.ByteString.Lazy.Char8 as BL8
 import qualified Data.TypedEncoding.Instances.Restriction.ASCII as RAscii
 
 -- $setup
 -- >>> :set -XScopedTypeVariables -XKindSignatures -XMultiParamTypeClasses -XDataKinds -XPolyKinds -XPartialTypeSignatures -XFlexibleInstances -XTypeApplications
-
-
-
-
 
 
 
