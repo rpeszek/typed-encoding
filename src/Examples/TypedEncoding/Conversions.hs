@@ -65,6 +65,7 @@ module Examples.TypedEncoding.Conversions where
 
 import           Data.TypedEncoding
 import           Data.TypedEncoding.Instances.Enc.Base64 () 
+import           Data.TypedEncoding.Instances.Restriction.Base64 () 
 import           Data.TypedEncoding.Instances.Restriction.ASCII ()
 import           Data.TypedEncoding.Instances.Restriction.UTF8 ()
 import           Data.TypedEncoding.Instances.Restriction.D76 ()
@@ -277,6 +278,11 @@ notTextBB64Ascii =  _encodesInto notTextB
 -- "Enc '[r-UTF8,enc-B64] () (ByteString w7E=)"
 --
 
+
+notTextB64AsTxt :: Enc '["r-B64"] () T.Text
+notTextB64AsTxt =  EncTe.decodeUtf8 $ flattenAs $ notTextB
+-- ^ /Base64/ encoding of a non-text binary data can still be converted to Text format
+--  @Enc '["r-B64"] () T.Text@ signifies that the value is B64 encoding but it cannot be decoded to a Text. 
 
 
 -- * Lenient recovery

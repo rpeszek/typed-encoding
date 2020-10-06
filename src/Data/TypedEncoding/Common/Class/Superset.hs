@@ -64,7 +64,10 @@ import           Data.Either (isLeft)
 --
 -- @since 0.2.2.0
 type family IsSuperset (y :: Symbol) (x :: Symbol) :: Bool where
+    IsSuperset "r-B64" "r-B64" = 'True
+    IsSuperset "r-ASCII" "r-B64" = 'True
     IsSuperset "r-ASCII" "r-ASCII" = 'True
+    IsSuperset "r-UTF8" "r-B64" = 'True
     IsSuperset "r-UTF8"  "r-ASCII" = 'True
     IsSuperset "r-UTF8"  "r-UTF8" = 'True
     IsSuperset "r-CHAR8" "r-ASCII" = 'True  -- "r-CHAR8" is phantom, no explicit instances so it does not need reflexive case

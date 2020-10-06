@@ -21,6 +21,7 @@ import qualified Data.ByteString.Lazy as BL
 
 import qualified Data.ByteString.Base64 as B64
 import qualified Data.ByteString.Base64.Lazy as BL64
+import           Data.TypedEncoding.Instances.Restriction.Base64 ()
 
 
 
@@ -66,6 +67,10 @@ instance FlattenAs "r-ASCII" "enc-B64-nontext" where
 instance FlattenAs "r-ASCII" "enc-B64" where
 
 -- |
+-- @since 0.5.1.0 
+instance FlattenAs "r-B64" "enc-B64" where
+
+-- |
 -- This is not precise, actually /Base 64/ uses a subset of ASCII
 -- and that would require a new definition @"r-B64"@.
 --
@@ -80,13 +85,13 @@ instance FlattenAs "r-ASCII" "enc-B64" where
 --
 -- @since 0.3.0.0
 instance EncodingSuperset "enc-B64" where
-    type EncSuperset "enc-B64" = "r-ASCII"
+    type EncSuperset "enc-B64" = "r-B64"
 
 -- |
 -- >>> tstChar8Encodable @ '["enc-B64-len", "enc-B64"]
 -- "I am CHAR8 encodable"
 instance EncodingSuperset "enc-B64-len" where
-    type EncSuperset "enc-B64-len" = "r-ASCII"
+    type EncSuperset "enc-B64-len" = "r-B64"
 
 -- * Encoders
 
