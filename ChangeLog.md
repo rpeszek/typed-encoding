@@ -9,8 +9,9 @@
 - (post 0.5) "enc-B64" will be moved to a different package (more distant goal)
 - (intended as private) @implVerifyR@ will be removed from Data.TypedEncoding.Instances.Restriction.UTF8
 
-## Unreleased
+## 0.5.1.0
 - "r-B64" added
+- @implVerifyR@ convenience function added to 'Data.TypedEncoding.Instances.Support.Encode'
 
 ## 0.5.0
 

@@ -52,6 +52,18 @@ acceptLenientS = withUnsafeCoerce (B64.encode . B64.decodeLenient)
 acceptLenientL :: Enc ("enc-B64-len" ': ys) c BL.ByteString -> Enc ("enc-B64" ': ys) c BL.ByteString 
 acceptLenientL = withUnsafeCoerce (BL64.encode . BL64.decodeLenient)
 
+-- |
+-- Validated "r-B64" is guaranteed to decode.  
+-- This would not be safe for Text
+asEncodingB :: Enc '["r-B64"] c B.ByteString ->  Enc '["enc-B64"] c B.ByteString 
+asEncodingB = withUnsafeCoerce id
+
+-- |
+-- Validated "r-B64" is guaranteed to decode.  
+-- This would not be safe for Text
+asEncodingBL :: Enc '["r-B64"] c BL.ByteString ->  Enc '["enc-B64"] c BL.ByteString 
+asEncodingBL = withUnsafeCoerce id
+
 -- | allow to treat B64 encodings as ASCII forgetting about B64 encoding
 -- 
 --

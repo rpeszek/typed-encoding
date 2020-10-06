@@ -13,7 +13,12 @@
 -- | 'r-B64' is restricted to values that are valid Base64 encodings of some data.
 -- For example, @Enc '["r-B64"] () T.Text@ can contain encoded binary image.
 --
--- @since 0.1.0.0
+-- "enc-B64" can be converted to "r-B64" using @flattenAs@ defined in
+-- 'Data.TypedEncoding.Instances.Enc.Base64'.     
+-- However, there is no, and there should be no conversion general conversion from "r-B64" back to "enc-B64":
+-- @Enc '["r-B64"] () T.Text@ is not B64 encoded text, it is B64 encoded something.
+--
+-- @since 0.5.1.0
 module Data.TypedEncoding.Instances.Restriction.Base64 where
 
 import           Data.TypedEncoding.Instances.Support
@@ -67,9 +72,9 @@ encRB64B = _implEncodingEx (implVerifyR (B64.decode))
 encRB64BL :: Encoding (Either EncodeEx) "r-B64" "r-B64" c BL.ByteString
 encRB64BL = _implEncodingEx (implVerifyR (BL64.decode)) 
 
--- | convert text to bytestring using UTF8 decoding and then verify encoding in ByteString
--- This is safe without 'RAscii.encASCII' since valid values must be ASCII, any non-ASCII text will still convert to ByteString
--- but will fail B64.decode (needs test)
+-- | Converts text to bytestring using UTF8 decoding and then verify encoding in ByteString
+-- This is safe without verifying ASCII, any non-ASCII text will still convert to ByteString
+-- but will fail B64.decode (TODO tests would be nice)
 encRB64T :: Encoding (Either EncodeEx) "r-B64" "r-B64" c T.Text
 encRB64T = _implEncodingEx (implVerifyR (B64.decode . TE.encodeUtf8)) 
 

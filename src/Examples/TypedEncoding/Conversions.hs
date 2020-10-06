@@ -285,6 +285,9 @@ notTextB64AsTxt =  EncTe.decodeUtf8 $ flattenAs $ notTextB
 --  @Enc '["r-B64"] () T.Text@ signifies that the value is B64 encoding but it cannot be decoded to a Text. 
 
 
+-- tst = encodeAll . toEncoding () $ "" :: Enc '["enc-B64"] () B.ByteString
+-- tst2 = EncTe.decodeUtf8 $ flattenAs $ tst :: Enc '["r-B64"] () T.Text
+
 -- * Lenient recovery
 
 lenientSomething :: Enc '["enc-B64-len"] () B.ByteString

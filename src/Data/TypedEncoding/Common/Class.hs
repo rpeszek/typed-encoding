@@ -55,7 +55,7 @@ class (KnownSymbol nm, KnownSymbol ann) => FromEncString f nm ann a str where
 
 -- | Flatten is more permissive 'IsSuperset'
 -- @
--- instance FlattenAs "r-ASCII" "enc-B64" where -- OK
+-- instance FlattenAs "r-ASCII" "enc-B64" where 
 -- @
 -- 
 -- Now encoded data has form @Enc '["r-ASCII"] c str@ 
