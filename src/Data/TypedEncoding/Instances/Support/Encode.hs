@@ -84,3 +84,9 @@ implEncodingEncodeEx' f = UnsafeMkEncoding Proxy $ implTranF f
         p = Proxy :: Proxy nm
 
 
+
+implVerifyR :: (a -> Either err b) -> a -> Either err a
+implVerifyR fn a = 
+     case fn a of 
+         Left err -> Left err
+         Right _ -> Right a

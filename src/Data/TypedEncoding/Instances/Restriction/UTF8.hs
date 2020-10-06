@@ -16,7 +16,11 @@
 -- conversion to @Text@ to work.
 --
 -- @since 0.1.0.0
-module Data.TypedEncoding.Instances.Restriction.UTF8 where
+module Data.TypedEncoding.Instances.Restriction.UTF8 (
+     module Data.TypedEncoding.Instances.Restriction.UTF8
+     -- * reexported for backward compatibility, will be removed in the future
+     , implVerifyR 
+   ) where
 
 import           Data.TypedEncoding.Instances.Support
 
@@ -109,9 +113,3 @@ verEncoding :: B.ByteString -> Either err B.ByteString -> Bool
 verEncoding bs (Left _) = isLeft . TE.decodeUtf8' $ bs
 verEncoding bs (Right _) = isRight . TE.decodeUtf8' $ bs
 
--- | private implementation helper
-implVerifyR :: (a -> Either err b) -> a -> Either err a
-implVerifyR fn a = 
-     case fn a of 
-         Left err -> Left err
-         Right _ -> Right a

@@ -7,6 +7,10 @@
 - `Data.TypedEncoding.Common.Class.IsStringR` expected to be be changed / replaced
 - More module renaming to separate internal implementation code and code targeting examples
 - (post 0.5) "enc-B64" will be moved to a different package (more distant goal)
+- (intended as private) @implVerifyR@ will be removed from Data.TypedEncoding.Instances.Restriction.UTF8
+
+## Unreleased
+- "r-B64" added
 
 ## 0.5.0
 
