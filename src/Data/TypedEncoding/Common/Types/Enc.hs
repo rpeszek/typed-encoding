@@ -127,7 +127,7 @@ getPayload (UnsafeMkEnc _ _ str) = str
 -- Encoding Identity "enc-B64" "enc-B64" () ByteString
 -- @
 --
--- Represents a /Byte 64/ encoder that can operate on any stack of previous encodings.
+-- Represents a /Base 64/ encoder that can operate on any stack of previous encodings.
 -- (encoding name and algorithm name are "enc-B64", there is no  
 -- additional configuration @()@ needed and it runs in the @Identity@ Functor.
 --

@@ -37,6 +37,6 @@ spec =
         describe "String based" $ 
             it "r-UNICODE.D76 > r-ASCII" $ property $ propSuperset_ @"r-UNICODE.D76" @"r-ASCII" @String encoding encoding
         describe "EncodingSuperset test" $
-            it "enc-B64 < r-ASCII" $ property $ propEncodesInto_ @"enc-B64" @"r-ASCII" @B.ByteString encoding encoding
+            it "enc-B64 < r-ASCII" $ property $ propEncodesInto_ @"enc-B64" @"r-B64" @B.ByteString encoding encoding
 runSpec :: IO ()
 runSpec = hspec spec   

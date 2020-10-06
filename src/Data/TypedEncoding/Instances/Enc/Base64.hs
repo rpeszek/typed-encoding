@@ -21,6 +21,7 @@ import qualified Data.ByteString.Lazy as BL
 
 import qualified Data.ByteString.Base64 as B64
 import qualified Data.ByteString.Base64.Lazy as BL64
+import           Data.TypedEncoding.Instances.Restriction.Base64 ()
 
 
 
@@ -51,6 +52,18 @@ acceptLenientS = withUnsafeCoerce (B64.encode . B64.decodeLenient)
 acceptLenientL :: Enc ("enc-B64-len" ': ys) c BL.ByteString -> Enc ("enc-B64" ': ys) c BL.ByteString 
 acceptLenientL = withUnsafeCoerce (BL64.encode . BL64.decodeLenient)
 
+-- |
+-- Validated "r-B64" is guaranteed to decode.  
+-- This would not be safe for Text
+asEncodingB :: Enc '["r-B64"] c B.ByteString ->  Enc '["enc-B64"] c B.ByteString 
+asEncodingB = withUnsafeCoerce id
+
+-- |
+-- Validated "r-B64" is guaranteed to decode.  
+-- This would not be safe for Text
+asEncodingBL :: Enc '["r-B64"] c BL.ByteString ->  Enc '["enc-B64"] c BL.ByteString 
+asEncodingBL = withUnsafeCoerce id
+
 -- | allow to treat B64 encodings as ASCII forgetting about B64 encoding
 -- 
 --
@@ -64,6 +77,10 @@ instance FlattenAs "r-ASCII" "enc-B64-nontext" where
 -- |
 -- @since 0.1.0.0 
 instance FlattenAs "r-ASCII" "enc-B64" where
+
+-- |
+-- @since 0.5.1.0 
+instance FlattenAs "r-B64" "enc-B64" where
 
 -- |
 -- This is not precise, actually /Base 64/ uses a subset of ASCII
@@ -80,13 +97,13 @@ instance FlattenAs "r-ASCII" "enc-B64" where
 --
 -- @since 0.3.0.0
 instance EncodingSuperset "enc-B64" where
-    type EncSuperset "enc-B64" = "r-ASCII"
+    type EncSuperset "enc-B64" = "r-B64"
 
 -- |
 -- >>> tstChar8Encodable @ '["enc-B64-len", "enc-B64"]
 -- "I am CHAR8 encodable"
 instance EncodingSuperset "enc-B64-len" where
-    type EncSuperset "enc-B64-len" = "r-ASCII"
+    type EncSuperset "enc-B64-len" = "r-B64"
 
 -- * Encoders
 
