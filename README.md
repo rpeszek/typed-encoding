@@ -109,9 +109,6 @@ Bridge work:
 
 - [typed-encoding-encoding](https://github.com/rpeszek/typed-encoding-encoding) bridges [encoding](https://github.com/dmwit/encoding) package 
 
-## News 
-
-- v0.3 has numerous changes and improvements. 
 
 ## Tested with
 
