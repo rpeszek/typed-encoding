@@ -30,6 +30,9 @@ and provides ways for
 - converting types to encoded strings
 - typesafe conversion of encoded strings to types
 
+Partial and dangerous things like `decodeUtf8` are no longer dangerous, 
+`ByteString` `Text` conversions become fully reversible.  Life is good!
+
 ... but this approach seems to be a bit more...
 
 ```Haskell
@@ -45,18 +48,29 @@ Transformations can be
 - used with parameters
 - applied or undone partially (if encoding is reversible)
 
-One of more interesting uses of this library are encoding restrictions.   
-(Arbitrary) bounded alpha-numeric (`"r-ban"`) restrictions 
-and a simple annotation Boolean algebra are both provided.
+One of more interesting uses of this library are encoding restrictions included in this library.   
+Example are (arbitrary) bounded alpha-numeric (`"r-ban"`) restrictions.
 
 ```Haskell
-phone :: Enc '["r-ban:999-999-9999"] () T.Text
-phone = ...
+-- allow only properly formatted phone numbers
 
--- simple boolean algebra:
-phone' :: Enc '["boolOr:(r-ban:999-999-9999)(r-ban:(999) 999-9999)"] () T.Text
-phone' = ...
+type PhoneSymbol = "r-ban:999-999-9999"
+phone :: Enc '[PhoneSymbol] () T.Text
+phone = ... 
 ```
+
+The author often uses _typed_encoding_ with _Servant_ (`HttpApiData` instances are not included), e.g.:
+
+```Haskell
+type LookupByPhone = 
+  "customer"
+  :> "byphone"
+  :> Capture "phone" (Enc '[PhoneSymbol] () T.Text)
+  :> Get '[JSON] ([Customer])
+```
+
+or to get type safety over text document using Unix vs Windows line breaks!
+
 
 ## Goals and limitations
 
@@ -74,7 +88,7 @@ Here are some code examples:
 
 - [Overview](src/Examples/TypedEncoding/Overview.hs)
 - [Conversions between encodings](src/Examples/TypedEncoding/Conversions.hs)
-- [Adding a new encoding, error handling](src/Examples/TypedEncoding/Instances/DiySignEncoding.hs)
+- [DIY encoding, error handling](src/Examples/TypedEncoding/Instances/DiySignEncoding.hs)
 - [To and from string conversions](src/Examples/TypedEncoding/ToEncString.hs)
 - [Unsafe - working inside encodings](src/Examples/TypedEncoding/Unsafe.hs)
  
@@ -93,7 +107,7 @@ Currently /typed-encoding/ depends on
 
 Bridge work:
 
-- [typed-encoding-encoding](https://github.com/rpeszek/typed-encoding-encoding) bridges [encoding](https://github.com/dmwit/encoding) package
+- [typed-encoding-encoding](https://github.com/rpeszek/typed-encoding-encoding) bridges [encoding](https://github.com/dmwit/encoding) package 
 
 ## News 
 
