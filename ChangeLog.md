@@ -10,6 +10,7 @@
 - Fixed up IsSuperset type family improving transitivity
 - added `_mkEncoding1` `runEncoding1'` functions that show equivalence of `Encoding` to one level encoding
 - added convenience one level encoding conversion functions
+- base64-bytestring deps relaxed
 
 ## 0.5.1.0
 
