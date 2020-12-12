@@ -240,6 +240,11 @@ helloRevLimitParDec =  decodePart @'["enc-B64"] helloLimitB64
 --
 -- Note naming thing: "r-" is partial identity ("r-" is from restriction).
 --
+-- >>>   _runEncodings encodings . toEncoding () $ "HeLlo world" :: Either EncodeEx (Enc '["r-ASCII"] () B.ByteString) 
+-- Right (UnsafeMkEnc Proxy () "HeLlo world")
+--
+-- or equivalently
+--
 -- >>>  encodeFAll . toEncoding () $ "HeLlo world" :: Either EncodeEx (Enc '["r-ASCII"] () B.ByteString) 
 -- Right (UnsafeMkEnc Proxy () "HeLlo world")
 helloAscii :: Either EncodeEx (Enc '["r-ASCII"] () B.ByteString)

@@ -53,7 +53,10 @@ acceptLenientL :: Enc ("enc-B64-len" ': ys) c BL.ByteString -> Enc ("enc-B64" ':
 acceptLenientL = withUnsafeCoerce (BL64.encode . BL64.decodeLenient)
 
 -- |
--- Validated "r-B64" is guaranteed to decode.  
+-- Validated "r-B64" is guaranteed to decode.
+-- 
+-- Use flattenAs in the other direction.
+--  
 -- This would not be safe for Text
 asEncodingB :: Enc '["r-B64"] c B.ByteString ->  Enc '["enc-B64"] c B.ByteString 
 asEncodingB = withUnsafeCoerce id
@@ -64,17 +67,21 @@ asEncodingB = withUnsafeCoerce id
 asEncodingBL :: Enc '["r-B64"] c BL.ByteString ->  Enc '["enc-B64"] c BL.ByteString 
 asEncodingBL = withUnsafeCoerce id
 
--- | allow to treat B64 encodings as ASCII forgetting about B64 encoding
--- 
---
--- >>> let tstB64 = encodeAll . toEncoding () $ "Hello World" :: Enc '["enc-B64"] () B.ByteString
--- >>> displ (flattenAs tstB64 :: Enc '["r-ASCII"] () B.ByteString)
--- "Enc '[r-ASCII] () (ByteString SGVsbG8gV29ybGQ=)"
+
+-- @"enc-B64-nontext"@ is deprecated, use "r-B64"
 --
 -- @since 0.1.0.0 
 instance FlattenAs "r-ASCII" "enc-B64-nontext" where
 
--- |
+-- | allow to treat B64 encodings as ASCII forgetting about B64 encoding.
+--
+-- Converting to "r-B64" is also an option now.
+--
+-- >>> let tstB64 = encodeAll . toEncoding () $ "Hello World" :: Enc '["enc-B64"] () B.ByteString
+-- >>> displ (flattenAs $ tstB64 :: Enc '["r-ASCII"] () B.ByteString)
+-- "Enc '[r-ASCII] () (ByteString SGVsbG8gV29ybGQ=)"
+--
+--
 -- @since 0.1.0.0 
 instance FlattenAs "r-ASCII" "enc-B64" where
 

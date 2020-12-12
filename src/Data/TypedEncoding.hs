@@ -63,7 +63,9 @@
 --
 -- Examples: @"r-UTF8"@, @"r-ASCII"@, upper alpha-numeric bound /r-ban/ restrictions like @"r-ban:999-999-9999"@
 --
--- == "do-" transformations (not provided in this library other than as /Examples/ "Examples.TypedEncoding.Instances.Do.Sample")
+-- == "do-" transformations 
+--
+--(not provided in this library other than as /Examples/ "Examples.TypedEncoding.Instances.Do.Sample")
 --
 -- * /encoding/ applies transformation to the string (could be partial)
 -- * /decoding/ - typically none
@@ -119,15 +121,17 @@ module Data.TypedEncoding (
     , toEncoding
     , fromEncoding
     , getPayload
-
+  
     -- * Untyped versions of @Enc@
     , module  Data.TypedEncoding.Common.Types.CheckedEnc
 
     -- * @Encoding@ and basic combinators
     , Encoding (..)
     , _mkEncoding
+    , _mkEncoding1 
     , runEncoding'
     , _runEncoding 
+    , runEncoding1'
   
     -- * List of encodings
     , Encodings (..)

@@ -27,6 +27,13 @@ pack :: (
           ) => Enc xs c String -> Enc xs c T.Text
 pack = unsafeChangePayload T.pack
 
+-- | simplified version of @pack@ that works on single /r-/ encodings
+-- @since 0.5.2.0
+pack1 :: (
+         Superset "r-UNICODE.D76" y 
+         ) => Enc '[y] c String -> Enc '[y] c T.Text
+pack1 = pack
+
 -- | This assumes that each of the encodings in @xs@ work work equivalently in @String@ and @Text@.
 -- This is similar to the assumptions made in 'pack'. 
 unpack :: (
@@ -36,6 +43,13 @@ unpack :: (
          , AllEncodeInto "r-UNICODE.D76" encs
           ) => Enc xs c T.Text -> Enc xs c String
 unpack = unsafeChangePayload T.unpack 
+
+-- | simplified version of @unpack@ that works on single /r-/ encodings
+-- @since 0.5.2.0
+unpack1 :: (
+         Superset "r-UNICODE.D76" y 
+         ) => Enc '[y] c T.Text -> Enc '[y] c String
+unpack1 = unpack
 
 -- | 
 -- Text is automatically @"r-UTF8"@ encoded

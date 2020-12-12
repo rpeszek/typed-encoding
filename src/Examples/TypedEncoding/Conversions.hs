@@ -98,10 +98,10 @@ import           Data.TypedEncoding.Instances.Restriction.BoundedAlphaNums ()
 -- * Moving between Text and ByteString
 
 eHelloAsciiB :: Either EncodeEx (Enc '["r-ASCII"] () B.ByteString)
-eHelloAsciiB = encodeFAll . toEncoding () $ "HeLlo world" 
+eHelloAsciiB = _runEncodings encodings . toEncoding () $ "HeLlo world" 
 -- ^ Example value to play with
 --
--- >>>  encodeFAll . toEncoding () $ "HeLlo world" :: Either EncodeEx (Enc '["r-ASCII"] () B.ByteString) 
+-- >>>  _runEncodings encodings . toEncoding () $ "HeLlo world" :: Either EncodeEx (Enc '["r-ASCII"] () B.ByteString) 
 -- Right (UnsafeMkEnc Proxy () "HeLlo world")
 
 Right helloAsciiB = eHelloAsciiB
@@ -197,8 +197,7 @@ helloUtf8B64T = EncT.utf8Demote . EncTe.decodeUtf8 $ helloUtf8B64B
 -- 
 -- >>> :t EncTe.encodeUtf8 helloUtf8B64T
 -- ...
--- ... Couldn't match type ‘IsSupersetOpen
--- ... "r-UTF8" "enc-B64" ...
+-- ... Couldn't match type ...
 -- ...
 --
 -- This is not allowed! We need to add the redundant "r-UTF8" back:
@@ -223,7 +222,6 @@ notTextB = encodeAll . toEncoding () $ "\195\177"
 -- ...
 -- ... error:
 -- ... Couldn't match type ...
--- ... "r-UTF8" "enc-B64" ...
 -- ...
 --
 -- This is good because having the payload inside of @Enc '["enc-B64"] () Text@ would allow us
@@ -280,7 +278,7 @@ notTextBB64Ascii =  _encodesInto notTextB
 
 
 notTextB64AsTxt :: Enc '["r-B64"] () T.Text
-notTextB64AsTxt =  EncTe.decodeUtf8 $ flattenAs $ notTextB
+notTextB64AsTxt =  EncTe.decodeUtf8 $ flattenAs notTextB
 -- ^ /Base64/ encoding of a non-text binary data can still be converted to Text format
 --  @Enc '["r-B64"] () T.Text@ signifies that the value is B64 encoding but it cannot be decoded to a Text. 
 

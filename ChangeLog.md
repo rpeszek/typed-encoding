@@ -2,14 +2,17 @@
 
 ## Anticipated future breaking changes
 
-- `Data.TypedEncoding.Instances.Do.Sample` will be moved to `Examples`
-- `HasA` Typeclass will be moved to `Examples`
 - `Data.TypedEncoding.Common.Class.IsStringR` expected to be be changed / replaced
-- More module renaming to separate internal implementation code and code targeting examples
-- (post 0.5) "enc-B64" will be moved to a different package (more distant goal)
-- (intended as private) @implVerifyR@ will be removed from Data.TypedEncoding.Instances.Restriction.UTF8
+- (post 0.5) "enc-B64" could be moved to a different package (more distant goal)
+
+## 0.5.2.0
+
+- Fixed up IsSuperset type family improving transitivity
+- added `_mkEncoding1` `runEncoding1'` functions that show equivalence of `Encoding` to one level encoding
+- added convenience one level encoding conversion functions
 
 ## 0.5.1.0
+
 - "r-B64" added
 - @implVerifyR@ convenience function added to 'Data.TypedEncoding.Instances.Support.Encode'
 
