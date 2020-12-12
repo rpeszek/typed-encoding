@@ -152,7 +152,11 @@ module Data.TypedEncoding (
     , propSafeValidatedDecoding'
     , _propSafeValidatedDecoding
 
-    -- * Classes
+    -- * Encoding Classes
+    , Encode (..)
+    , EncodeAll (..)
+
+    -- * Decoding, Validation and Other Classes
     , module Data.TypedEncoding.Common.Class
   
       -- * Combinators

@@ -20,8 +20,19 @@ module Data.TypedEncoding.Common.Class.Encode where
 
 import           Data.TypedEncoding.Common.Types.Enc
 
+-- $setup
+-- >>> :set -XOverloadedStrings -XMultiParamTypeClasses -XDataKinds -XAllowAmbiguousTypes
+-- >>> import qualified Data.ByteString as B
+-- >>> import Data.Functor.Identity
+-- >>> import Data.TypedEncoding
+-- >>> import Data.TypedEncoding.Instances.Enc.Base64 ()
 
 -- | 
+-- Allows for polymorphic access to encoding, for example
+--
+-- >>> displ (runIdentity . _runEncoding encoding $ toEncoding () "Hello" :: Enc '["enc-B64"] () B.ByteString)
+-- "Enc '[enc-B64] () (ByteString SGVsbG8=)"
+--
 -- Using 2 Symbol type variables (@nm@ and @alg@) creates what seems like redundant typing
 -- in statically defined instances such as @"r-ASCII"@, however it 
 -- provides future flexibility to 
@@ -37,6 +48,15 @@ class Encode f nm alg conf str where
     encoding :: Encoding f nm alg conf str
 
 -- |
+-- Allows for polymorphic access to Encodings
+-- 
+-- For example
+--
+-- >>> displ (runIdentity . _runEncodings encodings $ toEncoding () "Hello" :: (Enc '["enc-B64", "enc-B64"] () B.ByteString))
+-- "Enc '[enc-B64,enc-B64] () (ByteString U0dWc2JHOD0=)"
+--
+-- You can also use convenience functions like @encodeAll@
+-- 
 -- @since 0.3.0.0
 class EncodeAll f nms algs conf str where
     encodings :: Encodings f nms algs conf str

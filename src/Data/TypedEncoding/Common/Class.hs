@@ -53,7 +53,7 @@ class (KnownSymbol nm, KnownSymbol ann) => FromEncString f nm ann a str where
 
 -- Other classes --
 
--- | Flatten is more permissive 'IsSuperset'
+-- | Flatten is a more permissive 'IsSuperset'
 -- @
 -- instance FlattenAs "r-ASCII" "enc-B64" where 
 -- @
