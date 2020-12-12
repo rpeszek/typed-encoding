@@ -59,7 +59,7 @@ phone :: Enc '[PhoneSymbol] () T.Text
 phone = ... 
 ```
 
-The author often uses _typed_encoding_ with _Servant_ (`HttpApiData` instances are not included), e.g.:
+The author often uses _typed-encoding_ with _Servant_ (`HttpApiData` instances are not included), e.g.:
 
 ```Haskell
 type LookupByPhone = 
