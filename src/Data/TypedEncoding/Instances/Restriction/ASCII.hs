@@ -14,10 +14,10 @@
 -- prop> B8.all ((< 128) . ord) . getPayload @ '["r-ASCII"] @() @B.ByteString
 -- 
 -- >>> :set -XOverloadedStrings -XMultiParamTypeClasses -XDataKinds
--- >>> encodeFAll . toEncoding () $ "Hello World" :: Either EncodeEx (Enc '["r-ASCII"] () T.Text)
+-- >>> _runEncodings encodings . toEncoding () $ "Hello World" :: Either EncodeEx (Enc '["r-ASCII"] () T.Text)
 -- Right (UnsafeMkEnc Proxy () "Hello World")
 --
--- >>> encodeFAll . toEncoding () $ "\194\160" :: Either EncodeEx (Enc '["r-ASCII"] () T.Text)
+-- >>> _runEncodings encodings . toEncoding () $ "\194\160" :: Either EncodeEx (Enc '["r-ASCII"] () T.Text)
 -- Left (EncodeEx "r-ASCII" (NonAsciiChar '\194'))
 --
 -- @since 0.1.0.0

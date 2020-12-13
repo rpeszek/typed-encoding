@@ -62,22 +62,27 @@ import           Data.Either (isLeft)
 -- Note, no IsSuperset "r-UNICODE.D76" "r-CHAR8" even though the numeric range of D76 includes all CHAR8 bytes.
 -- This is more /nominal/ decision that prevents certain unwanted conversions from being possible.
 --
+-- This is not fully transitive to conserve compilation cost.
 -- @since 0.2.2.0
 type family IsSuperset (y :: Symbol) (x :: Symbol) :: Bool where
-    IsSuperset "r-B64" "r-B64" = 'True
-    IsSuperset "r-ASCII" "r-B64" = 'True
+    IsSuperset "r-B64" "r-B64" = 'True          -- "r-B64" is currently not expected to have any explicit superset logic
     IsSuperset "r-ASCII" "r-ASCII" = 'True
-    IsSuperset "r-UTF8" "r-B64" = 'True
-    IsSuperset "r-UTF8"  "r-ASCII" = 'True
-    IsSuperset "r-UTF8"  "r-UTF8" = 'True
-    IsSuperset "r-CHAR8" "r-ASCII" = 'True  -- "r-CHAR8" is phantom, no explicit instances so it does not need reflexive case
-    IsSuperset "r-CHAR8" "r-ByteRep" = 'True
-    IsSuperset "r-UNICODE.D76" "r-UNICODE.D76" = 'True 
-    IsSuperset "r-UNICODE.D76" "r-ASCII" = 'True 
-    IsSuperset "r-UNICODE.D76" x = Or (IsSuperset "r-CHAR8" x) (IsSupersetOpen "r-UNICODE.D76" x (TakeUntil x ":") (ToList x))
+    IsSuperset "r-ASCII" "r-B64" = 'True
+    IsSuperset "r-UNICODE.D76" "r-UNICODE.D76" = 'True --  guards what can go to Text  
+                                                       -- "r-UNICODE.D76" and "r-UTF8" should be considered equivalent
+                                                       -- currently there is no subset relationship between them
+    -- IsSuperset "r-UNICODE.D76" "r-ASCII" = 'True -- redundant
+    IsSuperset "r-UNICODE.D76" x = Or (IsSuperset "r-ASCII" x) (IsSupersetOpen "r-UNICODE.D76" x (TakeUntil x ":") (ToList x))
+    IsSuperset "r-UTF8"  "r-UTF8" = 'True  
+    -- IsSuperset "r-UTF8"  "r-ASCII" = 'True      -- redundant
+    IsSuperset "r-UTF8"  x = Or (IsSuperset "r-ASCII" x) (IsSupersetOpen "r-UTF8" x (TakeUntil x ":") (ToList x)) 
+    -- IsSuperset "r-CHAR8" "r-ASCII" = 'True  -- redundant
+    IsSuperset "r-CHAR8" "r-ByteRep" = 'True -- "r-CHAR8" is phantom root type defining type safe ByteString pack and unpack, it is not used directly, nor is a subset
+                                             -- "r-ByteRep" is another encoding with special handling
     IsSuperset "r-CHAR8" x = Or (IsSuperset "r-ASCII" x) (IsSupersetOpen "r-CHAR8" x (TakeUntil x ":") (ToList x))
     IsSuperset y x = IsSupersetOpen y x (TakeUntil x ":") (ToList x)
 
+ 
 -- TODO introduce "r-NODEC" which does not decode
 
 

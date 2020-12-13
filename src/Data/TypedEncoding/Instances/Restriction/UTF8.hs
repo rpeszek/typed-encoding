@@ -58,10 +58,10 @@ prxyUtf8 = Proxy :: Proxy "r-UTF8"
 
 -- | UTF8 encodings are defined for ByteString only as that would not make much sense for Text
 --
--- >>> encodeFAll . toEncoding () $ "\xc3\xb1" :: Either EncodeEx (Enc '["r-UTF8"] () B.ByteString)
+-- >>> _runEncodings encodings . toEncoding () $ "\xc3\xb1" :: Either EncodeEx (Enc '["r-UTF8"] () B.ByteString)
 -- Right (UnsafeMkEnc Proxy () "\195\177")
 --
--- >>> encodeFAll . toEncoding () $ "\xc3\x28" :: Either EncodeEx (Enc '["r-UTF8"] () B.ByteString)
+-- >>> _runEncodings encodings . toEncoding () $ "\xc3\x28" :: Either EncodeEx (Enc '["r-UTF8"] () B.ByteString)
 -- Left (EncodeEx "r-UTF8" (Cannot decode byte '\xc3': ...
 --
 -- Following test uses 'verEncoding' helper that checks that bytes are encoded as Right iff they are valid UTF8 bytes

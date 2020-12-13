@@ -25,6 +25,7 @@ import           Data.TypedEncoding.Unsafe (withUnsafe)
 -- >>> import Test.QuickCheck
 -- >>> import Test.QuickCheck.Instances.Text()
 -- >>> import Test.QuickCheck.Instances.ByteString()
+-- >>> import Data.TypedEncoding.Instances.Restriction.BoundedAlphaNums()
 -- >>> import qualified Data.ByteString.Char8 as B8
 -- >>> import Data.Char
 -- >>> import Data.Either
@@ -71,7 +72,7 @@ import           Data.TypedEncoding.Unsafe (withUnsafe)
 -- >>> displ . utf8Demote . decodeUtf8 $ (unsafeSetPayload () "Hello" :: Enc '["r-UTF8"] () B.ByteString)
 -- "Enc '[] () (Text Hello)"
 --
--- @decodeUtf8@ and  @encodeUtf8@ form isomorphism
+-- @decodeUtf8@ and @encodeUtf8@ now form isomorphism
 -- 
 -- prop> \x -> getPayload x == (getPayload . encodeUtf8 . decodeUtf8 @ '["r-UTF8"] @() $ x)
 --
@@ -87,7 +88,17 @@ import           Data.TypedEncoding.Unsafe (withUnsafe)
 -- as any of the "enc-" and "do-" encodings that can be currently found in this library. 
 -- Future versions of this method are likely to introduce constraints that guarantee better type safety.
 --
+--
+-- This is technically unsafe (even if we ignore the use of @unsafeSetPayload@) of decodeUtf8 
+-- since currently @"r-ban:999"@ does not have @ByteString@ instances and that violates the assumption of matching encoding/decoding stacks
+-- on both sides.  
+-- >>> displ . decodeUtf8 $ (unsafeSetPayload () "123" :: Enc '["r-ban:999"] () B.ByteString)
+-- "Enc '[r-ban:999] () (Text 123)"
+--
 -- See "Data.TypedEncoding.Conv" for more detailed discussion.
+--
+-- Note: implementation uses the partial 'TE.decodeUtf8' function but provides type level guarantee that it this function
+-- will not error out unless unsafe combinators were used in constructing the encoded input
 --
 -- @since 0.4.0.0
 decodeUtf8 :: forall xs c t y ys encs. (
@@ -97,6 +108,13 @@ decodeUtf8 :: forall xs c t y ys encs. (
          , AllEncodeInto "r-UTF8" encs
         ) => Enc xs c B.ByteString -> Enc xs c T.Text 
 decodeUtf8 = withUnsafe (fmap TE.decodeUtf8)
+
+-- | simplified version of @decodeUtf8@ that works on single /r-/ encodings
+-- @since 0.5.2.0
+decodeUtf8_1 :: (
+         Superset "r-UTF8" y 
+         ) => Enc '[y] c  B.ByteString -> Enc '[y] c T.Text 
+decodeUtf8_1 = decodeUtf8
 
 -- |
 -- >>> displ $ encodeUtf8 $ utf8Promote $ toEncoding () ("text" :: T.Text)
@@ -114,3 +132,10 @@ encodeUtf8 :: forall xs c t y ys encs.   (
          , AllEncodeInto "r-UTF8" encs
         ) => Enc xs c T.Text -> Enc xs c B.ByteString 
 encodeUtf8 = withUnsafe (fmap TE.encodeUtf8)
+
+-- | simplified version of @decodeUtf8@ that works on single /r-/ encodings
+-- @since 0.5.2.0
+encodeUtf8_1 :: (
+         Superset "r-UTF8" y 
+         ) => Enc '[y] c  T.Text -> Enc '[y] c B.ByteString 
+encodeUtf8_1 = encodeUtf8

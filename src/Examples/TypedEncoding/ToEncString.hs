@@ -77,8 +77,8 @@ tstIp = IpV4F 128 1 1 10
 
 
 -- |
--- In this example @toEncString@ converts 'IpV4' to @Enc '["r-IPv4"] Text@.
---  
+-- In this example @toEncString@ converts our example 'IpV4' type to @Enc '["r-IPv4"] Text@.
+--
 -- This is done with help of existing @"r-Word8-decimal"@ annotation defined
 -- in "Data.TypedEncoding.Instances.Restriction.Misc"
 --

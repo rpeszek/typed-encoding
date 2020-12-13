@@ -32,7 +32,7 @@ import           Data.TypedEncoding.Common.Types.Common
 -- >>> import Data.Functor.Identity
 -- >>> import Data.TypedEncoding
 -- >>> import Data.TypedEncoding.Instances.Enc.Base64 ()
--- >>> import Data.TypedEncoding.Instances.Restriction.BoundedAlphaNums ()
+-- >>> import Data.TypedEncoding.Instances.Restriction.BoundedAlphaNums (encFBan)
 
 -- |
 -- Contains encoded data annotated by 
@@ -84,7 +84,10 @@ fromEncoding = getPayload
 getPayload :: Enc enc conf str -> str  
 getPayload (UnsafeMkEnc _ _ str) = str
 
- 
+-- |
+-- @since 0.5.2.0
+getContent :: Enc enc conf str -> (conf, str)   
+getContent (UnsafeMkEnc _ c str) = (c, str)
 
 -- |
 -- Wraps the encoding function.
@@ -114,6 +117,13 @@ getPayload (UnsafeMkEnc _ _ str) = str
 -- Using 2 variables allows us to define typeclass constraints that work
 -- with definitions like @"r-ban"@ where @"r-ban:@" can be followed by arbitrary
 -- string literal.
+--
+-- This existential definition is intended for clarity. /typed-encoding/ supports type level lists of encodings
+-- and each encoding should not know what encodings have already been applied.
+--
+-- However, this construction is mostly equivalent to storing a simple one level encoding function 
+-- @Enc ('[]:: [Symbol]) conf str -> f (Enc '[nm] conf str)@ 
+-- (see '_mkEncoding1' and 'runEncoding1'' below).  
 --
 -- Examples: 
 --
@@ -145,6 +155,8 @@ data Encoding f (nm :: Symbol) (alg :: Symbol) conf str where
     -- would make compilation much slower
     UnsafeMkEncoding :: Proxy nm -> (forall (xs :: [Symbol]) . Enc xs conf str -> f (Enc (nm ': xs) conf str)) -> Encoding f nm alg conf str
 
+
+
 -- | Type safe smart constructor
 --
 -- Adding the type family @(AlgNm nm)@ mapping to @Encoding@ constructor slows down the compilation.  
@@ -165,27 +177,54 @@ data Encoding f (nm :: Symbol) (alg :: Symbol) conf str where
 -- This particular function appears to not increase compilation time. 
 --
 -- @since 0.3.0.0
-_mkEncoding :: forall f (nm :: Symbol) conf str . (forall (xs :: [Symbol]) . Enc xs conf str -> f (Enc (nm ': xs) conf str)) -> Encoding f nm (AlgNm nm) conf str
+_mkEncoding :: forall f (nm :: Symbol) conf str . 
+         (forall (xs :: [Symbol]) . Enc xs conf str -> f (Enc (nm ': xs) conf str)) -> Encoding f nm (AlgNm nm) conf str
 _mkEncoding = UnsafeMkEncoding Proxy
 
+-- |
+-- Defines encoding by only specifying a simple one level encoding function. 
+-- This typically is not used in constructing encodings as there are more convenient combinators for doing this
+-- (e.g. in "Data.TypedEncoding.Instances.Support").
+-- It is here for completeness to show that the @Encoding@ definition is a bit overdone.
+-- 
+-- @since 0.5.2.0
+_mkEncoding1 :: forall f (nm :: Symbol) conf str . 
+        Functor f  => (Enc ('[]:: [Symbol]) conf str -> f (Enc '[nm] conf str)) -> Encoding f nm (AlgNm nm) conf str
+_mkEncoding1 fn = UnsafeMkEncoding Proxy (fmap (mkenc Proxy . getContent) . fn . mkenc Proxy . getContent)
+  where 
+      mkenc p (c,s) = UnsafeMkEnc p c s
+ 
 -- |
 -- @since 0.3.0.0
 runEncoding' :: forall alg nm f xs conf str . Encoding f nm alg conf str -> Enc xs conf str -> f (Enc (nm ': xs) conf str)
 runEncoding' (UnsafeMkEncoding _ fn) = fn
 
+-- |
+-- Version of @runEncoding'@ function specialized to empty encoding
+--
+-- @since 0.5.2.0
+runEncoding1' :: forall alg nm f  conf str . Encoding f nm alg conf str -> Enc ('[] :: [Symbol]) conf str -> f (Enc '[nm] conf str)
+runEncoding1'  = runEncoding' @alg @nm @f @'[]
+
 -- | Same as 'runEncoding'' but compiler figures out algorithm name
 --
 -- Using it can slowdown compilation
 --
--- This combinator has @Algorithm nm alg@ constraint (which stands for @TakeUntil ":" nm ~ alg@.
--- If rules on @alg@ are relaxed this will just return the /default/ algorithm.
+-- This combinator has @Algorithm nm alg@ constraint (which currently stands for @TakeUntil ":" nm ~ alg@.
 --
--- If that happens @-XTypeApplications@ annotations will be needed and @_@ methods will simply 
--- use default algorithm name.
+-- @runEncoding@ functions are typically not used directly, @runEncodings@ functions defined below or @encodeAll@ 
+-- functions are used instead.  
+--
+-- In the following example (and other examples) we use displ convenience function that provides String display of the encoding.
+-- The @"r-ban:111"@ allows only strings with 3 characters satisfying alphanumeric bound of '1'
+--
+-- >>> fmap displ (_runEncoding encFBan $ toEncoding () "000" :: Either EncodeEx (Enc '["r-ban:111"] () T.Text))
+-- Right "Enc '[r-ban:111] () (Text 000)"
 --
 -- @since 0.3.0.0
 _runEncoding :: forall nm f xs conf str alg . (Algorithm nm alg) => Encoding f nm alg conf str -> Enc xs conf str -> f (Enc (nm ': xs) conf str)
 _runEncoding = runEncoding' @(AlgNm nm)
+
 
 -- |
 -- HList like construction that defines a list of @Encoding@ elements.
@@ -198,16 +237,35 @@ _runEncoding = runEncoding' @(AlgNm nm)
 --
 -- @since 0.3.0.0
 data Encodings f (nms :: [Symbol]) (algs :: [Symbol]) conf str where
-    -- | constructor is to be treated as Unsafe to Encode and Decode instance implementations
-    -- particular encoding instances may expose smart constructors for limited data types
     ZeroE :: Encodings f '[] '[] conf str
-    ConsE ::  Encoding f nm alg conf str -> Encodings f nms algs conf str -> Encodings f (nm ': nms) (alg ': algs) conf str
+    ConsE :: Encoding f nm alg conf str -> Encodings f nms algs conf str -> Encodings f (nm ': nms) (alg ': algs) conf str
+
+infixr 5 -:-
+(-:-) ::  Encoding f nm alg conf str -> Encodings f nms algs conf str -> Encodings f (nm ': nms) (alg ': algs) conf str
+(-:-) = ConsE 
 
 -- |
 -- Runs encodings, requires -XTypeApplication annotation specifying the algorithm(s)
 --
--- >>> runEncodings' @'["r-ban"] encodings . toEncoding () $ ("22") :: Either EncodeEx (Enc '["r-ban:111"] () T.Text)
+-- >>> runEncodings' @'["r-ban"] (encFBan -:- ZeroE) . toEncoding () $ "000" :: Either EncodeEx (Enc '["r-ban:111"] () T.Text)
+-- Right (UnsafeMkEnc Proxy () "000")
+--
+-- Polymorphic access to encodings is provided by @EncodeAll@ typeclass so we can simply write:
+--
+-- >>> runEncodings' @'["r-ban"] encodings . toEncoding () $ "22" :: Either EncodeEx (Enc '["r-ban:111"] () T.Text)
 -- Left (EncodeEx "r-ban:111" ("Input list has wrong size expecting 3 but length \"22\" == 2"))
+--
+-- This library also offers backward compatible equivalents @encodeFAll@ to @runEncodings@ functions 
+-- (see "Data.TypedEncoding.Combinators.Encode") which are basically equivalent to something like
+-- @
+-- runEncoding' encoding
+-- @
+--
+-- >>> encodeFAll' @'["r-ban"] . toEncoding () $ "111" :: Either EncodeEx (Enc '["r-ban:111"] () T.Text)
+-- Right (UnsafeMkEnc Proxy () "111")
+--
+-- >>> fmap displ . encodeFAll' @'["r-ban"] @'["r-ban:111"] @(Either EncodeEx) @() @T.Text . toEncoding () $ "111"
+-- Right "Enc '[r-ban:111] () (Text 111)"
 --
 -- @since 0.3.0.0
 runEncodings' :: forall algs nms f c str . (Monad f) => Encodings f nms algs c str -> Enc ('[]::[Symbol]) c str -> f (Enc nms c str)
