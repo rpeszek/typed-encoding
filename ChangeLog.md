@@ -5,6 +5,10 @@
 - `Data.TypedEncoding.Common.Class.IsStringR` expected to be be changed / replaced
 - (post 0.5) "enc-B64" could be moved to a different package (more distant goal)
 
+
+## 0.5.2.1
+
+- documentation improvements
 ## 0.5.2.0
 
 - Fixed up IsSuperset type family improving transitivity
