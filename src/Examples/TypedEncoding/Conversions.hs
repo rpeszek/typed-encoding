@@ -10,6 +10,8 @@
 
 -- | Examples or moving between type annotated encodings
 --
+-- Please also see documentation in "Data.TypedEncoding.Conv".
+--
 -- Haskell programs typically make these imports to do String, ByteString, and Text conversions:
 --
 -- @
