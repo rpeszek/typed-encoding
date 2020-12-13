@@ -38,7 +38,7 @@
 -- * /encoding/
 -- * /decoding/
 -- * /validation (recreation)/ (verification of existing payload)
--- * type conversions between encoded types
+-- * safe type conversions between encoded types
 -- * combinators for creating new encodings from existing encodings (e.g. by applying Boolean rules)
 --
 -- of string-like data (@ByteString@, @Text@) that is subject of some
