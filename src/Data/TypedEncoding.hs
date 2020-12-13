@@ -96,8 +96,15 @@
 -- 
 -- ... and needed conversions. 
 --
--- Conversion combinator module structure is similar to one found in /text/ and /bytestring/ packages
--- Please see comments in "Data.TypedEncoding.Conv" for more information.
+-- Conversion combinator module structure is similar to the one found in /text/ and /bytestring/ packages.
+--
+-- Conversion is /typed-encoding/ are safe and reversible!
+--
+-- Please see comments in 
+--    
+-- * "Data.TypedEncoding.Conv" 
+--
+-- for more information.
 --
 -- The instance list is not intended to be exhaustive, rather separate libraries
 -- can provide instances for other encodings and transformations.
