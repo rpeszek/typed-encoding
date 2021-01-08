@@ -50,7 +50,7 @@ class UnexpectedDecodeErr f where
     unexpectedDecodeErr :: UnexpectedDecodeEx -> f a
 
 instance UnexpectedDecodeErr Identity where
-    unexpectedDecodeErr x = fail $ show x
+    unexpectedDecodeErr x = error $ show x
 
 instance UnexpectedDecodeErr (Either UnexpectedDecodeEx) where
     unexpectedDecodeErr = Left 
