@@ -113,6 +113,7 @@ Bridge work:
 ## Tested with
 
 - stack (1.9.3) lts-14.27 (ghc-8.6.5)
+- stack (2.5.1) lts-16.27 (ghc-8.8.4)
 - needs ghc >= 8.2.2, base >=4.10 for GHC.TypeLits support
 
 ## Known issues
