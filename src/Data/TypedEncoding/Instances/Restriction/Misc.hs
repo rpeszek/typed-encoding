@@ -37,7 +37,7 @@ instance (IsStringR str) =>  Validate (Either RecreateEx) "r-Word8-decimal" "r-W
 instance (IsString str, Applicative f) => ToEncString f "r-Word8-decimal" "r-Word8-decimal" Word8 str where
     toEncF  i = pure $ UnsafeMkEnc Proxy () (fromString . show $ i)
 instance (IsStringR str, UnexpectedDecodeErr f, Applicative f) => FromEncString f "r-Word8-decimal" "r-Word8-decimal" Word8 str where
-    fromEncF  = asUnexpected @ "r-Word8-decimal" . readEither . toString . getPayload
+    fromEncF  = asUnexpected @"r-Word8-decimal" . readEither . toString . getPayload
 
 encWord8Dec :: (IsStringR str) => Encoding (Either EncodeEx) "r-Word8-decimal" "r-Word8-decimal" c str
 encWord8Dec = _implEncodingEx (verifyWithRead @Word8 "Word8-decimal")

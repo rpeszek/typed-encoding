@@ -5,6 +5,9 @@
 - `Data.TypedEncoding.Common.Class.IsStringR` expected to be be changed / replaced
 - (post 0.5) "enc-B64" could be moved to a different package (more distant goal)
 
+
+## 0.5.2.3
+- compile with ghc 9.4.7 / lts-21.14
 ## 0.5.2.2
 
 - `instance UnexpectedDecodeErr Identity` does not use `fail` to allow for base >= 4.9 compilation

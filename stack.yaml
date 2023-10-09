@@ -1,8 +1,7 @@
-resolver: lts-14.27
+resolver: lts-21.14
 
 packages:
 - .
 
 extra-deps:
 - symbols-0.3.0.0    
-

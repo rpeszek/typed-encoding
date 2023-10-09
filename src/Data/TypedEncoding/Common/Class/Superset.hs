@@ -94,7 +94,7 @@ type Superset big small = (IsSuperset big small ~ 'True)
 
 -- |
 -- >>> let Right tstAscii = encodeFAll . toEncoding () $ "Hello World" :: Either EncodeEx (Enc '["r-ASCII"] () T.Text)
--- >>> displ (injectInto @ "r-UTF8" tstAscii)
+-- >>> displ (injectInto @"r-UTF8" tstAscii)
 -- "Enc '[r-UTF8] () (Text Hello World)"
 --
 -- @since 0.2.2.0

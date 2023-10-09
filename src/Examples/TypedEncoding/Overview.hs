@@ -91,7 +91,7 @@ helloB64Decoded = fromEncoding . decodeAll $ helloB64
 -- Right (UnsafeMkEnc Proxy () "SGVsbG8gV29ybGQ=")
 --
 -- >>> recreateFAll . toEncoding () $ "SGVsbG8gV29ybGQ" :: Either RecreateEx (Enc '["enc-B64"] () B.ByteString)
--- Left (RecreateEx "enc-B64" ("invalid padding"))
+-- Left (RecreateEx "enc-B64" ("Base64-encoded bytestring is unpadded or has invalid padding"))
 --
 -- The above example start by placing payload in zero-encoded @Enc '[] ()@ type and then apply 'recreateFAll'
 -- this is a good way to recreate encoded type if encoding is known. 
@@ -143,7 +143,7 @@ helloB64B64Decoded = fromEncoding . decodeAll $ helloB64B64
 -- Again, notice the same expression is used as in previous recovery. 
 --
 -- >>> recreateFAll . toEncoding () $ "SGVsbG8gV29ybGQ=" :: Either RecreateEx (Enc '["enc-B64", "enc-B64"] () B.ByteString)
--- Left (RecreateEx "enc-B64" ("invalid padding"))
+-- Left (RecreateEx "enc-B64" ("Base64-encoded bytestring is unpadded or has invalid padding"))
 helloB64B64RecoveredErr :: Either RecreateEx (Enc '["enc-B64", "enc-B64"] () B.ByteString)
 helloB64B64RecoveredErr = recreateFAll . toEncoding () $ "SGVsbG8gV29ybGQ="
 

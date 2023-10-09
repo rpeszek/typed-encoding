@@ -68,14 +68,14 @@ getCheckedEncPayload (UnsafeMkCheckedEnc t _ s) = (t,s)
 -- @since 0.2.0.0
 toCheckedEnc :: forall xs c str . (SymbolList xs) => Enc xs c str -> CheckedEnc c str 
 toCheckedEnc (UnsafeMkEnc p c s) = 
-        UnsafeMkCheckedEnc (symbolVals @ xs) c s   
+        UnsafeMkCheckedEnc (symbolVals @xs) c s   
 
 -- |
 -- @since 0.2.0.0
 fromCheckedEnc :: forall xs c str . SymbolList xs => CheckedEnc c str -> Maybe (Enc xs c str)
 fromCheckedEnc (UnsafeMkCheckedEnc xs c s) = 
     let p = Proxy :: Proxy xs
-    in if symbolVals @ xs == xs
+    in if symbolVals @xs == xs
        then Just $ UnsafeMkEnc p c s
        else Nothing
 
@@ -88,7 +88,7 @@ fromCheckedEnc (UnsafeMkCheckedEnc xs c s) =
 -- >>> procToCheckedEncFromCheckedEnc @'["TEST1"] encsometest
 -- False
 procToCheckedEncFromCheckedEnc :: forall xs c str . (SymbolList xs, Eq c, Eq str) => CheckedEnc c str -> Bool
-procToCheckedEncFromCheckedEnc x = (== Just x) . fmap (toCheckedEnc @ xs) . fromCheckedEnc $ x
+procToCheckedEncFromCheckedEnc x = (== Just x) . fmap (toCheckedEnc @xs) . fromCheckedEnc $ x
 
 -- |
 -- >>> let enctest = unsafeSetPayload () "hello" :: Enc '["TEST"] () T.Text

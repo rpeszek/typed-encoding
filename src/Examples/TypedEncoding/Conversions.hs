@@ -248,7 +248,7 @@ helloUtf8B = injectInto helloAsciiB
 --
 -- @injectInto@ method accepts proxy to specify superset to use.
 --
--- >>> displ $ injectInto @ "r-UTF8" helloAsciiB
+-- >>> displ $ injectInto @"r-UTF8" helloAsciiB
 -- "Enc '[r-UTF8] () (ByteString HeLlo world)"
 --
 -- Superset is intended for @"r-"@ annotations only, should not be used
@@ -300,7 +300,7 @@ lenientSomething = recreateAll . toEncoding () $ "abc==CB"
 -- lenient algorithms are not partial and automatically fix invalid input:
 --
 -- >>> recreateFAll . toEncoding () $ "abc==CB" :: Either RecreateEx (Enc '["enc-B64"] () B.ByteString)
--- Left (RecreateEx "enc-B64" ("invalid padding"))
+-- Left (RecreateEx "enc-B64" ("Base64-encoded bytestring is unpadded or has invalid padding"))
 --
 -- This library allows to recover to "enc-B64-len" which is different than "enc-B64"
 --
@@ -328,6 +328,6 @@ b64IsAscii = flattenAs helloUtf8B64B
 -- thus, we should be able to treat "enc-B64" as "r-ASCII" losing some information.
 -- this is done using 'FlattenAs' type class
 --
--- >>> :t flattenAs @ "r-ASCII" helloUtf8B64B
--- flattenAs @ "r-ASCII" helloUtf8B64B
+-- >>> :t flattenAs @"r-ASCII" helloUtf8B64B
+-- flattenAs @"r-ASCII" helloUtf8B64B
 -- ... :: Enc '["r-ASCII"] () B.ByteString
