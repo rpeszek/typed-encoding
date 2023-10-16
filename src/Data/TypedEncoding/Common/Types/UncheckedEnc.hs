@@ -57,7 +57,7 @@ getUncheckedPayload (MkUncheckedEnc _ _ str) = str
 verifyAnn :: forall xs c str . SymbolList xs => UncheckedEnc c str -> Either String (UncheckedEnc c str)
 verifyAnn x@(MkUncheckedEnc xs _ _) = 
     let p = Proxy :: Proxy xs
-    in if symbolVals @ xs == xs
+    in if symbolVals @xs == xs
        then Right x
        else Left $ "UncheckedEnc has not matching annotation " ++ displ xs
 

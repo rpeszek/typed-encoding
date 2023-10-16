@@ -4,6 +4,7 @@
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TypeOperators #-}
 
 -- |
 -- @since 0.2.2.0
@@ -58,11 +59,11 @@ import           Data.TypedEncoding.Unsafe (withUnsafe)
 -- To be consistent we make the same assumption of also restricting representable Unicode chars as in /Unicode.D76/.
 --
 -- >>> TE.decodeUtf8 "\237\160\128"
--- "*** Exception: Cannot decode byte '\xed': Data.Text.Internal.Encoding.decodeUtf8: Invalid UTF-8 stream
+-- "*** Exception: Cannot decode byte '\xed': Data.Text.Encoding: Invalid UTF-8 stream
 -- 
 -- The "\xdfff" case (@11101101 10111111 10111111@ @ed bf bf@):
 -- >>> TE.decodeUtf8 "\237\191\191"
--- "*** Exception: Cannot decode byte '\xed': Data.Text.Internal.Encoding.decodeUtf8: Invalid UTF-8 stream
+-- "*** Exception: Cannot decode byte '\xed': Data.Text.Encoding: Invalid UTF-8 stream
 --
 -- >>> displ . decodeUtf8 $ (unsafeSetPayload () "Hello" :: Enc '["r-ASCII"] () B.ByteString)
 -- "Enc '[r-ASCII] () (Text Hello)"
@@ -74,14 +75,14 @@ import           Data.TypedEncoding.Unsafe (withUnsafe)
 --
 -- @decodeUtf8@ and @encodeUtf8@ now form isomorphism
 -- 
--- prop> \x -> getPayload x == (getPayload . encodeUtf8 . decodeUtf8 @ '["r-UTF8"] @() $ x)
+-- prop> \x -> getPayload x == (getPayload . encodeUtf8 . decodeUtf8 @'["r-UTF8"] @() $ x)
 --
--- prop> \x -> getPayload x == (getPayload . decodeUtf8 . encodeUtf8 @ '["r-UTF8"] @() $ x)
+-- prop> \x -> getPayload x == (getPayload . decodeUtf8 . encodeUtf8 @'["r-UTF8"] @() $ x)
 --
 -- These nicely work as iso's for "r-ASCII" subset
 --
--- prop> \x -> getPayload x == (getPayload . encodeUtf8 . decodeUtf8 @ '["r-ASCII"] @() $ x)
--- prop> \x -> getPayload x == (getPayload . decodeUtf8 . encodeUtf8 @ '["r-ASCII"] @() $ x)
+-- prop> \x -> getPayload x == (getPayload . encodeUtf8 . decodeUtf8 @'["r-ASCII"] @() $ x)
+-- prop> \x -> getPayload x == (getPayload . decodeUtf8 . encodeUtf8 @'["r-ASCII"] @() $ x)
 --
 -- Similarly to 'Data.TypedEncoding.Conv.ByteString.Char8.pack' this function makes unverified assumption
 -- that the encoding stack @xs@ does invalidate UTF8 byte layout.  This is safe for any "r-" encoding as well

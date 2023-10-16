@@ -45,7 +45,7 @@ instance SymbolList '[] where
     symbolVals = []
 
 -- |
--- >>> symbolVals @ '["FIRST", "SECOND"]
+-- >>> symbolVals @'["FIRST", "SECOND"]
 -- ["FIRST","SECOND"]
 instance (SymbolList xs, KnownSymbol x) => SymbolList (x ': xs) where
     symbolVals =  symbolVal (Proxy :: Proxy x) : symbolVals @xs
@@ -81,8 +81,8 @@ instance Displ String where
 -- >>> displ (Proxy :: Proxy ["FIRST", "SECOND"])
 -- "[FIRST,SECOND]"
 instance (SymbolList xs) => Displ (Proxy xs) where
-    displ _ = displ $  symbolVals @ xs
-        -- "[" ++ (L.intercalate "," $ map displ $ symbolVals @ xs) ++ "]"
+    displ _ = displ $  symbolVals @xs
+        -- "[" ++ (L.intercalate "," $ map displ $ symbolVals @xs) ++ "]"
 
 
 

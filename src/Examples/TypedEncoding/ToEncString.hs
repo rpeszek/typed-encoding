@@ -47,7 +47,7 @@ import qualified Data.Text as T
 import qualified Data.ByteString as B
 import           Control.Applicative -- ((<|>))
 import           Data.Maybe
-import           Data.Semigroup ((<>))
+
 
 
 
@@ -123,7 +123,7 @@ instance ToEncString Identity "r-IPv4" "r-IPv4" IpV4 T.Text where
 -- To get 'IpV4' out of the string we need to reverse previous @reduce@.
 -- This is currently done using helper 'EnT.splitPayload' combinator. 
 --
--- >>> EnT.splitPayload @ '["r-Word8-decimal"] (T.splitOn $ T.pack ".") $ enc 
+-- >>> EnT.splitPayload @'["r-Word8-decimal"] (T.splitOn $ T.pack ".") $ enc 
 -- [UnsafeMkEnc Proxy () "128",UnsafeMkEnc Proxy () "1",UnsafeMkEnc Proxy () "1",UnsafeMkEnc Proxy () "10"]
 -- 
 -- The conversion of a list to IpV4F needs handle errors but these errors 
@@ -134,7 +134,7 @@ instance ToEncString Identity "r-IPv4" "r-IPv4" IpV4 T.Text where
 instance (UnexpectedDecodeErr f, Applicative f) => FromEncString f "r-IPv4" "r-IPv4" IpV4 T.Text where   
     fromEncF = fmap map . unreduce
       where unreduce :: Enc '["r-IPv4"] () T.Text -> f (IpV4F (Enc '["r-Word8-decimal"] () T.Text))
-            unreduce = asUnexpected @"r-IPv4" . recover . EnT.splitPayload @ '["r-Word8-decimal"] (T.splitOn ".")
+            unreduce = asUnexpected @"r-IPv4" . recover . EnT.splitPayload @'["r-Word8-decimal"] (T.splitOn ".")
             
             map :: IpV4F (Enc '["r-Word8-decimal"] () T.Text) -> IpV4F Word8 
             map = fmap fromEncString
@@ -265,25 +265,25 @@ recreateEncoding = mapM encodefn
 --
 -- This code will not pick it up:
 --
--- >>> fromCheckedEnc @ '["enc-B64", "r-UTF8"] $ piece
+-- >>> fromCheckedEnc @'["enc-B64", "r-UTF8"] $ piece
 -- Nothing
 --
 -- But this one will:
 --
--- >>> fromCheckedEnc @ '["enc-B64", "r-ASCII"]  $ piece
+-- >>> fromCheckedEnc @'["enc-B64", "r-ASCII"]  $ piece
 -- Just (UnsafeMkEnc Proxy () "U29tZSBBU0NJSSBUZXh0")
 --
 -- so we can apply the decoding on the selected piece 
 --
--- >>> fmap (toCheckedEnc . decodePart @'["enc-B64"]) . fromCheckedEnc @ '["enc-B64", "r-ASCII"] $ piece
+-- >>> fmap (toCheckedEnc . decodePart @'["enc-B64"]) . fromCheckedEnc @'["enc-B64", "r-ASCII"] $ piece
 -- Just (UnsafeMkCheckedEnc ["r-ASCII"] () "Some ASCII Text")
 
 decodeB64ForTextOnly :: SimplifiedEmailEncB -> SimplifiedEmailEncB
 decodeB64ForTextOnly = fmap (runAlternatives fromMaybe [tryUtf8, tryAscii]) 
   where
     tryUtf8, tryAscii :: CheckedEnc c B.ByteString -> Maybe (CheckedEnc c B.ByteString)
-    tryUtf8 = fmap (toCheckedEnc . decodeToUtf8) . fromCheckedEnc @ '["enc-B64", "r-UTF8"] 
-    tryAscii = fmap (toCheckedEnc . decodeToAscii) . fromCheckedEnc @ '["enc-B64", "r-ASCII"] 
+    tryUtf8 = fmap (toCheckedEnc . decodeToUtf8) . fromCheckedEnc @'["enc-B64", "r-UTF8"] 
+    tryAscii = fmap (toCheckedEnc . decodeToAscii) . fromCheckedEnc @'["enc-B64", "r-ASCII"] 
  
     decodeToUtf8 :: Enc '["enc-B64", "r-UTF8"] c B.ByteString -> _
     decodeToUtf8 = decodePart @'["enc-B64"]

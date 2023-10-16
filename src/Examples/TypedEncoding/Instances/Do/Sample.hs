@@ -75,7 +75,7 @@ newtype SizeLimit = SizeLimit {unSizeLimit :: Int} deriving (Eq, Show)
 -- |
 -- @since 0.3.0.0 
 instance (HasA SizeLimit c, Applicative f) => Encode f "do-size-limit" "do-size-limit" c T.Text where
-    encoding = _implEncodingConfP (T.take . unSizeLimit . has @ SizeLimit) 
+    encoding = _implEncodingConfP (T.take . unSizeLimit . has @SizeLimit) 
 instance (HasA SizeLimit c, Applicative f) => Encode f "do-size-limit" "do-size-limit" c B.ByteString where
-    encoding = _implEncodingConfP (B.take . unSizeLimit .  has @ SizeLimit) 
+    encoding = _implEncodingConfP (B.take . unSizeLimit .  has @SizeLimit) 
 

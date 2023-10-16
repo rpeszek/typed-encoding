@@ -11,7 +11,7 @@
 --
 -- This is sometimes referred to as ASCII-7 and future versions of @type-encoding@ may change @"r-ASCII"@ symbol annotation to reflect this.
 --  
--- prop> B8.all ((< 128) . ord) . getPayload @ '["r-ASCII"] @() @B.ByteString
+-- prop> B8.all ((< 128) . ord) . getPayload @'["r-ASCII"] @() @B.ByteString
 -- 
 -- >>> :set -XOverloadedStrings -XMultiParamTypeClasses -XDataKinds
 -- >>> _runEncodings encodings . toEncoding () $ "Hello World" :: Either EncodeEx (Enc '["r-ASCII"] () T.Text)
